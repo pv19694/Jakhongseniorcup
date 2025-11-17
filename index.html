@@ -142,45 +142,27 @@
         </div>
     </header>
 
-   <!-- Navigation -->
-<nav class="bg-gradient-to-r from-red-600 via-red-500 to-yellow-400 text-white shadow-lg sticky top-0 z-40">
-    <div class="container mx-auto px-4">
-        <div class="flex overflow-x-auto">
-            <button class="nav-item active flex items-center space-x-2 px-6 py-4 whitespace-nowrap transition-all bg-yellow-500 text-red-900 hover:bg-yellow-400" onclick="showSection('dashboard')">
-                <i class="fas fa-home text-yellow-900"></i>
-                <span>หน้าหลัก</span>
-            </button>
-            <button class="nav-item flex items-center space-x-2 px-6 py-4 whitespace-nowrap transition-all hover:bg-yellow-400 hover:text-red-900" onclick="showSection('match-record')">
-                <i class="fas fa-edit text-yellow-900"></i>
-                <span>บันทึกผล</span>
-            </button>
-            <button class="nav-item flex items-center space-x-2 px-6 py-4 whitespace-nowrap transition-all hover:bg-yellow-400 hover:text-red-900" onclick="showSection('player-records')">
-                <i class="fas fa-medal text-yellow-900"></i>
-                <span>บันทึกสถิติผู้เล่น</span>
-            </button>
-            <button class="nav-item flex items-center space-x-2 px-6 py-4 whitespace-nowrap transition-all hover:bg-yellow-400 hover:text-red-900" onclick="showSection('leaderboard')">
-                <i class="fas fa-trophy text-yellow-900"></i>
-                <span>ตารางคะแนน</span>
-            </button>
-            <button class="nav-item flex items-center space-x-2 px-6 py-4 whitespace-nowrap transition-all hover:bg-yellow-400 hover:text-red-900" onclick="showSection('team-management')">
-                <i class="fas fa-users text-yellow-900"></i>
-                <span>จัดการทีม</span>
-            </button>
-            <button class="nav-item flex items-center space-x-2 px-6 py-4 whitespace-nowrap transition-all hover:bg-yellow-400 hover:text-red-900" onclick="showSection('player-list')">
-                <i class="fas fa-list text-yellow-900"></i>
-                <span>รายชื่อนักกีฬา</span>
-            </button>
-            <button class="nav-item flex items-center space-x-2 px-6 py-4 whitespace-nowrap transition-all hover:bg-yellow-400 hover:text-red-900" onclick="showSection('next-matches')">
-                <i class="fas fa-calendar-plus text-yellow-900"></i>
-                <span>แมทช์ต่อไป</span>
-            </button>
-            <button class="nav-item flex items-center space-x-2 px-6 py-4 whitespace-nowrap transition-all hover:bg-yellow-400 hover:text-red-900" onclick="showSection('daily-summary')">
-                <i class="fas fa-calendar-day text-yellow-900"></i>
-                <span>สรุปตามวันที่</span>
-            </button>
-        </div>
-    </div>
-</nav>
+   <!-- Navigation --> 
+    <nav class="glass-effect shadow-lg sticky top-0 z-40"> 
+        <div class="container mx-auto px-4"> 
+            <div class="flex overflow-x-auto"> 
+                <button class="nav-item active flex items-center space-x-2 px-6 py-4 whitespace-nowrap transition-all" onclick="showSection('dashboard')"> <i class="fas fa-home"></i> 
+                    <span>หน้าหลัก</span> </button> 
+                <button class="nav-item flex items-center space-x-2 px-6 py-4 whitespace-nowrap transition-all hover:bg-gray-100" onclick="showSection('match-record')"> 
+                    <i class="fas fa-edit"></i> <span>บันทึกผล</span> 
+                </button> <button class="nav-item flex items-center space-x-2 px-6 py-4 whitespace-nowrap transition-all hover:bg-gray-100" onclick="showSection('player-records')"> 
+                    <i class="fas fa-medal"></i> <span>บันทึกสถิติผู้เล่น</span> 
+                </button> <button class="nav-item flex items-center space-x-2 px-6 py-4 whitespace-nowrap transition-all hover:bg-gray-100" onclick="showSection('leaderboard')"> 
+                    <i class="fas fa-trophy"></i> <span>ตารางคะแนน</span> </button> 
+                <button class="nav-item flex items-center space-x-2 px-6 py-4 whitespace-nowrap transition-all hover:bg-gray-100" onclick="showSection('team-management')"> 
+                    <i class="fas fa-users"></i> <span>จัดการทีม</span> </button> 
+                <button class="nav-item flex items-center space-x-2 px-6 py-4 whitespace-nowrap transition-all hover:bg-gray-100" onclick="showSection('player-list')"> 
+                    <i class="fas fa-list"></i> <span>รายชื่อนักกีฬา</span> </button> 
+                <button class="nav-item flex items-center space-x-2 px-6 py-4 whitespace-nowrap transition-all hover:bg-gray-100" onclick="showSection('next-matches')"> 
+                    <i class="fas fa-calendar-plus"></i> <span>แมทช์ต่อไป</span> </button>
+                <button class="nav-item flex items-center space-x-2 px-6 py-4 whitespace-nowrap transition-all hover:bg-gray-100" onclick="showSection('daily-summary')">
+                    <i class="fas fa-calendar-day"></i> <span>สรุปตามวันที่</span> </button> </div> </div> 
+    </nav>
 
 
     <!-- Main Content -->
