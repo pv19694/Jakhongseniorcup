@@ -1071,16 +1071,15 @@
 <div id="daily-summary" class="section hidden">
     <div class="glass-effect rounded-xl shadow-2xl p-6 mb-8 bg-white/30 backdrop-blur-md border border-yellow-400">
 
-        <!-- Header -->
+        <!-- Header + Date -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <h2 class="text-2xl font-bold flex items-center text-red-900">
                 <i class="fas fa-calendar-day mr-3 text-yellow-400 drop-shadow-lg"></i>
                 สรุปตามวันที่
             </h2>
 
-            <!-- Date Picker -->
             <div class="flex flex-col md:flex-row md:items-center gap-2">
-                <label class="block text-sm font-medium text-red-900">เลือกวันที่</label>
+                <label for="summary-date" class="block text-sm font-medium text-red-900">เลือกวันที่</label>
                 <input
                     type="date"
                     id="summary-date"
@@ -1090,7 +1089,7 @@
             </div>
         </div>
 
-        <!-- Summary Cards -->
+        <!-- Summary Cards (ยอดรวมทั้งวัน) -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="bg-gradient-to-br from-red-600 via-red-500 to-yellow-400 text-white rounded-xl shadow-lg p-6">
                 <div class="flex items-center justify-between">
@@ -1126,22 +1125,25 @@
         <!-- MATCHDAY + PLAYER HIGHLIGHT -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-            <!-- MATCHDAY BLOCK (LEFT SIDE) -->
+            <!-- MATCHDAY / รายการแมตช์ (ฝั่งซ้าย) -->
             <div class="lg:col-span-2 rounded-2xl p-5 
                         bg-gradient-to-b from-[#7b0000] via-[#8b0000] to-[#d4af37]
                         shadow-md text-white">
 
+                <!-- หัว MATCHDAY -->
                 <div class="flex justify-center mb-4 text-center">
                     <h3 class="text-base md:text-lg font-extrabold tracking-[0.25em] uppercase">
                         MATCHDAY : <span id="matchday-date-text">-- / -- / ----</span>
                     </h3>
                 </div>
 
-                <!-- Match list -->
-                <div id="daily-matches-list" class="space-y-3"></div>
+                <!-- รายการแมตช์ในวันที่เลือก -->
+                <div id="daily-matches-list" class="space-y-3">
+                    <!-- JS จะเติมการ์ดแมตช์เข้ามา -->
+                </div>
             </div>
 
-            <!-- PLAYER HIGHLIGHT BLOCK (RIGHT SIDE) -->
+            <!-- ไฮไลต์ผู้เล่นวันนี้ (ฝั่งขวา) -->
             <div class="bg-white rounded-2xl p-5 shadow-md border border-red-100 flex flex-col gap-4" id="daily-player-records">
 
                 <div class="flex items-center justify-between">
@@ -1151,29 +1153,33 @@
                     </h3>
                 </div>
 
-                <!-- Goal Scorers -->
+                <!-- ผู้ทำประตู -->
                 <section>
                     <h4 class="text-sm font-bold text-red-700 mb-2 flex items-center gap-1">
                         <span class="w-2 h-2 rounded-full bg-red-600"></span>
                         ผู้ทำประตูวันนี้
                     </h4>
-                    <div id="goal-scorers-grid" class="grid grid-cols-2 gap-2"></div>
+                    <div id="goal-scorers-grid" class="grid grid-cols-2 gap-2">
+                        <!-- JS เติมการ์ดผู้ทำประตู -->
+                    </div>
                 </section>
 
                 <hr class="border-red-100 my-1" />
 
-                <!-- Goalkeepers -->
+                <!-- ผู้รักษาประตู -->
                 <section>
                     <h4 class="text-sm font-bold text-red-700 mb-2 flex items-center gap-1">
                         <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
                         ผู้รักษาประตูเด่น
                     </h4>
-                    <div id="goalkeepers-grid" class="grid grid-cols-2 gap-2"></div>
+                    <div id="goalkeepers-grid" class="grid grid-cols-2 gap-2">
+                        <!-- JS เติมการ์ดผู้รักษาประตู -->
+                    </div>
                 </section>
 
                 <hr class="border-red-100 my-1" />
 
-                <!-- TOP SCORERS BANNER -->
+                <!-- ดาวซันโวประจำวัน -->
                 <section>
                     <div class="w-full py-2 mb-3 rounded-xl bg-gradient-to-r from-yellow-500 to-red-600
                                 shadow-md flex items-center justify-center gap-2">
@@ -1183,13 +1189,16 @@
                         </h4>
                     </div>
 
-                    <div id="top-scorers-list" class="space-y-2"></div>
+                    <div id="top-scorers-list" class="space-y-2">
+                        <!-- JS เติม Top 3 ดาวซันโว -->
+                    </div>
                 </section>
 
             </div>
         </div>
     </div>
 </div>
+
 
 
     </main>
