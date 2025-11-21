@@ -1065,120 +1065,196 @@
             </div>
         </div>
 
-    <!-- Daily Summary Section (เวอร์ชันใหม่ + มีช่องเลือกวันที่) -->
+   <!-- Daily Summary Section (เวอร์ชันใหม่) -->
 <div id="daily-summary" class="section hidden">
   <div class="w-full max-w-6xl mx-auto space-y-8">
 
-    <!-- HEADER -->
+    <!-- HEADER + DATE -->
     <div class="bg-[#0b1024] rounded-3xl shadow-xl border border-yellow-400 px-6 py-8 flex items-center justify-center relative overflow-hidden">
-        <div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_top,_#ffffff33,_transparent_65%)]"></div>
+      <div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_top,_#ffffff33,_transparent_65%)]"></div>
 
-        <!-- ชื่อทัวร์นาเมนต์ -->
-        <h1 class="text-3xl md:text-4xl font-extrabold text-white drop-shadow-xl text-center relative z-10">
-            ผลการแข่งขัน
-            <span class="text-yellow-300 drop-shadow-2xl font-extrabold">
-                JAKHONG SENIOR CUP
-            </span>
-        </h1>
+      <!-- ชื่อทัวร์นาเมนต์ -->
+      <h1 class="text-3xl md:text-4xl font-extrabold text-white drop-shadow-xl text-center relative z-10">
+        ผลการแข่งขัน
+        <span class="text-yellow-300 drop-shadow-2xl font-extrabold">
+          JAKHONG SENIOR CUP
+        </span>
+      </h1>
 
-        <!-- เลือกวันที่ + แสดงวันที่ -->
-        <div class="absolute bottom-4 right-4 flex flex-col items-end gap-1 bg-black/40 px-4 py-2 rounded-full text-white shadow-lg">
-            <label for="summary-date" class="text-xs md:text-sm flex items-center gap-2">
-                <i class="fas fa-calendar-day text-yellow-300"></i>
-                <span>เลือกวันที่</span>
-            </label>
-            <input
-                type="date"
-                id="summary-date"
-                class="bg-transparent border border-yellow-300/70 rounded-full px-3 py-1 text-xs md:text-sm text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-300"
-                onchange="updateDailySummary()"
-            >
+      <!-- เลือกวันที่ + แสดงวันที่ -->
+      <div
+        class="absolute bottom-4 right-4 flex items-center gap-3 bg-black/40 px-4 py-2 rounded-full text-white shadow-lg">
+        <i class="fas fa-calendar-day text-yellow-300"></i>
+
+        <div class="flex flex-col items-start gap-1">
+          <span class="text-xs md:text-sm">
+            วันที่:
+            <span id="summary-date-display" class="font-bold text-yellow-300">-- / -- / ----</span>
+          </span>
+
+          <input
+            type="date"
+            id="summary-date"
+            class="bg-transparent border border-yellow-300/70 rounded-full px-3 py-1 text-xs md:text-sm text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-300"
+          />
         </div>
+      </div>
     </div>
 
-    <!-- SCOREBOARD (JS เติมแมตช์ใน #daily-matches-list) -->
+    <!-- SUMMARY CARDS (3 ใบ ใช้ id เดิมให้ JS ต่อได้) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+      <div class="bg-gradient-to-br from-red-600 via-red-500 to-yellow-400 text-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-yellow-100 text-sm mb-1">แมทช์ในวันนี้</p>
+            <p class="text-3xl font-bold" id="daily-matches">0</p>
+          </div>
+          <i class="fas fa-futbol text-3xl opacity-90 drop-shadow-lg"></i>
+        </div>
+      </div>
+
+      <div class="bg-gradient-to-br from-yellow-500 via-yellow-400 to-red-500 text-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-yellow-100 text-sm mb-1">ประตูรวม</p>
+            <p class="text-3xl font-bold" id="daily-goals">0</p>
+          </div>
+          <i class="fas fa-bullseye text-3xl opacity-90 drop-shadow-lg"></i>
+        </div>
+      </div>
+
+      <div class="bg-gradient-to-br from-red-700 via-red-600 to-yellow-500 text-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-yellow-100 text-sm mb-1">ทีมที่เล่น</p>
+            <p class="text-3xl font-bold" id="daily-teams">0</p>
+          </div>
+          <i class="fas fa-users text-3xl opacity-90 drop-shadow-lg"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCOREBOARD (แมตช์ในวันนั้น) -->
     <div class="bg-[#0b1024] rounded-3xl shadow-xl border border-yellow-500 overflow-hidden relative">
-        <div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_top,_#ffffff33,_transparent_60%)] pointer-events-none"></div>
-        <div id="daily-matches-list" class="flex flex-col relative z-10">
-            <!-- JS จะเติมการ์ดแมตช์เข้ามาตรงนี้ -->
-        </div>
+      <div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_top,_#ffffff33,_transparent_60%)] pointer-events-none"></div>
+      <div id="daily-matches-list" class="flex flex-col relative z-10">
+        <!-- JS ของเธอจะเติมการ์ดแมตช์เข้ามาตรงนี้ -->
+      </div>
     </div>
 
-    <!-- PLAYER STATS SECTION -->
-    <div class="relative rounded-3xl shadow-2xl border border-purple-500/60 p-6 md:p-8 overflow-hidden bg-gradient-to-br from-[#0b1024] via-[#190a33] to-[#3a0b3a]">
-        <div class="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_top,_#ffffff33,_transparent_55%)] pointer-events-none"></div>
-        <div class="absolute -top-10 -left-10 w-40 h-40 rounded-full bg-fuchsia-500/10 blur-3xl"></div>
-        <div class="absolute -bottom-10 -right-10 w-40 h-40 rounded-full bg-yellow-400/10 blur-3xl"></div>
+    <!-- PLAYER STATS -->
+    <div
+      class="relative rounded-3xl shadow-2xl border border-purple-500/60 p-6 md:p-8 overflow-hidden bg-gradient-to-br from-[#0b1024] via-[#190a33] to-[#3a0b3a]">
+      <div class="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_top,_#ffffff33,_transparent_55%)] pointer-events-none"></div>
+      <div class="absolute -top-10 -left-10 w-40 h-40 rounded-full bg-fuchsia-500/10 blur-3xl"></div>
+      <div class="absolute -bottom-10 -right-10 w-40 h-40 rounded-full bg-yellow-400/10 blur-3xl"></div>
 
-        <div class="relative z-10 space-y-10">
+      <div class="relative z-10 space-y-10">
 
-            <!-- TOP 3 SUMMARY -->
-            <section>
-                <h2 class="text-2xl md:text-3xl font-extrabold text-yellow-300 mb-6 flex items-center gap-3">
-                    <i class="fas fa-chart-line text-yellow-300"></i>
-                    สรุปสถิตินักฟุตบอล (รวมทุกแมตช์)
-                </h2>
+        <!-- TOP 3 SUMMARY -->
+        <section>
+          <h2 class="text-2xl md:text-3xl font-extrabold text-yellow-300 mb-6 flex items-center gap-3">
+            <i class="fas fa-chart-line text-yellow-300"></i>
+            สรุปสถิตินักฟุตบอล (รวมทุกแมตช์)
+          </h2>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                    <!-- Top 3 ดาวซันโว -->
-                    <div class="bg-white/5 border border-yellow-500/40 rounded-2xl p-4 shadow-md">
-                        <h3 class="text-lg font-bold text-yellow-300 mb-3 flex items-center gap-2">
-                            <i class="fas fa-futbol text-yellow-300"></i>
-                            Top 3 ดาวซันโว (รวมทุกแมตช์)
-                        </h3>
-                        <div id="top-scorers-list" class="grid grid-cols-3 gap-3">
-                            <!-- JS เติมการ์ดดาวซันโวรวม -->
-                        </div>
-                    </div>
+            <!-- Top 3 ดาวซันโว -->
+            <div class="bg-white/5 border border-yellow-500/40 rounded-2xl p-4 shadow-md">
+              <h3 class="text-lg font-bold text-yellow-300 mb-3 flex items-center gap-2">
+                <i class="fas fa-futbol text-yellow-300"></i>
+                Top 3 ดาวซันโว (รวมทุกแมตช์)
+              </h3>
+              <div id="top-scorers-list" class="grid grid-cols-3 gap-3">
+                <!-- JS เติมข้อมูล Top 3 -->
+              </div>
+            </div>
 
-                    <!-- Top 3 ผู้รักษาประตูยอดเยี่ยม -->
-                    <div class="bg-white/5 border border-cyan-300/50 rounded-2xl p-4 shadow-md">
-                        <h3 class="text-lg font-bold text-cyan-300 mb-3 flex items-center gap-2">
-                            <i class="fas fa-shield-heart text-cyan-300"></i>
-                            Top 3 ผู้รักษาประตูยอดเยี่ยม (รวมทุกแมตช์)
-                        </h3>
-                        <div id="top-gks-list" class="grid grid-cols-3 gap-3">
-                            <!-- JS เติมการ์ดผู้รักษาประตูรวม -->
-                        </div>
-                    </div>
+            <!-- Top 3 ผู้รักษาประตูยอดเยี่ยม -->
+            <div class="bg-white/5 border border-cyan-300/50 rounded-2xl p-4 shadow-md">
+              <h3 class="text-lg font-bold text-cyan-300 mb-3 flex items-center gap-2">
+                <i class="fas fa-shield-heart text-cyan-300"></i>
+                Top 3 ผู้รักษาประตูยอดเยี่ยม (รวมทุกแมตช์)
+              </h3>
+              <div id="top-gks-list" class="grid grid-cols-3 gap-3">
+                <!-- JS เติมข้อมูล Top 3 GK -->
+              </div>
+            </div>
 
-                </div>
-            </section>
+          </div>
+        </section>
 
-            <!-- TODAY SCORERS & KEEPERS -->
-            <section class="space-y-10">
+        <!-- TODAY SCORERS & KEEPERS -->
+        <section class="space-y-10">
 
-                <!-- ผู้ที่ทำประตูได้วันนี้ -->
-                <div>
-                    <h3 class="text-xl md:text-2xl font-extrabold text-yellow-300 mb-3 flex items-center gap-2">
-                        <i class="fas fa-star text-yellow-300"></i>
-                        ผู้ที่ทำประตูได้วันนี้
-                    </h3>
-                    <div id="goal-scorers-grid" class="flex flex-wrap gap-0 justify-center md:justify-start">
-                        <!-- การ์ดผู้ทำประตูวันนี้ (160px ต่อตัว) -->
-                    </div>
-                </div>
+          <!-- ผู้ที่ทำประตูได้วันนี้ -->
+          <div>
+            <h3 class="text-xl md:text-2xl font-extrabold text-yellow-300 mb-3 flex items-center gap-2">
+              <i class="fas fa-star text-yellow-300"></i>
+              ผู้ที่ทำประตูได้วันนี้
+            </h3>
+            <div id="goal-scorers-grid" class="flex flex-wrap gap-0 justify-center md:justify-start">
+              <!-- JS เติมการ์ด 160px ต่อคน -->
+            </div>
+          </div>
 
-                <!-- ผู้ที่รักษาประตูได้วันนี้ -->
-                <div>
-                    <h3 class="text-xl md:text-2xl font-extrabold text-cyan-300 mb-3 flex items-center gap-2">
-                        <i class="fas fa-shield-halved text-cyan-300"></i>
-                        ผู้ที่รักษาประตูได้วันนี้
-                    </h3>
-                    <div id="goalkeepers-grid" class="flex flex-wrap gap-0 justify-center md:justify-start">
-                        <!-- การ์ดผู้รักษาประตูวันนี้ (160px ต่อตัว) -->
-                    </div>
-                </div>
+          <!-- ผู้ที่รักษาประตูได้วันนี้ -->
+          <div>
+            <h3 class="text-xl md:text-2xl font-extrabold text-cyan-300 mb-3 flex items-center gap-2">
+              <i class="fas fa-shield-halved text-cyan-300"></i>
+              ผู้ที่รักษาประตูได้วันนี้
+            </h3>
+            <div id="goalkeepers-grid" class="flex flex-wrap gap-0 justify-center md:justify-start">
+              <!-- JS เติมการ์ด 160px ต่อคน -->
+            </div>
+          </div>
 
-            </section>
+        </section>
 
-        </div>
+      </div>
     </div>
-
   </div>
 </div>
 
+<!-- สคริปต์จัดรูปแบบวันที่ + เรียก updateDailySummary() -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const input  = document.getElementById('summary-date');
+  const label  = document.getElementById('summary-date-display');
+
+  if (!input || !label) return;
+
+  function formatAndShow(dateStr) {
+    if (!dateStr) {
+      label.textContent = '-- / -- / ----';
+      return;
+    }
+    const [yyyy, mm, dd] = dateStr.split('-');
+    label.textContent = `${dd} / ${mm} / ${yyyy}`;
+  }
+
+  input.addEventListener('change', () => {
+    formatAndShow(input.value);
+    if (typeof updateDailySummary === 'function') {
+      updateDailySummary();   // ให้ JS เดิมของเธอทำงานต่อ
+    }
+  });
+
+  // ตั้งค่าเริ่มต้น = วันนี้
+  const today = new Date();
+  const yyyy  = today.getFullYear();
+  const mm    = String(today.getMonth() + 1).padStart(2, '0');
+  const dd    = String(today.getDate()).padStart(2, '0');
+  input.value = `${yyyy}-${mm}-${dd}`;
+  formatAndShow(input.value);
+
+  // ถ้าอยากโหลดข้อมูลทันทีวันแรก
+  if (typeof updateDailySummary === 'function') {
+    updateDailySummary();
+  }
+});
+</script>
 
 
 
