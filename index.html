@@ -104,6 +104,17 @@
             border-collapse: separate;
             border-spacing: 0 5px;
         }
+        #lb-table thead th:last-child {
+            /* For Points column gradient */
+            padding: 0; 
+        }
+        #lb-table thead th:last-child > div {
+            padding: 1rem;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         #lb-table tbody tr {
             border-radius: 8px;
             overflow: hidden;
@@ -113,6 +124,11 @@
         #lb-table tbody tr:hover {
             background-color: #2a3952;
         }
+        #lb-table tbody tr td:last-child {
+             /* For Points column body */
+            padding: 1rem;
+        }
+
 
         /* Schedule Grouping */
         .schedule-group-header {
@@ -195,8 +211,14 @@
             <div class="glass p-3 rounded-xl mb-4 flex flex-wrap gap-4 items-center text-xs">
                 <strong class="text-yellow-400">ปรับแต่งตาราง:</strong>
                 <div><label>สีพื้นตาราง</label><input type="color" id="lb-bg-body" value="#1e293b" class="w-5 h-5 rounded align-middle ml-1 cursor-pointer" oninput="renderLeaderboard()"></div>
-                <div><label>สีตัวอักษรในตาราง</label><input type="color" id="lb-body-text-color" value="#ffffff" class="w-5 h-5 rounded align-middle ml-1 cursor-pointer" oninput="renderLeaderboard()"></div>
-                <div><label>สีตัวอักษรหัวตาราง</label><input type="color" id="lb-text-color" value="#facc15" class="w-5 h-5 rounded align-middle ml-1 cursor-pointer" oninput="renderLeaderboard()"></div>
+                <div><label>สีตัวอักษร</label><input type="color" id="lb-body-text-color" value="#ffffff" class="w-5 h-5 rounded align-middle ml-1 cursor-pointer" oninput="renderLeaderboard()"></div>
+                <div class="h-4 w-px bg-gray-600"></div>
+                <div><label>สีพื้นหลังหัวตาราง 1</label><input type="color" id="lb-header-grad-1" value="#1c365b" class="w-5 h-5 rounded align-middle ml-1 cursor-pointer" oninput="renderLeaderboard()"></div>
+                <div><label>สีพื้นหลังหัวตาราง 2</label><input type="color" id="lb-header-grad-2" value="#0c1626" class="w-5 h-5 rounded align-middle ml-1 cursor-pointer" oninput="renderLeaderboard()"></div>
+                <div><label>สีตัวอักษรหัวตาราง</label><input type="color" id="lb-header-text-color" value="#ffffff" class="w-5 h-5 rounded align-middle ml-1 cursor-pointer" oninput="renderLeaderboard()"></div>
+                <div class="h-4 w-px bg-gray-600"></div>
+                <div><label>สีพื้นหลังแต้ม 1</label><input type="color" id="lb-pts-grad-1" value="#facc15" class="w-5 h-5 rounded align-middle ml-1 cursor-pointer" oninput="renderLeaderboard()"></div>
+                <div><label>สีพื้นหลังแต้ม 2</label><input type="color" id="lb-pts-grad-2" value="#e3a008" class="w-5 h-5 rounded align-middle ml-1 cursor-pointer" oninput="renderLeaderboard()"></div>
             </div>
 
             <div class="rounded-xl overflow-hidden shadow-2xl">
@@ -219,7 +241,9 @@
                                 <th class="p-4 text-center" style="color: #ffffff;">แพ้</th>
                                 <th class="p-4 text-center" style="color: #ffffff;">ได้/เสีย</th>
                                 <th class="p-4 text-center" style="color: #ffffff;">+/-</th>
-                                <th class="p-4 text-center text-xl" style="color: #facc15;">แต้ม</th>
+                                <th class="p-0 text-center text-xl">
+                                    <div style="background: linear-gradient(135deg, #facc15, #e3a008); color: black;" class="font-black">แต้ม</div>
+                                </th>
                             </tr>
                         </thead>
                         <tbody id="lb-body" class="text-base font-medium"></tbody>
@@ -236,6 +260,8 @@
                 <input type="color" id="sc-bg-color" value="#1c365b" class="w-5 h-5 rounded cursor-pointer" oninput="renderSchedule()">
                 <label>สีตัวอักษร:</label>
                 <input type="color" id="sc-text-color" value="#ffffff" class="w-5 h-5 rounded cursor-pointer" oninput="renderSchedule()">
+                <label>สีพื้นหลังหัวข้อ:</label>
+                <input type="color" id="sc-pill-color" value="#facc15" class="w-5 h-5 rounded cursor-pointer" oninput="renderSchedule()">
                 <input type="text" id="sc-header-text" value="โปรแกรมการแข่งขัน" class="bg-gray-700 text-white px-2 rounded w-32" oninput="renderSchedule()">
             </div>
 
@@ -272,11 +298,17 @@
                     <div><label class="text-xs text-gray-400 block mb-1">สีพื้นแถบ 1</label><input type="color" id="daily-row-bg-1" value="#1f2937" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
                     <div><label class="text-xs text-gray-400 block mb-1">สีพื้นแถบ 2</label><input type="color" id="daily-row-bg-2" value="#0c1626" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
                 </div>
+                <div class="flex gap-2">
+                    <div><label class="text-xs text-gray-400 block mb-1">แบนเนอร์ 1</label><input type="color" id="daily-banner-grad-1" value="#1c365b" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                    <div><label class="text-xs text-gray-400 block mb-1">แบนเนอร์ 2</label><input type="color" id="daily-banner-grad-2" value="#0c1626" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                    <div><label class="text-xs text-gray-400 block mb-1">อักษรแบนเนอร์</label><input type="color" id="daily-banner-text" value="#facc15" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                    <div><label class="text-xs text-gray-400 block mb-1">ขอบแบนเนอร์</label><input type="color" id="daily-banner-border" value="#facc15" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                </div>
             </div>
 
             <div id="daily-preview" class="bg-white max-w-[900px] mx-auto shadow-2xl overflow-hidden pb-10 rounded-xl">
                 
-                <div id="daily-header" class="py-4 px-4 flex flex-wrap items-center justify-between bg-gradient-to-r from-blue-900 to-black relative border-b-4 border-yellow-500">
+                <div id="daily-header" class="py-4 px-4 flex flex-wrap items-center justify-between relative border-b-4 border-yellow-500">
                     <div class="flex items-center gap-3 z-10">
                         <img id="daily-logo-img" src="" class="w-12 h-12 object-contain drop-shadow-md bg-white rounded-full p-1 border border-yellow-400">
                         <div contenteditable="true" id="daily-title-edit" class="text-xl md:text-3xl font-extrabold uppercase italic leading-none outline-text text-yellow-400" style="text-shadow: 2px 2px 0 #000;">
@@ -416,7 +448,7 @@
                     <input type="color" id="ptb-color-picker" class="hidden" oninput="updateTeamColorLive(this)">
                 </div>
             </div>
-            <div id="player-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"></div>
+            <div id="player-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
         </div>
 
     </main>
@@ -427,7 +459,7 @@
             <form onsubmit="handleSchedSubmit(event)" class="space-y-4">
                 <input type="date" id="sc-date" class="w-full bg-gray-800 p-2 rounded" required>
                 <input type="time" id="sc-time" class="w-full bg-gray-800 p-2 rounded" required>
-                <div class="flex gap-2">
+                <input type="number" id="sc-week" placeholder="Week ที่ (เช่น 1, 2)" class="w-full bg-gray-800 p-2 rounded" min="1" required> <div class="flex gap-2">
                     <select id="sc-team-a" class="flex-1 bg-gray-800 p-2 rounded" required></select>
                     <span class="text-gray-400">VS</span>
                     <select id="sc-team-b" class="flex-1 bg-gray-800 p-2 rounded" required></select>
@@ -457,6 +489,9 @@
                 </div>
                 <label class="flex gap-2 text-sm items-center"><input type="checkbox" id="p-manager" class="w-4 h-4 text-yellow-500 bg-gray-700 border-gray-600 rounded focus:ring-yellow-500"> เป็นผู้จัดการทีม</label>
                 <input type="file" id="p-img" accept="image/*" class="w-full text-xs text-gray-400">
+                <p class="text-[10px] text-gray-500 mt-1">
+                    *ภาพจะถูกปรับและครอบตัดเป็นสัดส่วน 3:4 โดยอัตโนมัติเพื่อให้พอดีกับการ์ด
+                </p>
                 <button type="submit" id="btn-player-save" class="w-full bg-green-600 py-2 rounded font-bold hover:bg-green-500 transition">บันทึก</button>
                 <button type="button" onclick="closePlayerModal()" class="w-full bg-gray-600 py-2 rounded mt-2">ปิด</button>
             </form>
@@ -504,9 +539,9 @@
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
                         const targetWidth = 300;
-                        const targetHeight = 400; 
+                        const targetHeight = 400; // Force 3:4 aspect ratio
 
-                        // Calculate scale to cover the container (3:4 ratio)
+                        // Calculate scale to ensure the image covers the container (object-fit: cover logic)
                         const scale = Math.max(targetWidth / img.width, targetHeight / img.height);
                         const x = (targetWidth / 2) - (img.width / 2) * scale;
                         const y = (targetHeight / 2) - (img.height / 2) * scale;
@@ -574,7 +609,8 @@
         function renderDashboard() {
             // General Stats
             document.getElementById('stat-total-teams').innerText = teams.length;
-            document.getElementById('stat-total-matches').innerText = matches.length;
+            // stat-total-matches is intentionally kept as the count of completed matches
+            document.getElementById('stat-total-matches').innerText = matches.length; 
             document.getElementById('stat-total-players').innerText = players.length;
             
             const totalGoals = stats.filter(s => s.type === 'goal').reduce((sum, s) => sum + s.count, 0);
@@ -629,26 +665,40 @@
 
         // --- 1. LEADERBOARD ---
         function renderLeaderboard() {
-            const tx = document.getElementById('lb-text-color').value;
+            // NEW Controls
             const bodyTx = document.getElementById('lb-body-text-color').value;
             const bg = document.getElementById('lb-bg-body').value;
+            const headerGrad1 = document.getElementById('lb-header-grad-1').value;
+            const headerGrad2 = document.getElementById('lb-header-grad-2').value;
+            const ptsGrad1 = document.getElementById('lb-pts-grad-1').value;
+            const ptsGrad2 = document.getElementById('lb-pts-grad-2').value;
+            const headerTx = document.getElementById('lb-header-text-color').value;
 
+            // Apply Header Background Gradient to Banner and Table Header
+            const banner = document.getElementById('lb-banner');
+            banner.style.background = `linear-gradient(135deg, ${headerGrad1}, ${headerGrad2})`;
+            document.getElementById('lb-title').style.color = headerTx;
+
+            const thead = document.getElementById('lb-table').querySelector('thead');
+            thead.style.background = `linear-gradient(135deg, ${headerGrad1}, ${headerGrad2})`;
+            
             // Set dynamic colors for the fixed part of the header
             document.getElementById('lb-thead-row').querySelectorAll('th').forEach((th, index) => {
-                // 'แต้ม' (index 8) uses the accent color (tx), others use body color (bodyTx)
+                th.style.color = headerTx; 
+                // Target the Points column header for special gradient
                 if (index === 8) {
-                    th.style.color = tx;
+                    const div = th.querySelector('div');
+                    div.style.background = `linear-gradient(135deg, ${ptsGrad1}, ${ptsGrad2})`;
+                    div.style.color = 'black'; // Keep text dark for contrast on bright gradient
                 } else {
-                    th.style.color = bodyTx; 
+                    th.style.background = 'transparent'; // Use parent thead background
                 }
             });
             
-            document.getElementById('lb-banner').style.color = tx;
-            document.getElementById('lb-title').style.color = tx;
-            
+            // Apply body styles
             const tbody = document.getElementById('lb-body');
             tbody.parentElement.style.backgroundColor = bg; 
-            tbody.style.color = bodyTx;
+            tbody.style.color = bodyTx; // All body text/numbers
 
             // Calculate
             const data = teams.map(t => {
@@ -660,22 +710,28 @@
                 return { ...t, p, w, d, l, gf, ga, gd: gf-ga, pts: (w*3)+d };
             }).sort((a,b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
 
-            tbody.innerHTML = data.map((d, i) => `
-                <tr style="background-color: ${bg}; color: ${bodyTx};">
+            tbody.innerHTML = data.map((d, i) => {
+                // Apply body styles to all cells except the 'แต้ม' column
+                const baseStyle = `background-color: ${bg}; color: ${bodyTx};`;
+                // Use a solid color for the points column body for visual tie-in with the gradient
+                const ptsStyle = `background: ${ptsGrad1}; color: black; font-weight: 900;`; 
+                
+                return `
+                <tr style="${baseStyle}">
                     <td class="p-4 font-black rounded-l-lg" style="color: ${bodyTx}">${i+1}</td>
                     <td class="p-4 flex items-center gap-3">
                         <img src="${d.logo || ''}" class="w-10 h-10 logo-circle bg-white p-0.5">
                         <span class="font-bold uppercase">${d.name}</span>
                     </td>
-                    <td class="p-4 text-center opacity-70">${d.p}</td>
-                    <td class="p-4 text-center text-green-400 font-bold">${d.w}</td>
-                    <td class="p-4 text-center opacity-70">${d.d}</td>
-                    <td class="p-4 text-center text-red-400 font-bold">${d.l}</td>
-                    <td class="p-4 text-center opacity-70 text-sm">${d.gf}/${d.ga}</td>
-                    <td class="p-4 text-center font-bold">${d.gd>0?'+'+d.gd:d.gd}</td>
-                    <td class="p-4 text-center font-black text-xl rounded-r-lg" style="color: ${tx}">${d.pts}</td>
+                    <td class="p-4 text-center opacity-70" style="color: ${bodyTx}">${d.p}</td>
+                    <td class="p-4 text-center text-green-400 font-bold" style="color: ${bodyTx}">${d.w}</td>
+                    <td class="p-4 text-center opacity-70" style="color: ${bodyTx}">${d.d}</td>
+                    <td class="p-4 text-center text-red-400 font-bold" style="color: ${bodyTx}">${d.l}</td>
+                    <td class="p-4 text-center opacity-70 text-sm" style="color: ${bodyTx}">${d.gf}/${d.ga}</td>
+                    <td class="p-4 text-center font-bold" style="color: ${bodyTx}">${d.gd>0?'+'+d.gd:d.gd}</td>
+                    <td class="p-4 text-center font-black text-xl rounded-r-lg" style="${ptsStyle}">${d.pts}</td>
                 </tr>
-            `).join('');
+            `}).join('');
         }
 
         // --- 2. SCHEDULE ---
@@ -686,6 +742,7 @@
                 id: Date.now(),
                 date: document.getElementById('sc-date').value,
                 time: document.getElementById('sc-time').value,
+                week: document.getElementById('sc-week').value, // NEW
                 teamA: document.getElementById('sc-team-a').value,
                 teamB: document.getElementById('sc-team-b').value,
                 group: document.getElementById('sc-group').value || null 
@@ -711,20 +768,26 @@
             const bg = document.getElementById('sc-bg-color').value;
             const tx = document.getElementById('sc-text-color').value;
             const txt = document.getElementById('sc-header-text').value;
+            const pillColor = document.getElementById('sc-pill-color').value; // NEW
 
             document.getElementById('sc-bg-overlay').style.background = `linear-gradient(135deg, ${bg}, #000)`;
             document.getElementById('sc-pill').textContent = txt;
+            document.getElementById('sc-pill').style.backgroundColor = pillColor; // NEW
             document.getElementById('sc-container').style.color = tx;
 
             let filteredSchedules = schedules.filter(s => 
                 currentGroupFilter === 'All' || s.group === currentGroupFilter
             );
 
-            // Group by date
-            const groupedByDate = filteredSchedules.sort((a,b)=> new Date(a.date+'T'+a.time) - new Date(b.date+'T'+b.time)).reduce((acc, s) => {
+            // Group by Week first
+            const groupedByWeek = filteredSchedules.sort((a,b)=> a.week - b.week || new Date(a.date+'T'+a.time) - new Date(b.date+'T'+b.time)).reduce((acc, s) => {
+                const weekKey = s.week;
+                if (!acc[weekKey]) acc[weekKey] = {};
+                
+                // Group by Date second
                 const dateKey = s.date;
-                if (!acc[dateKey]) acc[dateKey] = [];
-                acc[dateKey].push(s);
+                if (!acc[weekKey][dateKey]) acc[weekKey][dateKey] = [];
+                acc[weekKey][dateKey].push(s);
                 return acc;
             }, {});
 
@@ -732,39 +795,45 @@
             let htmlContent = '';
             
             // Render groups
-            Object.keys(groupedByDate).forEach(dateKey => {
-                const daySchedules = groupedByDate[dateKey];
+            Object.keys(groupedByWeek).forEach(weekKey => {
+                const weekData = groupedByWeek[weekKey];
+
+                htmlContent += `<div class="schedule-group-header" style="background-color: ${pillColor};">WEEK ${weekKey}</div>`;
                 
-                // Add Group Header (Date/Week)
-                htmlContent += `<div class="schedule-group-header mt-8">สัปดาห์/วันที่: ${formatDate(dateKey)}</div>`;
+                Object.keys(weekData).forEach(dateKey => {
+                    const daySchedules = weekData[dateKey];
+                    
+                    // Add Date Header
+                    htmlContent += `<div class="text-center font-bold text-lg mt-4 mb-2 text-yellow-400 border-b border-gray-700 pb-1">วันที่: ${formatDate(dateKey)}</div>`;
 
-                // Add individual match cards
-                htmlContent += daySchedules.map(s => {
-                    const t1 = teams.find(x => x.id == s.teamA);
-                    const t2 = teams.find(x => x.id == s.teamB);
-                    const groupTag = s.group ? `<span class="text-xs font-bold text-black bg-yellow-400 px-2 py-0.5 rounded-full absolute top-1 left-1">${s.group}</span>` : '';
+                    // Add individual match cards
+                    htmlContent += daySchedules.map(s => {
+                        const t1 = teams.find(x => x.id == s.teamA);
+                        const t2 = teams.find(x => x.id == s.teamB);
+                        const groupTag = s.group ? `<span class="text-xs font-bold text-black bg-yellow-400 px-2 py-0.5 rounded-full absolute top-1 left-1">${s.group}</span>` : '';
 
-                    return `
-                    <div class="schedule-card p-3 rounded-xl flex items-center relative group">
-                        ${groupTag}
-                        <button onclick="delSched(${s.id})" class="absolute -top-2 -right-2 bg-red-600 w-6 h-6 rounded-full text-xs opacity-0 group-hover:opacity-100 transition z-20"><i class="fas fa-trash"></i></button>
-                        <div class="w-20 text-center border-r border-white/20 pr-2 mr-2">
-                            <div class="text-xs opacity-70">${formatDate(s.date).split('/')[0]}/${formatDate(s.date).split('/')[1]}</div>
-                            <div class="text-xl font-black">${s.time}</div>
-                        </div>
-                        <div class="flex-1 flex justify-between items-center px-2">
-                            <div class="flex flex-col items-center w-1/3">
-                                <img src="${t1?.logo||''}" class="w-12 h-12 logo-circle bg-white p-0.5 mb-1 border-2 border-yellow-400">
-                                <span class="text-xs font-bold uppercase text-center leading-tight">${t1?.name||'?'}</span>
+                        return `
+                        <div class="schedule-card p-3 rounded-xl flex items-center relative group bg-gray-800 shadow-md">
+                            ${groupTag}
+                            <button onclick="delSched(${s.id})" class="absolute -top-2 -right-2 bg-red-600 w-6 h-6 rounded-full text-xs opacity-0 group-hover:opacity-100 transition z-20"><i class="fas fa-trash"></i></button>
+                            <div class="w-20 text-center border-r border-white/20 pr-2 mr-2">
+                                <div class="text-xs opacity-70">${s.date.substring(5, 7)}/${s.date.substring(8, 10)}</div>
+                                <div class="text-xl font-black">${s.time}</div>
                             </div>
-                            <div class="text-2xl font-black opacity-50 italic">VS</div>
-                            <div class="flex flex-col items-center w-1/3">
-                                <img src="${t2?.logo||''}" class="w-12 h-12 logo-circle bg-white p-0.5 mb-1 border-2 border-yellow-400">
-                                <span class="text-xs font-bold uppercase text-center leading-tight">${t2?.name||'?'}</span>
+                            <div class="flex-1 flex justify-between items-center px-2">
+                                <div class="flex flex-col items-center w-1/3">
+                                    <img src="${t1?.logo||''}" class="w-12 h-12 logo-circle bg-white p-0.5 mb-1 border-2 border-yellow-400">
+                                    <span class="text-xs font-bold uppercase text-center leading-tight">${t1?.name||'?'}</span>
+                                </div>
+                                <div class="text-2xl font-black opacity-50 italic">VS</div>
+                                <div class="flex flex-col items-center w-1/3">
+                                    <img src="${t2?.logo||''}" class="w-12 h-12 logo-circle bg-white p-0.5 mb-1 border-2 border-yellow-400">
+                                    <span class="text-xs font-bold uppercase text-center leading-tight">${t2?.name||'?'}</span>
+                                </div>
                             </div>
-                        </div>
-                    </div>`;
-                }).join('');
+                        </div>`;
+                    }).join('');
+                });
             });
 
             div.innerHTML = htmlContent;
@@ -778,13 +847,18 @@
             const cBg1 = document.getElementById('daily-row-bg-1').value;
             const cBg2 = document.getElementById('daily-row-bg-2').value;
 
-            // 1. Banner Styles (Using default colors since user didn't request dynamic banner color controls here)
-            // If they want control, uncomment this block (daily-col-1/2/text) and update it in HTML
-            // const c1 = document.getElementById('daily-col-1').value;
-            // const c2 = document.getElementById('daily-col-2').value;
-            // const ctx = document.getElementById('daily-col-text').value;
-            // document.getElementById('daily-header').style.background = `linear-gradient(to right, ${c1}, ${c2})`;
-            // document.getElementById('daily-title-edit').style.color = ctx;
+            // NEW Banner Styles
+            const cGrad1 = document.getElementById('daily-banner-grad-1').value;
+            const cGrad2 = document.getElementById('daily-banner-grad-2').value;
+            const cText = document.getElementById('daily-banner-text').value;
+            const cBorder = document.getElementById('daily-banner-border').value;
+
+            // 1. Banner Styles 
+            const headerEl = document.getElementById('daily-header');
+            headerEl.style.background = `linear-gradient(to right, ${cGrad1}, ${cGrad2})`;
+            headerEl.style.borderColor = cBorder;
+            document.getElementById('daily-title-edit').style.color = cText;
+            document.getElementById('daily-logo-img').style.borderColor = cBorder;
 
             // 2. Matches List (Dark/Yellow theme)
             const list = matches.filter(m => m.date === date);
@@ -805,7 +879,7 @@
                     </div>
                     <div class="flex items-center w-[40%] justify-end pr-2 gap-3">
                         <span class="font-bold text-sm leading-tight text-right">${t2?.name}</span>
-                        <img src="${t2?.logo||''}" class="w-14 h-14 logo-circle bg-white border border-yellow-400 p-0.5">
+                        <img src="${t2?.logo||''}" class="w-14 h-14 logo-circle bg-white p-0.5 border-2 border-yellow-400">
                     </div>
                 </div>`;
             }).join('');
@@ -853,7 +927,7 @@
             }).join('');
         }
 
-        // --- 4. STATS & HISTORY --- (No major changes here, only dependencies on save() and renderAll())
+        // --- 4. STATS & HISTORY (No change) ---
 
         function showHistory(type, button) {
             document.getElementById('history-match-list').classList.add('hidden');
