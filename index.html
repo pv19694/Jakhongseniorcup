@@ -314,24 +314,25 @@
             aspect-ratio: 3/4;
         }
         
-       .scorer-rank-tag {
+        .scorer-rank-tag {
             position: absolute;
-            top: 0;
-            left: 10px; /* แก้ไข: ย้ายจาก 50% มาทางซ้าย เว้นระยะ 10px */
-            transform: translateY(-50%); /* แก้ไข: เอา translateX(-50%) ออก เพื่อให้ตำแหน่งคงที่ */
+            top: 15px; 
+            left: 10px; 
+            transform: translateY(-50%); 
             
-            /* ส่วนอื่นๆ คงไว้ */
             background: var(--primary-color);
             color: black; 
-            font-size: 1rem; /* ปรับขนาดตัวอักษรให้พอดีขึ้น */
+            
+            font-size: 0.9rem; /* *** แก้ไข: ปรับขนาดตัวเลขลงเล็กน้อย (จาก 1rem) *** */
             font-weight: 900;
-            width: 35px; /* ปรับขนาดให้เล็กลงเล็กน้อย */
-            height: 35px;
+            width: 32px; /* *** แก้ไข: ปรับขนาดวงกลมลงเล็กน้อย (จาก 35px) *** */
+            height: 32px; /* *** แก้ไข: ปรับขนาดวงกลมลงเล็กน้อย (จาก 35px) *** */
+            
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            border: 2px solid white; /* เปลี่ยนขอบเป็นสีขาว เพื่อให้ตัดกับสีทอง/เงิน/ทองแดง */
+            border: 2px solid white; 
             z-index: 20;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
         }
