@@ -1490,128 +1490,172 @@
                 </div>`;
             }).join('');
 
-            // --- ส่วนที่ 3: Top Scorers (แก้ไขใหม่: ลบขอบ, ใช้ Gradient การ์ดใหม่) ---
-            
-            // 1. ดึงค่าสีจาก Input ที่เราเพิ่มไป (ใช้ Grad แทน bg/border)
-            const cCardGrad1 = document.getElementById('d-card-grad-1').value; 
-            const cCardGrad2 = document.getElementById('d-card-grad-2').value; 
-            const cCardText = document.getElementById('d-card-text').value; // สีชื่อ/รายละเอียด
+           // --- ส่วนที่ 3: Top Scorers (แก้ไขใหม่: ลบขอบ, ใช้ Gradient การ์ดใหม่) ---
 
-            // ดึงค่าสีแบนเนอร์
-            const cBannerGrad1 = document.getElementById('daily-banner-grad-1').value;
-            const cBannerGrad2 = document.getElementById('daily-banner-grad-2').value;
-            const cBannerText = document.getElementById('daily-banner-text').value;
+// 1. ดึงค่าสีจาก Input ที่เราเพิ่มไป (ใช้ Grad แทน bg/border)
+const cCardGrad1 = document.getElementById('d-card-grad-1').value; 
+const cCardGrad2 = document.getElementById('d-card-grad-2').value; 
+const cCardText = document.getElementById('d-card-text').value; // สีชื่อ/รายละเอียด
 
-            // ปรับ Header ของดาวซัลโวให้ใช้สีที่ตั้งค่าใหม่ (พร้อมลบขอบทั้งหมด)
-            const scorerHeader = document.querySelector('#daily-content > div:nth-child(2) > div.bg-gray-800');
-            if (scorerHeader) {
-                // อัปเดตพื้นหลังของคอนเทนเนอร์ดาวซัลโว (แถบใหญ่)
-                scorerHeader.style.background = `linear-gradient(to right, ${cBannerGrad1}, ${cBannerGrad2})`;
-                // ลบขอบกรอบสีเหลือง/อื่นๆ ออก
-                scorerHeader.style.border = 'none'; 
-                
-                // อัปเดตสีตัวอักษรของ Header และลบเส้นใต้
-                const h3 = scorerHeader.querySelector('h3');
-                if (h3) {
-                     h3.style.color = cBannerText;
-                     // ลบขอบสีขาวด้านล่างหัวข้อ
-                     h3.style.borderBottom = 'none'; 
-                }
-            }
+// ดึงค่าสีแบนเนอร์
+const cBannerGrad1 = document.getElementById('daily-banner-grad-1').value;
+const cBannerGrad2 = document.getElementById('daily-banner-grad-2').value;
+const cBannerText = document.getElementById('daily-banner-text').value;
+
+// *** FIX: เพิ่มการดึงค่าสีสกอร์ (จำเป็นต้องใช้ทั้ง Part 3 และ Part 4) ***
+const cScoreText = document.getElementById('daily-score-text-color').value;
+const cScoreGrad1 = document.getElementById('daily-score-grad-1').value;
+const cScoreGrad2 = document.getElementById('daily-score-grad-2').value;
 
 
-            const topScorerData = calculateTopScorer(sortKey, 5); 
-            
-            const headerText = {
-                'goals': 'ผู้ที่ยิงประตูได้สูงสุด (ดาวซัลโว)',
-                'name': 'เรียงตามชื่อนักกีฬา',
-                'number': 'เรียงตามเบอร์เสื้อ'
-            };
-            document.getElementById('daily-scorer-header').innerText = headerText[sortKey] || 'ดาวซัลโวสูงสุด';
+// ปรับ Header ของดาวซัลโวให้ใช้สีที่ตั้งค่าใหม่ (พร้อมลบขอบทั้งหมด)
+const scorerHeader = document.querySelector('#daily-content > div:nth-child(2) > div.bg-gray-800');
+if (scorerHeader) {
+    // อัปเดตพื้นหลังของคอนเทนเนอร์ดาวซัลโว (แถบใหญ่)
+    scorerHeader.style.background = `linear-gradient(to right, ${cBannerGrad1}, ${cBannerGrad2})`;
+    // ลบขอบกรอบสีเหลือง/อื่นๆ ออก
+    scorerHeader.style.border = 'none'; 
+    
+    // อัปเดตสีตัวอักษรของ Header และลบเส้นใต้
+    const h3 = scorerHeader.querySelector('h3');
+    if (h3) {
+         h3.style.color = cBannerText;
+         // ลบขอบสีขาวด้านล่างหัวข้อ
+         h3.style.borderBottom = 'none'; 
+    }
+}
 
-            const topScorersCont = document.getElementById('daily-top-scorers');
-            
-            topScorersCont.innerHTML = topScorerData.sortedData.map((data, i) => {
-                const t = teams.find(x => x.id == data.teamId);
-                
-                // --- Logic สีพื้นหลังอันดับ (ทอง/เงิน/ทองแดง) ---
-                let rankBgColor;
-                let rankTextColor = 'black'; 
-                
-                if (i === 0) rankBgColor = '#FFD700';      // ที่ 1: สีทอง 🥇
-                else if (i === 1) rankBgColor = '#C0C0C0'; // ที่ 2: สีเงิน 🥈
-                else if (i === 2) rankBgColor = '#CD7F32'; // ที่ 3: สีทองแดง 🥉
-                else {
-                    rankBgColor = themeColor; 
-                    rankTextColor = 'black';
-                }
 
-                const rankText = i + 1; 
-                
-                // สไตล์สกอร์ (Gradient - ใช้สีเดิมจาก Input)
-                const scoreStyle = `background-image: linear-gradient(to right, ${cScoreGrad1}, ${cScoreGrad2}); color: ${cScoreText};`;
-                
-                // สไตล์การ์ด (ใช้ Gradient ใหม่ และไม่มีขอบตามคำขอ)
-                const cardCustomStyle = `background-image: linear-gradient(135deg, ${cCardGrad1}, ${cCardGrad2}); border: none;`;
+const topScorerData = calculateTopScorer(sortKey, 5); 
+    
+const headerText = {
+    'goals': 'ผู้ที่ยิงประตูได้สูงสุด (ดาวซัลโว)',
+    'name': 'เรียงตามชื่อนักกีฬา',
+    'number': 'เรียงตามเบอร์เสื้อ'
+};
+document.getElementById('daily-scorer-header').innerText = headerText[sortKey] || 'ดาวซัลโวสูงสุด';
 
-                return `
-                <div class="scorer-card" style="${cardCustomStyle}">
-                    <div class="scorer-rank-tag" style="background-color: ${rankBgColor}; color: ${rankTextColor};">
-                        ${rankText}
-                    </div>
-                    
-                    <img src="${data.img || ''}" class="scorer-card-img" alt="${data.name}"> 
-                    
-                    <div class="mt-2 w-full">
-                        <div class="font-bold text-sm truncate" style="color: ${cCardText};">${data.name} (#${data.number||'-'})</div>
-                        <div class="text-xs truncate mb-2 opacity-80" style="color: ${cCardText};">${t?.name || 'ไม่ระบุทีม'}</div>
-                        
-                        <div class="font-black text-2xl leading-tight inline-block px-3 py-1 rounded shadow-md" style="${scoreStyle}">
-                             ${data.goals}
-                             <span class="text-xs font-normal">ประตู</span>
-                        </div>
-                    </div>
-                </div>`;
-            }).join('') || '<p class="text-center text-gray-500 py-4 col-span-full">ไม่มีข้อมูลดาวซัลโว</p>';
+const topScorersCont = document.getElementById('daily-top-scorers');
 
-            // 4. Scorers Today (Horizontal Grid)
-            const todays = stats.filter(s => s.type === 'goal' && s.date === date);
-            const todayCounts = {};
-            todays.forEach(s => todayCounts[s.playerId] = (todayCounts[s.playerId]||0)+s.count);
-            
-            const todayScorersCont = document.getElementById('daily-today-scorers');
-            
-            // Get player details for today's scorers
-            const todayScorerData = Object.entries(todayCounts).map(([pid, c]) => {
-                const p = players.find(x => x.id == pid);
-                const t = teams.find(x => x.id == p?.teamId);
-                return {
-                    name: p?.name,
-                    number: p?.no,
-                    img: p?.img,
-                    teamName: t?.name,
-                    teamColor: t?.color,
-                    goalsToday: c
-                };
-            }).sort((a,b) => b.goalsToday - a.goalsToday); // Sort by goals today
+topScorersCont.innerHTML = topScorerData.sortedData.map((data, i) => {
+    const t = teams.find(x => x.id == data.teamId);
+    
+    // --- Logic สีพื้นหลังอันดับ (ทอง/เงิน/ทองแดง) ---
+    let rankBgColor;
+    let rankTextColor = 'black'; 
+    
+    if (i === 0) rankBgColor = '#FFD700';      // ที่ 1: สีทอง 🥇
+    else if (i === 1) rankBgColor = '#C0C0C0'; // ที่ 2: สีเงิน 🥈
+    else if (i === 2) rankBgColor = '#CD7F32'; // ที่ 3: สีทองแดง 🥉
+    else {
+        // ใช้ themeColor ที่ถูกประกาศไว้ในไฟล์หลัก
+        rankBgColor = themeColor; 
+        rankTextColor = 'black';
+    }
 
-            todayScorersCont.innerHTML = todayScorerData.map((data) => {
-                // NEW: Score Gradient Style
-                const scoreStyle = `background-image: linear-gradient(to right, ${cScoreGrad1}, ${cScoreGrad2}); color: ${cScoreText};`;
-                
-                // โค้ดใหม่ที่สร้างรายละเอียดผู้ทำประตู (ในส่วน scorerHtml)
-return `<div class="daily-scorer-item flex items-center justify-between text-sm py-1 border-b border-gray-700">
-    <div class="flex items-center">
-        <i class="fa-solid fa-square w-3 h-3 rounded-sm mr-2" style="color: ${scorerTeam?.color || 'white'};"></i>
-        <div class="font-medium" style="color: ${cTeamNameColor};">
-            ${p?.name || 'ไม่ระบุ'} 
-            <span class="text-xs font-bold text-gray-400 ml-1">#${p?.number || '-'}</span> 
+    const rankText = i + 1; 
+    
+    // สไตล์สกอร์ (Gradient)
+    const scoreStyle = `background-image: linear-gradient(to right, ${cScoreGrad1}, ${cScoreGrad2}); color: ${cScoreText};`;
+    
+    // สไตล์การ์ด (ใช้ Gradient ใหม่ และไม่มีขอบตามคำขอ)
+    const cardCustomStyle = `background-image: linear-gradient(135deg, ${cCardGrad1}, ${cCardGrad2}); border: none;`;
+
+    return `
+    <div class="scorer-card" style="${cardCustomStyle}">
+        <div class="scorer-rank-tag" style="background-color: ${rankBgColor}; color: ${rankTextColor};">
+            ${rankText}
         </div>
-    </div>
-    // ...
-</div>`;
-            }).join('') || '<p class="text-center text-gray-500 py-4 col-span-full">ไม่มีผู้ทำประตูในวันนี้</p>';
-        }
+        
+        <img src="${data.img || ''}" class="scorer-card-img" alt="${data.name}"> 
+        
+        <div class="mt-2 w-full">
+            <div class="font-bold text-sm truncate" style="color: ${cCardText};">${data.name} (#${data.number||'-'})</div>
+            <div class="text-xs truncate mb-2 opacity-80" style="color: ${cCardText};">${t?.name || 'ไม่ระบุทีม'}</div>
+            
+            <div class="font-black text-2xl leading-tight inline-block px-3 py-1 rounded shadow-md" style="${scoreStyle}">
+                 ${data.goals}
+                 <span class="text-xs font-normal">ประตู</span>
+            </div>
+        </div>
+    </div>`;
+}).join('') || '<p class="text-center text-gray-500 py-4 col-span-full">ไม่มีข้อมูลดาวซัลโว</p>';
+
+// --- สิ้นสุดส่วนที่ 3 ---
+
+
+// --- ส่วนที่ 4: Scorers Today (ผู้ที่ทำประตูวันนี้) ---
+const selectedDate = document.getElementById('daily-date').value;
+
+// 1. ค้นหาแมตช์แรกของวันนี้ (เพื่อดึงชื่อทีม)
+const todayMatch = matches.find(m => m.date === selectedDate); 
+let matchTitle = '';
+
+if (todayMatch) {
+    const t1 = teams.find(t => t.id === todayMatch.team1Id);
+    const t2 = teams.find(t => t.id === todayMatch.team2Id);
+    matchTitle = `(${t1?.name || 'ไม่ระบุทีม'} vs ${t2?.name || 'ไม่ระบุทีม'})`;
+}
+
+// 2. ประมวลผลข้อมูลผู้ทำประตูวันนี้
+const todays = stats.filter(s => s.type === 'goal' && s.date === selectedDate);
+const todayCounts = {};
+todays.forEach(s => todayCounts[s.playerId] = (todayCounts[s.playerId]||0)+s.count);
+
+const todayScorersCont = document.getElementById('daily-today-scorers');
+
+// Get player details for today's scorers
+const todayScorerData = Object.entries(todayCounts).map(([pid, c]) => {
+    const p = players.find(x => x.id == pid);
+    if (!p) return null; 
+    const t = teams.find(x => x.id == p.teamId); 
+    return {
+        name: p.name,
+        number: p.no,
+        img: p.img,
+        teamName: t?.name,
+        teamColor: t?.color,
+        goalsToday: c
+    };
+}).filter(d => d).sort((a,b) => b.goalsToday - a.goalsToday); // Sort by goals today
+
+// 3. อัปเดต HTML (ใช้ Card Layout ที่ถูกต้อง)
+// *** ใช้เพียงโค้ด Card Layout ชุดนี้เท่านั้น ***
+todayScorersCont.innerHTML = todayScorerData.map((data) => {
+    // cScoreGrad1, cScoreGrad2, และ cScoreText ต้องถูกดึงค่าไว้ก่อนหน้าใน Part 3
+    const scoreStyle = `background-image: linear-gradient(to right, ${cScoreGrad1}, ${cScoreGrad2}); color: ${cScoreText};`;
+    const cardCustomStyle = `background-color: #1f2937; border: none;`; // ใช้สีพื้นหลังเข้ม
+
+    return `
+    <div class="scorer-card" style="${cardCustomStyle}">
+        <div class="today-scorer-num-tag">
+            ${data.goalsToday}
+        </div>
+        
+        <img src="${data.img || ''}" class="scorer-card-img" alt="${data.name}"> 
+        
+        <div class="mt-2 w-full">
+            <div class="font-bold text-sm truncate" style="color: white;">${data.name} (#${data.number||'-'})</div>
+            <div class="text-xs truncate mb-2 opacity-80" style="color: gray;">${data.teamName || 'ไม่ระบุทีม'}</div>
+            
+            <div class="font-black text-2xl leading-tight inline-block px-3 py-1 rounded shadow-md" style="${scoreStyle}">
+                 ${data.goalsToday}
+                 <span class="text-xs font-normal">ประตู</span>
+            </div>
+        </div>
+    </div>`;
+}).join('') || '<p class="text-center text-gray-500 py-4 col-span-full">ไม่มีผู้ทำประตูในวันนี้</p>';
+    
+// 4. อัปเดต Header (แก้ปัญหาหัวข้อไม่กึ่งกลางและสี)
+// อัปเดตชื่อคู่แข่งขัน
+document.getElementById('daily-today-match-names').innerText = matchTitle;
+
+// อัปเดตสีหัวข้อ
+const todayHeader = document.getElementById('daily-today-header');
+if (todayHeader) {
+    // cBannerText ถูกดึงค่าไว้ใน Part 3 แล้ว
+    todayHeader.style.color = cBannerText; 
+}
 
         // --- NEW: All Stats Filtering Function ---
         function renderAllStats() {
