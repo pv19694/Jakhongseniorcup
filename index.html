@@ -1,8 +1,5 @@
 
 
-
-
-
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -316,22 +313,25 @@
             margin-bottom: 0.5rem;
             aspect-ratio: 3/4;
         }
-        .scorer-rank-tag {
+        
+       .scorer-rank-tag {
             position: absolute;
             top: 0;
-            left: 50%;
-            transform: translateX(-50%) translateY(-50%);
+            left: 10px; /* แก้ไข: ย้ายจาก 50% มาทางซ้าย เว้นระยะ 10px */
+            transform: translateY(-50%); /* แก้ไข: เอา translateX(-50%) ออก เพื่อให้ตำแหน่งคงที่ */
+            
+            /* ส่วนอื่นๆ คงไว้ */
             background: var(--primary-color);
-            color: black;
-            font-size: 1.25rem;
+            color: black; 
+            font-size: 1rem; /* ปรับขนาดตัวอักษรให้พอดีขึ้น */
             font-weight: 900;
-            width: 40px;
-            height: 40px;
+            width: 35px; /* ปรับขนาดให้เล็กลงเล็กน้อย */
+            height: 35px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            border: 3px solid black;
+            border: 2px solid white; /* เปลี่ยนขอบเป็นสีขาว เพื่อให้ตัดกับสีทอง/เงิน/ทองแดง */
             z-index: 20;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
         }
@@ -550,6 +550,15 @@
                         <div><label class="text-xs text-gray-400 block mb-1">แบนเนอร์ 2</label><input type="color" id="daily-banner-grad-2" value="#0c1626" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
                         <div><label class="text-xs text-gray-400 block mb-1">อักษรแบนเนอร์</label><input type="color" id="daily-banner-text" value="#facc15" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
                         <div><label class="text-xs text-gray-400 block mb-1">ขอบแบนเนอร์</label><input type="color" id="daily-banner-border" value="#facc15" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                    </div>
+
+                    <div class="w-full border-t border-gray-700 my-2 pt-2">
+                        <label class="text-xs text-yellow-400 font-bold block mb-2">🎨 ปรับแต่งการ์ดนักเตะ (ดาวซัลโว):</label>
+                        <div class="flex flex-wrap gap-2">
+                            <div><label class="text-xs text-gray-400 block mb-1">พื้นหลังการ์ด</label><input type="color" id="d-card-bg" value="#1f2937" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                            <div><label class="text-xs text-gray-400 block mb-1">สีขอบการ์ด</label><input type="color" id="d-card-border" value="#374151" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                            <div><label class="text-xs text-gray-400 block mb-1">สีชื่อ/รายละเอียด</label><input type="color" id="d-card-text" value="#ffffff" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -1479,8 +1488,36 @@
                 </div>`;
             }).join('');
 
-            // 3. Top Scorers (Top 5 Horizontal Grid)
-            const topScorerData = calculateTopScorer(sortKey, 5); // Limit to Top 5
+            // --- ส่วนที่ 3: Top Scorers (แก้ไขใหม่) ---
+            
+            // 1. ดึงค่าสีจาก Input ที่เราเพิ่มไป
+            const cCardBg = document.getElementById('d-card-bg').value;
+            const cCardBorder = document.getElementById('d-card-border').value;
+            const cCardText = document.getElementById('d-card-text').value;
+            
+            // ดึงค่าสีแบนเนอร์ใหม่มาใช้ในการสร้าง Header
+            const cBannerGrad1 = document.getElementById('daily-banner-grad-1').value;
+            const cBannerGrad2 = document.getElementById('daily-banner-grad-2').value;
+            const cBannerText = document.getElementById('daily-banner-text').value;
+            const cBannerBorder = document.getElementById('daily-banner-border').value;
+
+            // ปรับ Header ของดาวซัลโวให้ใช้สีที่ตั้งค่าใหม่
+            const scorerHeader = document.querySelector('#daily-content > div:nth-child(2) > div.bg-gray-800');
+            if (scorerHeader) {
+                // อัปเดตพื้นหลังและขอบของคอนเทนเนอร์ดาวซัลโว
+                scorerHeader.style.background = `linear-gradient(to right, ${cBannerGrad1}, ${cBannerGrad2})`;
+                scorerHeader.style.border = `1px solid ${cBannerBorder}`;
+                
+                // อัปเดตสีตัวอักษรของ Header
+                const h3 = scorerHeader.querySelector('h3');
+                if (h3) {
+                     h3.style.color = cBannerText;
+                     h3.style.borderBottomColor = cBannerBorder; // ใช้สีขอบแบนเนอร์สำหรับเส้นใต้
+                }
+            }
+
+
+            const topScorerData = calculateTopScorer(sortKey, 5); 
             
             const headerText = {
                 'goals': 'ผู้ที่ยิงประตูได้สูงสุด (ดาวซัลโว)',
@@ -1490,21 +1527,42 @@
             document.getElementById('daily-scorer-header').innerText = headerText[sortKey] || 'ดาวซัลโวสูงสุด';
 
             const topScorersCont = document.getElementById('daily-top-scorers');
+            
             topScorersCont.innerHTML = topScorerData.sortedData.map((data, i) => {
                 const t = teams.find(x => x.id == data.teamId);
-                const isTop = i === 0 ? 'is-top' : '';
-                const rankText = i === 0 ? '👑' : `#${i + 1}`;
                 
-                // NEW: Score Gradient Style
+                // --- Logic สีพื้นหลังอันดับ (ทอง/เงิน/ทองแดง) ---
+                let rankBgColor;
+                let rankTextColor = 'black'; 
+                
+                if (i === 0) rankBgColor = '#FFD700';      // ที่ 1: สีทอง 🥇
+                else if (i === 1) rankBgColor = '#C0C0C0'; // ที่ 2: สีเงิน 🥈
+                else if (i === 2) rankBgColor = '#CD7F32'; // ที่ 3: สีทองแดง 🥉
+                else {
+                    rankBgColor = themeColor; // ที่เหลือ: สีธีมหลัก
+                    rankTextColor = 'black';
+                }
+
+                const rankText = i + 1; 
+                
+                // สไตล์สกอร์ (Gradient - ใช้สีเดิม)
                 const scoreStyle = `background-image: linear-gradient(to right, ${cScoreGrad1}, ${cScoreGrad2}); color: ${cScoreText};`;
+                
+                // สไตล์การ์ด (Custom ตามที่เลือก)
+                const cardCustomStyle = `background-color: ${cCardBg}; border: 2px solid ${cCardBorder};`;
 
                 return `
-                <div class="scorer-card ${isTop}">
-                    <div class="scorer-rank-tag" style="background-color: ${t?.color || themeColor};">${rankText}</div>
+                <div class="scorer-card" style="${cardCustomStyle}">
+                    <div class="scorer-rank-tag" style="background-color: ${rankBgColor}; color: ${rankTextColor};">
+                        ${rankText}
+                    </div>
+                    
                     <img src="${data.img || ''}" class="scorer-card-img" style="border-color: ${t?.color || 'white'};" alt="${data.name}">
+                    
                     <div class="mt-2 w-full">
-                        <div class="text-white font-bold text-sm truncate">${data.name} (#${data.number||'-'})</div>
-                        <div class="text-gray-400 text-xs truncate mb-2">${t?.name || 'ไม่ระบุทีม'}</div>
+                        <div class="font-bold text-sm truncate" style="color: ${cCardText};">${data.name} (#${data.number||'-'})</div>
+                        <div class="text-xs truncate mb-2 opacity-80" style="color: ${cCardText};">${t?.name || 'ไม่ระบุทีม'}</div>
+                        
                         <div class="font-black text-2xl leading-tight inline-block px-3 py-1 rounded shadow-md" style="${scoreStyle}">
                              ${data.goals}
                              <span class="text-xs font-normal">ประตู</span>
