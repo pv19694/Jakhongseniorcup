@@ -135,12 +135,16 @@
         }
         /* --- FIX: REMOVED TEXT SHADOW ON SCORE NUMBERS --- */
         .daily-score-number {
-            padding: 0 0.5rem;
-            border-radius: 6px;
-            /* text-shadow: 2px 2px 0 #000;  <--- REMOVED */
+            width: 50px;            /* กำหนดความกว้าง */
+            height: 50px;           /* กำหนดความสูง */
+            display: flex;          /* จัดกึ่งกลางด้วย Flexbox */
+            justify-content: center; /* จัดกึ่งกลางแนวนอน */
+            align-items: center;    /* จัดกึ่งกลางแนวตั้ง */
+            border-radius: 6px;     /* ความมนของขอบ */
             line-height: 1;
             z-index: 10; 
         }
+        
         .daily-vs {
             /* FIX: Make VS smaller and central */
             font-size: 1rem;
