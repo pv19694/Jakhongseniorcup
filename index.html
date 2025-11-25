@@ -555,8 +555,8 @@
                     <div class="w-full border-t border-gray-700 my-2 pt-2">
                         <label class="text-xs text-yellow-400 font-bold block mb-2">🎨 ปรับแต่งการ์ดนักเตะ (ดาวซัลโว):</label>
                         <div class="flex flex-wrap gap-2">
-                            <div><label class="text-xs text-gray-400 block mb-1">พื้นหลังการ์ด</label><input type="color" id="d-card-bg" value="#1f2937" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
-                            <div><label class="text-xs text-gray-400 block mb-1">สีขอบการ์ด</label><input type="color" id="d-card-border" value="#374151" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                            <div><label class="text-xs text-gray-400 block mb-1">พื้นหลังการ์ด 1</label><input type="color" id="d-card-grad-1" value="#1c365b" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                            <div><label class="text-xs text-gray-400 block mb-1">พื้นหลังการ์ด 2</label><input type="color" id="d-card-grad-2" value="#0c1626" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
                             <div><label class="text-xs text-gray-400 block mb-1">สีชื่อ/รายละเอียด</label><input type="color" id="d-card-text" value="#ffffff" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
                         </div>
                     </div>
@@ -1488,31 +1488,32 @@
                 </div>`;
             }).join('');
 
-            // --- ส่วนที่ 3: Top Scorers (แก้ไขใหม่) ---
+            // --- ส่วนที่ 3: Top Scorers (แก้ไขใหม่: ลบขอบ, ใช้ Gradient การ์ดใหม่) ---
             
-            // 1. ดึงค่าสีจาก Input ที่เราเพิ่มไป
-            const cCardBg = document.getElementById('d-card-bg').value;
-            const cCardBorder = document.getElementById('d-card-border').value;
-            const cCardText = document.getElementById('d-card-text').value;
-            
-            // ดึงค่าสีแบนเนอร์ใหม่มาใช้ในการสร้าง Header
+            // 1. ดึงค่าสีจาก Input ที่เราเพิ่มไป (ใช้ Grad แทน bg/border)
+            const cCardGrad1 = document.getElementById('d-card-grad-1').value; 
+            const cCardGrad2 = document.getElementById('d-card-grad-2').value; 
+            const cCardText = document.getElementById('d-card-text').value; // สีชื่อ/รายละเอียด
+
+            // ดึงค่าสีแบนเนอร์
             const cBannerGrad1 = document.getElementById('daily-banner-grad-1').value;
             const cBannerGrad2 = document.getElementById('daily-banner-grad-2').value;
             const cBannerText = document.getElementById('daily-banner-text').value;
-            const cBannerBorder = document.getElementById('daily-banner-border').value;
 
-            // ปรับ Header ของดาวซัลโวให้ใช้สีที่ตั้งค่าใหม่
+            // ปรับ Header ของดาวซัลโวให้ใช้สีที่ตั้งค่าใหม่ (พร้อมลบขอบทั้งหมด)
             const scorerHeader = document.querySelector('#daily-content > div:nth-child(2) > div.bg-gray-800');
             if (scorerHeader) {
-                // อัปเดตพื้นหลังและขอบของคอนเทนเนอร์ดาวซัลโว
+                // อัปเดตพื้นหลังของคอนเทนเนอร์ดาวซัลโว (แถบใหญ่)
                 scorerHeader.style.background = `linear-gradient(to right, ${cBannerGrad1}, ${cBannerGrad2})`;
-                scorerHeader.style.border = `1px solid ${cBannerBorder}`;
+                // ลบขอบกรอบสีเหลือง/อื่นๆ ออก
+                scorerHeader.style.border = 'none'; 
                 
-                // อัปเดตสีตัวอักษรของ Header
+                // อัปเดตสีตัวอักษรของ Header และลบเส้นใต้
                 const h3 = scorerHeader.querySelector('h3');
                 if (h3) {
                      h3.style.color = cBannerText;
-                     h3.style.borderBottomColor = cBannerBorder; // ใช้สีขอบแบนเนอร์สำหรับเส้นใต้
+                     // ลบขอบสีขาวด้านล่างหัวข้อ
+                     h3.style.borderBottom = 'none'; 
                 }
             }
 
@@ -1539,17 +1540,17 @@
                 else if (i === 1) rankBgColor = '#C0C0C0'; // ที่ 2: สีเงิน 🥈
                 else if (i === 2) rankBgColor = '#CD7F32'; // ที่ 3: สีทองแดง 🥉
                 else {
-                    rankBgColor = themeColor; // ที่เหลือ: สีธีมหลัก
+                    rankBgColor = themeColor; 
                     rankTextColor = 'black';
                 }
 
                 const rankText = i + 1; 
                 
-                // สไตล์สกอร์ (Gradient - ใช้สีเดิม)
+                // สไตล์สกอร์ (Gradient - ใช้สีเดิมจาก Input)
                 const scoreStyle = `background-image: linear-gradient(to right, ${cScoreGrad1}, ${cScoreGrad2}); color: ${cScoreText};`;
                 
-                // สไตล์การ์ด (Custom ตามที่เลือก)
-                const cardCustomStyle = `background-color: ${cCardBg}; border: 2px solid ${cCardBorder};`;
+                // สไตล์การ์ด (ใช้ Gradient ใหม่ และไม่มีขอบตามคำขอ)
+                const cardCustomStyle = `background-image: linear-gradient(135deg, ${cCardGrad1}, ${cCardGrad2}); border: none;`;
 
                 return `
                 <div class="scorer-card" style="${cardCustomStyle}">
@@ -1557,7 +1558,7 @@
                         ${rankText}
                     </div>
                     
-                    <img src="${data.img || ''}" class="scorer-card-img" style="border-color: ${t?.color || 'white'};" alt="${data.name}">
+                    <img src="${data.img || ''}" class="scorer-card-img" alt="${data.name}"> 
                     
                     <div class="mt-2 w-full">
                         <div class="font-bold text-sm truncate" style="color: ${cCardText};">${data.name} (#${data.number||'-'})</div>
