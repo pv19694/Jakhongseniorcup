@@ -22,498 +22,2181 @@
             background-color: var(--theme-end);
             color: white;
             background-image: radial-gradient(circle at top right, #34050520 0%, transparent 40%),
-                              radial-gradient(circle at bottom left, #1a1a1a 0%, transparent 50%);
+                              radial-gradient(circle at bottom left, #1a1a1a 0%, transparent 40%);
+            min-height: 100vh;
         }
-        /* --- UTILITY & CUSTOM STYLES --- */
-        
-        .tab-button.active {
-            background-color: var(--primary-color);
-            color: black;
+        .glass {
+            background: rgba(12, 22, 38, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .navbar {
+            background: rgba(12, 22, 38, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--primary-color);
+        }
+        .nav-btn {
+            color: #ccc;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        .nav-btn.active {
+            background: var(--primary-color); 
+            color: #000;
             font-weight: 700;
+            border: 1px solid var(--primary-color);
+            transform: scale(1.05);
         }
-
-        .team-logo {
-            width: 40px;
-            height: 40px;
+        .nav-btn:hover:not(.active) {
+            background: rgba(var(--primary-color), 0.1); 
+            color: var(--primary-color);
+        }
+        .logo-circle {
+            border-radius: 50%;
             object-fit: cover;
-            border-radius: 50%;
-            border: 2px solid white;
+            aspect-ratio: 1/1;
         }
 
-        /* --- SCOREBOARD STYLES --- */
-        .score-row {
-            transition: all 0.3s ease-in-out;
-            cursor: pointer;
-        }
-        .score-row:hover {
-            background-color: #1f2937;
-        }
-        .rank-tag {
-            background-color: var(--primary-color);
-            color: black;
-            font-weight: 800;
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-
-        /* --- PLAYER CARD STYLES --- */
+        /* Player Card Design (Kept minimal style) */
         .player-card {
-            background-color: #1f2937;
-            border-radius: 8px;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            transition: transform 0.2s;
+            background: linear-gradient(145deg, #1f2937, #0c1626);
+            transition: all 0.3s;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .player-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        }
-        .player-photo {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 3px solid var(--primary-color);
-        }
-
-        /* --- TOP SCORER/DAILY SCORER STYLES --- */
-        .top-scorer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 15px;
-        }
-        .scorer-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-            transition: transform 0.2s;
-        }
-        .scorer-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.5);
-        }
-
-        /* --- START: MODIFIED SCORER STYLES (NEW) --- */
-        /* Custom Rank Tag & Photo Wrapper Styles */
-        .scorer-photo-wrapper {
+        .player-photo-container {
             position: relative;
-            width: 100%;
-            height: auto;
-            aspect-ratio: 3/4; /* Match image aspect */
             overflow: hidden;
-            border-radius: 8px; /* Match image border-radius */
-            margin-bottom: 0.5rem;
+            background-color: #0c1626;
+            border-bottom: 3px solid var(--primary-color);
+            aspect-ratio: 3 / 4; 
         }
-        
-        .scorer-card-img {
-            width: 100%;
+        .player-photo-container img {
             height: 100%;
+            width: 100%;
             object-fit: cover;
-            border-radius: 8px;
-            /* ** สำคัญ: Border Color จะถูกกำหนดด้วย JS ผ่าน style attribute ** */
-            border: 3px solid transparent; 
-            margin-bottom: 0; 
-            aspect-ratio: 3/4;
+            object-position: top center;
         }
-
-        /* Scorer Rank Tag (Adjusted Position: TOP-LEFT) */
-        .scorer-rank-tag {
+        /* Player Number Style (Circular only) */
+        .player-num-tag {
             position: absolute;
-            top: -10px; /* Pull it slightly out of the top border */
-            left: -10px; /* Pull it slightly out of the left border */
-            transform: none; /* Remove center transform */
-            background: #4b5563; /* Default gray/dark */
-            color: white;
-            font-size: 1rem;
+            top: 5px;
+            left: 5px;
+            background: var(--primary-color); 
+            color: black;
+            font-size: 0.9rem;
             font-weight: 900;
-            width: 32px;
+            width: 32px; /* Slightly larger circle */
             height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            border: 3px solid black;
-            z-index: 30; /* Higher Z-index to be on top of image and frame */
+            border: 2px solid white;
+            z-index: 20;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
         }
 
-        /* Rank Colors (Gold, Silver, Bronze) */
-        .rank-gold { background: #FFD700; color: #000; border-color: #FFF; }
-        .rank-silver { background: #C0C0C0; color: #000; border-color: #FFF; }
-        .rank-bronze { background: #CD7F32; color: #FFF; border-color: #FFF; }
-        /* --- END: MODIFIED SCORER STYLES (NEW) --- */
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #111; }
+        ::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary-color); } 
+        .no-scrollbar::-webkit-scrollbar { display: none; }
 
-
-        .today-scorer-num-tag {
-            position: absolute;
-            top: 5px; 
-            right: 5px; 
-            background-color: var(--primary-color);
-            color: black;
-            font-weight: 800;
-            font-size: 0.8rem;
-            padding: 2px 6px;
-            border-radius: 9999px;
-            border: 2px solid white;
-            z-index: 20;
+        .outline-text {
+            text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
         }
-
-        /* --- START: DAILY SUMMARY SCORE STYLES (FIXED: Score Overlap) --- */
+        
+        /* Schedule Grouping */
+        .schedule-group-header {
+            background-color: var(--primary-color); 
+            color: black;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 1.5rem;
+            box-shadow: 0 4px 10px rgba(var(--primary-color), 0.2); 
+        }
+        /* Daily Summary Score Style (FIXED: Score Overlap) */
         .daily-score-box {
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
-            font-weight: 900;
-            width: 60px; /* Width of the score display box */
-            text-align: center;
+            align-items: center;
+            font-size: 2.5rem; /* 3xl */
+            font-weight: 900; /* black */
+            letter-spacing: -0.05em; /* tracking-tighter */
+            position: relative;
         }
-        .daily-score-text {
-            font-size: 0.75rem;
-            font-weight: 400;
-            color: #ccc;
-            line-height: 1;
-        }
-        /* FIX: กำหนดความกว้างขั้นต่ำของพื้นหลังสกอร์ */
+        /* --- FIX: REMOVED TEXT SHADOW ON SCORE NUMBERS --- */
         .daily-score-number {
             padding: 0 0.5rem;
             border-radius: 6px;
+            /* text-shadow: 2px 2px 0 #000;  <--- REMOVED */
             line-height: 1;
-            z-index: 10;
-            min-width: 40px; /* NEW: กำหนดความกว้างขั้นต่ำเพื่อให้พื้นหลังสกอร์เท่ากัน */
-            text-align: center; 
+            z-index: 10; 
         }
-        /* --- END: DAILY SUMMARY SCORE STYLES (FIXED: Score Overlap) --- */
+        .daily-vs {
+            /* FIX: Make VS smaller and central */
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 0 0.3rem;
+            z-index: 5;
+            color: #ccc;
+        }
 
-        /* ... [ส่วน CSS อื่นๆ ที่มีอยู่เดิม] ... */
+        /* FIX: Today Scorer Number Tag */
+        .today-scorer-num-tag {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: black; 
+            color: white; 
+            font-size: 0.7rem;
+            font-weight: 900;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+            z-index: 20;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
 
+        /* --- SCHEDULE CARD NEW DESIGN --- */
+        .schedule-match-card {
+            background: #111827; /* gray-900 */
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 150px 1fr; /* Team A | Center Info | Team B */
+            align-items: center;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        .schedule-match-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+        }
+        
+        .schedule-team-logo {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            border-radius: 50%;
+            background-color: white;
+            padding: 4px;
+            border: 3px solid transparent;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Center Info Style */
+        .schedule-center-info {
+            position: relative;
+            text-align: center;
+            padding: 1rem 0;
+            z-index: 10;
+        }
+        /* VS Separator (Cooler effect) */
+        .schedule-center-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: repeating-linear-gradient(to bottom, var(--primary-color), var(--primary-color) 4px, transparent 4px, transparent 8px);
+            opacity: 0.2;
+            z-index: 5;
+        }
+
+        /* Action Buttons Container (Hidden by default) - REMOVED EDIT BUTTON */
+        .schedule-actions {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--primary-color);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .schedule-match-card.show-actions .schedule-actions {
+            opacity: 1;
+            visibility: visible;
+        }
+        /* Team Containers */
+        .schedule-team-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+        }
+        .schedule-team-container.team-a { text-align: right; }
+        .schedule-team-container.team-b { text-align: left; }
+        .schedule-team-container .flex { margin-top: 8px; }
+
+        /* Media Query for larger screens */
+        @media (min-width: 640px) {
+            .schedule-team-container.team-a { 
+                flex-direction: row; 
+                justify-content: flex-end;
+                text-align: right;
+                gap: 12px;
+            }
+            .schedule-team-container.team-b { 
+                flex-direction: row; 
+                justify-content: flex-start;
+                text-align: left;
+                gap: 12px;
+            }
+            /* Adjust padding on larger screens */
+            .schedule-team-container { padding: 1.5rem 1rem; }
+        }
+
+        /* --- NEW: Daily Top Scorer Grid Design (Desktop) --- */
+        .top-scorer-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr); /* Default to 1 column */
+            gap: 1rem;
+        }
+        @media (min-width: 768px) { /* md: */
+            .top-scorer-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (min-width: 1024px) { /* lg: */
+            .top-scorer-grid {
+                grid-template-columns: repeat(5, 1fr); /* 5 columns for top 5 */
+            }
+        }
+        .scorer-card {
+            background: #1f2937;
+            border-radius: 12px;
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+        .scorer-card.is-top {
+            border-color: var(--primary-color);
+        }
+        .scorer-card-img {
+            width: 100%;
+            height: auto;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 3px solid white;
+            margin-bottom: 0.5rem;
+            aspect-ratio: 3/4;
+        }
+        .scorer-rank-tag {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(-50%);
+            background: var(--primary-color);
+            color: black;
+            font-size: 1.25rem;
+            font-weight: 900;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 3px solid black;
+            z-index: 20;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        /* --- NEW: All Stats Filter Styles --- */
+        .all-stats-row {
+            transition: all 0.1s;
+        }
+        .all-stats-row:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
     </style>
 </head>
-<body>
-    <div class="container mx-auto p-4 max-w-7xl">
-        <div id="daily-header" class="p-4 rounded-lg shadow-2xl border-b-4" style="background: linear-gradient(to right, #1c365b, #0c1626); border-color: #facc15;">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <img id="daily-logo-img" src="" class="w-12 h-12 object-cover rounded-full border-2" style="border-color: #facc15;" alt="Logo">
-                    <h1 id="daily-title-edit" class="text-2xl font-extrabold" style="color: #facc15;">
-                        สรุปผลการแข่งขัน Jakhong System
+<body class="flex flex-col">
+
+    <nav class="navbar sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between py-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center shadow-lg border border-white" 
+                         style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color))">
+                        <i class="fas fa-trophy text-black"></i>
+                    </div>
+                    <h1 class="text-xl font-extrabold italic uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-500" 
+                        id="nav-title">
+                        JAKHONG SYSTEM
                     </h1>
                 </div>
-                <button onclick="document.getElementById('settings-modal').classList.remove('hidden')" class="text-white hover:text-gray-300 transition duration-150">
-                    <i class="fas fa-cog text-xl"></i>
-                </button>
+                <button onclick="toggleSettings()" class="text-gray-400 hover:text-white transition"><i class="fas fa-cog text-xl"></i></button>
             </div>
-            
-            <div id="daily-controls" class="mt-4 p-3 bg-gray-800 rounded-md shadow-inner">
-                <h4 class="text-sm font-semibold mb-2 text-gray-400 border-b border-gray-700 pb-1">ควบคุมการแสดงผลและสี</h4>
-                <div class="flex gap-4 mb-3 items-end">
-                    <div class="flex flex-col">
-                        <label class="text-xs text-gray-400 block mb-1">วันที่ต้องการแสดง</label>
-                        <input type="date" id="daily-date" class="bg-gray-700 text-white p-1 rounded text-sm w-40" onchange="renderDaily()">
-                    </div>
-                    <div class="flex flex-col">
-                        <label class="text-xs text-gray-400 block mb-1">เรียงดาวซัลโวตาม</label>
-                        <select id="daily-scorer-sort" class="bg-gray-700 text-white p-1 rounded text-sm w-40" onchange="renderDaily()">
-                            <option value="goals">จำนวนประตู</option>
-                            <option value="name">ชื่อ (ก-ฮ)</option>
-                        </select>
-                    </div>
-                    <div class="flex items-end gap-3 text-sm flex-wrap">
-                        <label class="flex items-center text-gray-300 cursor-pointer">
-                            <input type="checkbox" id="daily-show-matches" checked onchange="renderDaily()" class="form-checkbox h-4 w-4 text-yellow-400 bg-gray-700 border-gray-600 rounded">
-                            <span class="ml-2">แสดงสรุปผล</span>
-                        </label>
-                        <label class="flex items-center text-gray-300 cursor-pointer">
-                            <input type="checkbox" id="daily-show-top-scorers" checked onchange="renderDaily()" class="form-checkbox h-4 w-4 text-yellow-400 bg-gray-700 border-gray-600 rounded">
-                            <span class="ml-2">แสดงดาวซัลโว</span>
-                        </label>
-                        <label class="flex items-center text-gray-300 cursor-pointer">
-                            <input type="checkbox" id="daily-show-today-scorers" checked onchange="renderDaily()" class="form-checkbox h-4 w-4 text-yellow-400 bg-gray-700 border-gray-600 rounded">
-                            <span class="ml-2">แสดงคนทำประตูวันนี้</span>
-                        </label>
-                    </div>
-                </div>
+            <div class="flex overflow-x-auto gap-3 pb-3 no-scrollbar">
+                <button onclick="nav('home', this)" class="nav-btn active px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition"><i class="fas fa-home"></i> แดชบอร์ด</button>
+                <button onclick="nav('leaderboard', this)" class="nav-btn px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition"><i class="fas fa-list-ol"></i> ตารางคะแนน</button>
+                <button onclick="nav('schedule', this)" class="nav-btn px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition"><i class="fas fa-calendar-alt"></i> โปรแกรมแข่ง</button>
+                <button onclick="nav('daily', this)" class="nav-btn px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition"><i class="fas fa-star"></i> สรุปผล/ดาวซัลโว</button>
+                <button onclick="nav('stats', this)" class="nav-btn px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition"><i class="fas fa-chart-bar"></i> บันทึกสถิติ</button>
+                <button onclick="nav('teams', this)" class="nav-btn px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition"><i class="fas fa-shield-alt"></i> จัดการทีม</button>
+                <button onclick="nav('players', this)" class="nav-btn px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition"><i class="fas fa-users"></i> รายชื่อนักเตะ</button>
+            </div>
+        </div>
+    </nav>
 
-                <div class="flex gap-2 mb-3 border-t border-gray-700 pt-3">
-                    <h5 class="text-sm font-medium mb-1 text-gray-400 w-full">สีหลัก (Header/Score)</h5>
+    <main class="flex-grow container mx-auto px-2 py-6 md:px-4">
+
+        <div id="page-home" class="section fade-in">
+            <div class="glass p-6 rounded-2xl mb-6">
+                <h2 class="text-2xl font-extrabold mb-4 flex items-center gap-3" style="color: var(--primary-color);">
+                    <i class="fas fa-chart-line"></i> สรุปภาพรวมลีก
+                </h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                    <div class="bg-gray-800 p-4 rounded-xl shadow-lg border-b-4" style="border-color: var(--primary-color);">
+                        <div class="text-3xl font-black" id="stat-total-teams">0</div>
+                        <div class="text-gray-400 text-sm">จำนวนทีม</div>
+                    </div>
+                    <div class="bg-gray-800 p-4 rounded-xl shadow-lg border-b-4 border-green-500">
+                        <div class="text-3xl font-black" id="stat-total-stats">0</div>
+                        <div class="text-gray-400 text-sm">สถิติที่บันทึก</div> 
+                    </div>
+                    <div class="bg-gray-800 p-4 rounded-xl shadow-lg border-b-4 border-red-500">
+                        <div class="text-3xl font-black" id="stat-total-goals">0</div>
+                        <div class="text-gray-400 text-sm">รวมประตู</div>
+                    </div>
+                    <div class="bg-gray-800 p-4 rounded-xl shadow-lg border-b-4 border-blue-500">
+                        <div class="text-3xl font-black" id="stat-total-players">0</div>
+                        <div class="text-gray-400 text-sm">จำนวนนักเตะ</div>
+                    </div>
                 </div>
-                <div class="flex gap-2 mb-3">
-                    <div><label class="text-xs text-gray-400 block mb-1">สีสกอร์ 1</label><input type="color" id="daily-score-grad-1" value="#facc15" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
-                    <div><label class="text-xs text-gray-400 block mb-1">สีสกอร์ 2</label><input type="color" id="daily-score-grad-2" value="#eab308" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
-                    <div><label class="text-xs text-gray-400 block mb-1">อักษรสกอร์</label><input type="color" id="daily-score-text" value="#1f2937" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div id="leader-team-card" class="glass p-5 rounded-2xl border-l-4 flex items-center gap-4" style="border-color: var(--primary-color);">
+                    <i class="fas fa-trophy text-4xl" style="color: var(--primary-color);"></i>
+                    <div>
+                        <div class="text-lg font-bold" style="color: var(--primary-color);">ทีมนำตารางคะแนน:</div>
+                        <div class="text-2xl font-black uppercase" id="leader-team-name">N/A</div>
+                        <div class="text-sm text-gray-300"><span id="leader-team-pts">0</span> แต้ม</div>
+                    </div>
                 </div>
-                <div class="flex gap-2">
-                    <div><label class="text-xs text-gray-400 block mb-1">แบนเนอร์ 1</label><input type="color" id="daily-banner-grad-1" value="#1c365b" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
-                    <div><label class="text-xs text-gray-400 block mb-1">แบนเนอร์ 2</label><input type="color" id="daily-banner-grad-2" value="#0c1626" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
-                    <div><label class="text-xs text-gray-400 block mb-1">อักษรแบนเนอร์</label><input type="color" id="daily-banner-text" value="#facc15" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
-                    <div><label class="text-xs text-gray-400 block mb-1">ขอบแบนเนอร์</label><input type="color" id="daily-banner-border" value="#facc15" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                <div id="top-scorer-card" class="glass p-5 rounded-2xl border-l-4 border-red-500 flex items-center gap-4">
+                    <i class="fas fa-futbol text-4xl text-red-500"></i>
+                    <div>
+                        <div class="text-lg font-bold text-red-400">ดาวซัลโวสูงสุด:</div>
+                        <div class="text-2xl font-black uppercase" id="top-scorer-name">N/A</div>
+                        <div class="text-sm text-gray-300"><span id="top-scorer-goals">0</span> ประตู</div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="glass p-6 rounded-2xl">
+                <h2 class="text-2xl font-extrabold mb-4 flex items-center gap-3" style="color: var(--primary-color);">
+                    <i class="fas fa-user-tie"></i> รายชื่อผู้จัดการทีม
+                </h2>
+                <div id="manager-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    </div>
+            </div>
+        </div>
+
+        <div id="page-leaderboard" class="section hidden fade-in">
+            <div class="glass p-3 rounded-xl mb-4 flex flex-wrap gap-4 items-center text-xs">
+                <strong class="text-yellow-400">ปรับแต่งตาราง:</strong>
+                <div><label>สีพื้นตาราง</label><input type="color" id="lb-bg-body" value="#1e293b" class="w-5 h-5 rounded align-middle ml-1 cursor-pointer" oninput="renderLeaderboard()"></div>
+                <div><label>สีตัวอักษร</label><input type="color" id="lb-body-text-color" value="#ffffff" class="w-5 h-5 rounded align-middle ml-1 cursor-pointer" oninput="renderLeaderboard()"></div>
+                <div class="h-4 w-px bg-gray-600"></div>
+                <div><label>สีพื้นหลังหัวตาราง 1</label><input type="color" id="lb-header-grad-1" value="#1c365b" class="w-5 h-5 rounded align-middle ml-1 cursor-pointer" oninput="renderLeaderboard()"></div>
+                <div><label>สีพื้นหลังหัวตาราง 2</label><input type="color" id="lb-header-grad-2" value="#0c1626" class="w-5 h-5 rounded align-middle ml-1 cursor-pointer" oninput="renderLeaderboard()"></div>
+                <div><label>สีตัวอักษรหัวตาราง</label><input type="color" id="lb-header-text-color" value="#ffffff" class="w-5 h-5 rounded align-middle ml-1 cursor-pointer" oninput="renderLeaderboard()"></div>
+                <div class="h-4 w-px bg-gray-600"></div>
+                <div><label>สีพื้นหลังแต้ม 1</label><input type="color" id="lb-pts-grad-1" value="#facc15" class="w-5 h-5 rounded align-middle ml-1 cursor-pointer" oninput="renderLeaderboard()"></div>
+                <div><label>สีพื้นหลังแต้ม 2</label><input type="color" id="lb-pts-grad-2" value="#e3a008" class="w-5 h-5 rounded align-middle ml-1 cursor-pointer" oninput="renderLeaderboard()"></div>
+            </div>
+
+            <div class="rounded-xl overflow-hidden shadow-2xl">
+                <div id="lb-banner" class="p-6 text-center relative" style="background: linear-gradient(135deg, #1c365b, #0c1626);">
+                    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
+                    <h2 contenteditable="true" id="lb-title" class="relative text-3xl md:text-5xl font-extrabold uppercase italic outline-text tracking-wider z-10 focus:outline-none focus:border-b border-white" style="color: var(--primary-color);">
+                        ตารางคะแนน JAKHONG SENIOR CUP
+                    </h2>
                 </div>
                 
-                <div class="flex gap-2 mt-3 border-t border-gray-700 pt-3">
-                    <h5 class="text-sm font-medium mb-1 text-gray-400 w-full">สีรายละเอียดนักเตะ (ดาวซัลโว/ทำประตูวันนี้)</h5>
+                <div class="overflow-x-auto bg-gray-900">
+                    <table class="w-full text-left border-collapse min-w-[700px]" id="lb-table">
+                        <thead>
+                            <tr class="uppercase text-sm tracking-wider border-b border-white/10" id="lb-thead-row">
+                                <th class="p-4" style="color: #ffffff;">อันดับ</th>
+                                <th class="p-4" style="color: #ffffff;">ทีม</th>
+                                <th class="p-4 text-center" style="color: #ffffff;">แข่ง</th>
+                                <th class="p-4 text-center" style="color: #ffffff;">ชนะ</th>
+                                <th class="p-4 text-center" style="color: #ffffff;">เสมอ</th>
+                                <th class="p-4 text-center" style="color: #ffffff;">แพ้</th>
+                                <th class="p-4 text-center" style="color: #ffffff;">ได้/เสีย</th>
+                                <th class="p-4 text-center" style="color: #ffffff;">+/-</th>
+                                <th class="p-0 text-center text-xl">
+                                    <div style="background: linear-gradient(135deg, var(--primary-color), #e3a008); color: black;" class="font-black">แต้ม</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="lb-body" class="text-base font-medium"></tbody>
+                    </table>
                 </div>
-                <div class="flex gap-2">
-                    <div><label class="text-xs text-gray-400 block mb-1">สีพื้นการ์ด</label><input type="color" id="daily-card-bg" value="#1f2937" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
-                    <div><label class="text-xs text-gray-400 block mb-1">สีหัวข้อ/แบนเนอร์ดาว</label><input type="color" id="daily-scorer-banner-bg" value="#1c365b" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
-                    <div><label class="text-xs text-gray-400 block mb-1">สีอักษรรายละเอียด</label><input type="color" id="daily-detail-text" value="#ffffff" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
-                    <div><label class="text-xs text-gray-400 block mb-1">สีกรอบรูป</label><input type="color" id="daily-frame-color" value="#ffffff" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
-                </div>
-                </div>
+            </div>
         </div>
 
-        <div id="daily-content" class="mt-4 p-4 rounded-lg shadow-xl" style="background-color: #0c1626;">
+        <div id="page-schedule" class="section hidden fade-in">
+            <div class="glass p-3 rounded-xl mb-4 flex flex-wrap gap-4 items-center text-xs">
+                <button onclick="openAddSchedModal()" class="bg-green-600 text-white px-3 py-1 rounded font-bold hover:bg-green-500 transition">+ เพิ่มแมทช์</button>
+                <div class="h-4 w-px bg-gray-600"></div>
+                <div><label>สีพื้นหลัง (BG)</label><input type="color" id="sc-bg-color-main" value="#1c365b" class="w-5 h-5 rounded cursor-pointer" oninput="renderSchedule()"></div>
+                <label>สีพื้นหลัง (Overlay):</label>
+                <input type="color" id="sc-bg-color" value="#1c365b" class="w-5 h-5 rounded cursor-pointer" oninput="renderSchedule()">
+                <label>สีตัวอักษร:</label>
+                <input type="color" id="sc-text-color" value="#ffffff" class="w-5 h-5 rounded cursor-pointer" oninput="renderSchedule()">
+                <label>สีพื้นหลังหัวข้อ:</label>
+                <input type="color" id="sc-pill-color" value="#facc15" class="w-5 h-5 rounded cursor-pointer" oninput="renderSchedule()">
+                <input type="text" id="sc-header-text" value="โปรแกรมการแข่งขัน" class="bg-gray-700 text-white px-2 rounded w-32" oninput="renderSchedule()">
+            </div>
 
-            <div id="daily-matches-section">
-                <h3 class="text-center font-bold text-xl uppercase mb-4 border-b border-gray-700 pb-2">
-                    สรุปผลการแข่งขัน
-                </h3>
-                <div id="daily-matches" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex flex-col min-h-[500px] rounded-xl overflow-hidden shadow-2xl relative" id="schedule-main-container">
+                <div class="flex-1 p-4 md:p-8 relative z-10 w-full" id="sc-container">
+                    <div class="text-center mb-8">
+                        <span id="sc-pill" class="inline-block px-8 py-2 rounded-full text-xl md:text-2xl font-bold uppercase shadow-lg text-black mb-2 transform skew-x-[-10deg]" style="background-color: var(--primary-color);">
+                            โปรแกรมการแข่งขัน
+                        </span>
+                    </div>
+
+                    <div class="flex gap-3 justify-center mb-6 overflow-x-auto no-scrollbar" id="group-tabs-container">
+                        <button onclick="setGroupFilter('All', this)" class="group-tab active text-black px-4 py-1 rounded-full text-sm font-bold transition hover:bg-yellow-600" style="background-color: var(--primary-color);">ทั้งหมด</button>
+                        <button onclick="setGroupFilter('A', this)" class="group-tab bg-gray-700 text-white px-4 py-1 rounded-full text-sm font-medium transition hover:bg-gray-600">กลุ่ม A</button>
+                        <button onclick="setGroupFilter('B', this)" class="group-tab bg-gray-700 text-white px-4 py-1 rounded-full text-sm font-medium transition hover:bg-gray-600">กลุ่ม B</button>
+                    </div>
+                    
+                    <div id="sched-list" class="space-y-4 max-w-4xl mx-auto">
+                        </div>
+                </div>
+
+                <div id="sc-bg-overlay" class="absolute inset-0 z-0 bg-gradient-to-br from-blue-900 to-black opacity-90"></div>
+            </div>
+        </div>
+
+        <div id="page-daily" class="section hidden fade-in">
+            <div class="glass p-4 rounded-xl mb-6 flex flex-wrap gap-6 items-end">
+                <div>
+                    <label class="text-xs text-gray-400 block mb-1">แสดงผล (Daily/Stats)</label>
+                    <select id="daily-view-mode" class="bg-black border border-gray-600 p-2 rounded text-white text-sm w-full" onchange="renderDaily() || renderAllStats()">
+                        <option value="daily">สรุปผลประจำวัน</option>
+                        <option value="stats">สถิติรวมผู้เล่น (ทั้งลีก)</option>
+                    </select>
+                </div>
+                <div id="daily-controls" class="flex flex-wrap gap-6 items-end">
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">เลือกวันที่</label>
+                        <input type="date" id="daily-date" class="bg-black border border-gray-600 p-2 rounded text-white text-sm w-full" onchange="renderDaily()">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">เรียงดาวซัลโว</label>
+                        <select id="daily-scorer-sort" class="bg-black border border-gray-600 p-2 rounded text-white text-sm" onchange="renderDaily()">
+                            <option value="goals">ประตู (สูงสุด)</option>
+                            <option value="name">ชื่อ</option>
+                            <option value="number">เบอร์เสื้อ</option>
+                        </select>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <div><label class="text-xs text-gray-400 block mb-1">สีตัวเลขสกอร์</label><input type="color" id="daily-score-text-color" value="#000000" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                        
+                        <div><label class="text-xs text-gray-400 block mb-1">สีสกอร์ 1</label><input type="color" id="daily-score-grad-1" value="#facc15" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                        <div><label class="text-xs text-gray-400 block mb-1">สีสกอร์ 2</label><input type="color" id="daily-score-grad-2" value="#e3a008" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                        
+                        <div><label class="text-xs text-gray-400 block mb-1">สีชื่อทีม</label><input type="color" id="daily-team-name-color" value="#ffffff" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div> 
+                        <div><label class="text-xs text-gray-400 block mb-1">สีพื้นแถบ 1</label><input type="color" id="daily-row-bg-1" value="#1f2937" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                        <div><label class="text-xs text-gray-400 block mb-1">สีพื้นแถบ 2</label><input type="color" id="daily-row-bg-2" value="#0c1626" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                    </div>
+                    <div class="flex gap-2">
+                        <div><label class="text-xs text-gray-400 block mb-1">แบนเนอร์ 1</label><input type="color" id="daily-banner-grad-1" value="#1c365b" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                        <div><label class="text-xs text-gray-400 block mb-1">แบนเนอร์ 2</label><input type="color" id="daily-banner-grad-2" value="#0c1626" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                        <div><label class="text-xs text-gray-400 block mb-1">อักษรแบนเนอร์</label><input type="color" id="daily-banner-text" value="#facc15" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                        <div><label class="text-xs text-gray-400 block mb-1">ขอบแบนเนอร์</label><input type="color" id="daily-banner-border" value="#facc15" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                    </div>
+                </div>
+
+                <div id="all-stats-controls" class="hidden">
+                    <label class="text-xs text-gray-400 block mb-1">สถิติที่ต้องการกรอง</label>
+                    <select id="stat-filter-type" class="bg-black border border-gray-600 p-2 rounded text-white text-sm" onchange="renderAllStats()">
+                        <option value="goal">⚽ ประตู (สูงสุด)</option>
+                        <option value="yellow">🟨 ใบเหลือง (สูงสุด)</option>
+                        <option value="red">🟥 ใบแดง (สูงสุด)</option>
+                        <option value="save">🧤 เซฟ (สูงสุด)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="daily-preview" class="bg-white max-w-[900px] mx-auto shadow-2xl overflow-hidden pb-10 rounded-xl">
+                
+                <div id="daily-header" class="py-4 px-4 flex flex-wrap items-center justify-between relative border-b-4 border-yellow-500">
+                    <div class="flex items-center gap-3 z-10">
+                        <img id="daily-logo-img" src="" class="w-12 h-12 object-contain drop-shadow-md bg-white rounded-full p-1 border border-yellow-400">
+                        <div contenteditable="true" id="daily-title-edit" class="text-xl md:text-3xl font-extrabold uppercase italic leading-none outline-text text-yellow-400" style="text-shadow: 2px 2px 0 #000;">
+                            สรุปผลการแข่งขัน 25/11/2568 JAKHONG LEAGUE 3
+                        </div>
+                    </div>
+                </div>
+
+                <div id="daily-content">
+                    <div class="p-4 md:p-8 bg-gray-900 min-h-[200px] space-y-3" id="daily-matches-container"></div>
+
+                    <div class="grid grid-cols-1 mt-4">
+                        
+                        <div class="bg-gray-800 p-4 border-b border-gray-700 flex flex-col">
+                            <h3 class="text-center font-bold text-yellow-400 uppercase text-lg mb-4 border-b border-gray-700 pb-2">
+                                <span id="daily-scorer-header">ดาวซัลโวสูงสุด (Top 5)</span>
+                            </h3>
+                            <div id="daily-top-scorers" class="top-scorer-grid">
+                                </div>
+                        </div>
+
+                        <div class="bg-gradient-to-br from-gray-900 to-black p-4">
+                            <h3 class="text-center font-bold text-green-400 uppercase text-lg mb-4 border-b border-gray-700 pb-2">
+                                ผู้ที่ทำประตูวันนี้
+                            </h3>
+                            <div id="daily-today-scorers" class="top-scorer-grid">
+                                </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="all-stats-content" class="hidden">
+                    <div class="p-4 md:p-8 bg-gray-900 min-h-[200px]">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="uppercase text-xs tracking-wider border-b border-white/10 text-gray-400">
+                                    <th class="p-2">อันดับ</th>
+                                    <th class="p-2">นักเตะ</th>
+                                    <th class="p-2 text-center">ทีม</th>
+                                    <th class="p-2 text-center" id="all-stats-header">จำนวน</th>
+                                </tr>
+                            </thead>
+                            <tbody id="all-stats-body" class="text-sm font-medium">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="page-stats" class="section hidden fade-in">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="glass p-6 rounded-2xl h-fit">
+                    <h2 class="text-xl font-bold mb-4" style="color: var(--primary-color);">บันทึกสถิติ / ผลการแข่ง</h2>
+                    <div class="mb-6 p-4 bg-white/5 rounded-xl border border-white/10">
+                        <h3 class="text-sm font-bold text-gray-400 mb-2">บันทึกผลสกอร์</h3>
+                        <div class="mb-3">
+                            <label class="text-xs text-gray-400">ดึงข้อมูลจากโปรแกรมแข่ง (ที่ยังไม่แข่ง):</label>
+                            <select id="m-schedule-id" class="w-full bg-gray-800 p-2 rounded text-xs" onchange="prefillMatchFromSchedule()">
+                                <option value="">--- เลือกแมทช์เพื่อกรอกข้อมูลอัตโนมัติ ---</option>
+                            </select>
+                        </div>
+                        <form onsubmit="handleMatchSubmit(event)" class="space-y-3">
+                            <input type="hidden" id="match-edit-id">
+                            <div class="flex gap-4 items-end">
+                                <div class="flex-1">
+                                    <label class="text-xs text-gray-400">วันที่แข่ง</label>
+                                    <input type="date" id="m-date" class="w-full bg-gray-800 p-2 rounded border border-gray-600" required>
+                                </div>
+                                <div class="flex-1">
+                                    <label class="text-xs text-gray-400">กลุ่ม (ถ้ามี)</label>
+                                    <select id="m-group" class="w-full bg-gray-800 p-2 rounded border border-gray-600">
+                                        <option value="">ไม่ระบุ</option>
+                                        <option value="A">กลุ่ม A</option>
+                                        <option value="B">กลุ่ม B</option>
+                                        <option value="C">กลุ่ม C</option>
+                                        <option value="D">กลุ่ม D</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <select id="m-team-a" class="w-full bg-gray-800 p-2 rounded border border-gray-600" required></select>
+                                <input type="number" id="m-score-a" class="w-16 bg-gray-800 p-2 rounded border border-gray-600 text-center text-xl font-black" value="0" min="0" required>
+                            </div>
+                            <div class="text-center text-sm font-bold text-gray-400">VS</div>
+                            <div class="flex items-center gap-4">
+                                <select id="m-team-b" class="w-full bg-gray-800 p-2 rounded border border-gray-600" required></select>
+                                <input type="number" id="m-score-b" class="w-16 bg-gray-800 p-2 rounded border border-gray-600 text-center text-xl font-black" value="0" min="0" required>
+                            </div>
+                            <button id="btn-match-save" class="w-full text-black py-2 rounded font-bold hover:opacity-90 transition mt-4" style="background-color: var(--primary-color);">บันทึกผลการแข่ง</button>
+                            <button type="button" id="btn-match-cancel" onclick="resetMatchForm()" class="w-full bg-gray-600 py-2 rounded mt-2 hidden">ยกเลิก/เพิ่มใหม่</button>
+                        </form>
+                    </div>
+
+                    <div class="p-4 bg-white/5 rounded-xl border border-white/10">
+                        <h3 class="text-sm font-bold text-gray-400 mb-2">บันทึกสถิติผู้เล่น (ประตู / ใบเหลือง / ฯลฯ)</h3>
+                        <form onsubmit="handleStatSubmit(event)" class="space-y-3">
+                            <input type="hidden" id="edit-stat-id">
+                            <div class="flex gap-4 items-end">
+                                <div class="flex-1">
+                                    <label class="text-xs text-gray-400">วันที่</label>
+                                    <input type="date" id="s-date" class="w-full bg-gray-800 p-2 rounded border border-gray-600" required>
+                                </div>
+                                <div class="flex-1">
+                                    <label class="text-xs text-gray-400">ทีมที่ทำสถิติ</label>
+                                    <select id="s-team" class="w-full bg-gray-800 p-2 rounded border border-gray-600" onchange="updatePlayerDropdown('s-team', 's-player')" required></select>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-end">
+                                <div class="flex-1">
+                                    <label class="text-xs text-gray-400">นักเตะ</label>
+                                    <select id="s-player" class="w-full bg-gray-800 p-2 rounded border border-gray-600" required></select>
+                                </div>
+                                <div class="flex-1">
+                                    <label class="text-xs text-gray-400">ประเภทสถิติ</label>
+                                    <select id="s-type" class="w-full bg-gray-800 p-2 rounded border border-gray-600" required>
+                                        <option value="goal">⚽ ประตู</option>
+                                        <option value="yellow">🟨 ใบเหลือง</option>
+                                        <option value="red">🟥 ใบแดง</option>
+                                        <option value="save">🧤 เซฟ</option>
+                                    </select>
+                                </div>
+                                <div class="w-20">
+                                    <label class="text-xs text-gray-400">จำนวน</label>
+                                    <input type="number" id="s-count" class="w-full bg-gray-800 p-2 rounded border border-gray-600 text-center font-bold" value="1" min="1" required>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-400">หมายเหตุ (เช่น นาทีที่, จุดโทษ)</label>
+                                <input type="text" id="s-note" class="w-full bg-gray-800 p-2 rounded border border-gray-600">
+                            </div>
+                            <button id="btn-stat-save" class="w-full text-black py-2 rounded font-bold hover:opacity-90 transition mt-4" style="background-color: var(--primary-color);">บันทึกสถิติ</button>
+                            <button type="button" id="btn-stat-cancel" onclick="resetStatForm()" class="w-full bg-gray-600 py-2 rounded mt-2 hidden">ยกเลิก/เพิ่มใหม่</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="glass p-6 rounded-2xl flex flex-col max-h-[800px]">
+                    <h2 class="text-xl font-bold mb-4" style="color: var(--primary-color);">ประวัติการบันทึก</h2>
+                    <div class="flex mb-4 border-b border-gray-700">
+                        <button onclick="showHistory('match', this)" id="hist-tab-match" class="hist-tab px-4 py-2 text-sm font-bold border-b-2" style="color: var(--primary-color); border-color: var(--primary-color);">ผลการแข่งขัน</button>
+                        <button onclick="showHistory('stat', this)" id="hist-tab-stat" class="hist-tab px-4 py-2 text-sm font-bold text-gray-400 hover:text-white">สถิติผู้เล่น</button>
+                    </div>
+                    <div class="overflow-y-auto pr-2 space-y-2 flex-1 custom-scrollbar">
+                        <div id="history-match-list" class="space-y-2"></div>
+                        <div id="history-stat-list" class="space-y-2 hidden"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-teams" class="section hidden fade-in">
+            <div class="glass p-6 rounded-2xl mb-8">
+                <h2 class="text-xl font-bold mb-4" style="color: var(--primary-color);">จัดการทีม</h2>
+                <form onsubmit="handleTeamSubmit(event)" class="flex flex-wrap gap-4 items-end">
+                    <input type="hidden" id="team-edit-id">
+                    <div class="flex-1 min-w-[200px]">
+                        <label class="text-xs text-gray-400">ชื่อทีม</label>
+                        <input type="text" id="team-name" class="w-full bg-gray-800 p-2 rounded border border-gray-600" required>
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-400">สีทีม (เลือกสี)</label>
+                        <input type="color" id="team-color" class="w-10 h-10 rounded cursor-pointer block mt-1">
+                    </div>
+                    <div class="flex-1 min-w-[200px]">
+                        <label class="text-xs text-gray-400">เบอร์โทรผู้จัดการ (เพื่อแสดงในแดชบอร์ด)</label>
+                        <input type="tel" id="team-tel" class="w-full bg-gray-800 p-2 rounded border border-gray-600">
+                    </div>
+                    <div>
+                        <button id="btn-team-save" class="text-black py-2 px-6 rounded font-bold hover:opacity-90 transition whitespace-nowrap" style="background-color: var(--primary-color);">+ เพิ่มทีม</button>
+                        <button type="button" id="btn-team-cancel" onclick="resetTeamForm()" class="bg-gray-600 py-2 px-6 rounded ml-2 hidden">ยกเลิก</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="glass p-6 rounded-2xl">
+                <h2 class="text-xl font-bold mb-4" style="color: var(--primary-color);">รายชื่อทีมปัจจุบัน</h2>
+                <div id="teams-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                </div>
+            </div>
+        </div>
+
+        <div id="page-players" class="section hidden fade-in">
+            <div class="glass p-6 rounded-2xl mb-8">
+                <h2 class="text-xl font-bold mb-4" style="color: var(--primary-color);">รายชื่อนักเตะ</h2>
+                <div id="team-tabs-container" class="flex overflow-x-auto gap-3 pb-3 mb-6 border-b border-gray-700 no-scrollbar">
+                    </div>
+                <div id="players-list" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                     </div>
             </div>
-            
-            <div class="grid grid-cols-1 mt-4">
-    
-                <div id="top-scorer-section" class="p-4 border-b border-gray-700 flex flex-col" style="background-color: #1c365b;"> 
-                    <h3 class="text-center font-bold text-yellow-400 uppercase text-lg mb-4 border-b border-gray-700 pb-2">
-                        <span id="daily-scorer-header" style="color: #ffffff;">ดาวซัลโวสูงสุด (Top 5)</span>
-                    </h3>
-                    <div id="daily-top-scorers" class="top-scorer-grid">
+        </div>
+
+    </main>
+
+    <div id="settings-modal" class="fixed inset-0 bg-black/90 hidden z-50 flex items-center justify-center">
+        <div class="glass p-6 rounded-xl w-full max-w-lg">
+            <h3 class="text-xl font-bold mb-4" style="color: var(--primary-color);">ตั้งค่าระบบ</h3>
+            <div class="space-y-4">
+                <div class="p-3 bg-gray-800 rounded-lg">
+                    <h4 class="font-bold text-gray-300 mb-2">ข้อมูลลีก (แสดงบน Navbar / Banner)</h4>
+                    <input type="text" id="theme-name-input" placeholder="ชื่อลีก" class="w-full bg-gray-700 p-2 rounded mb-2" oninput="updateThemeAndSave()">
+                    <div class="flex gap-4">
+                        <div class="flex-1">
+                            <label class="text-xs text-gray-400">สีหลัก (Primary/Accent)</label>
+                            <input type="color" id="theme-color-input" class="w-full h-10 rounded cursor-pointer block mt-1" oninput="updateThemeAndSave()">
                         </div>
+                        <div class="flex-1">
+                            <label class="text-xs text-gray-400">สีรอง (Secondary/Header BG)</label>
+                            <input type="color" id="secondary-color-input" class="w-full h-10 rounded cursor-pointer block mt-1" oninput="updateThemeAndSave()">
+                        </div>
+                    </div>
                 </div>
 
-                <div id="today-scorer-section" class="p-4" style="background-color: #1c365b;">
-                    <h3 class="text-center font-bold text-green-400 uppercase text-lg mb-4 border-b border-gray-700 pb-2" style="color: #ffffff;">
-                        ผู้ที่ทำประตูวันนี้
-                    </h3>
-                    <div id="daily-today-scorers" class="top-scorer-grid">
-                        </div>
+                <div class="p-3 bg-gray-800 rounded-lg">
+                    <h4 class="font-bold text-gray-300 mb-2">โลโก้ลีก</h4>
+                    <input type="file" id="global-logo-input" accept="image/*" class="w-full text-xs text-gray-400 mb-2">
+                    <div class="flex items-center gap-4">
+                        <button onclick="uploadGlobalLogo()" class="bg-blue-600 text-white px-4 py-1.5 rounded text-sm font-bold hover:bg-blue-500 transition">อัปโหลดโลโก้</button>
+                        <img id="global-logo-preview" src="" alt="League Logo" class="w-12 h-12 logo-circle object-contain bg-white p-1 border border-white">
+                        <button onclick="clearGlobalLogo()" class="text-red-400 text-sm hover:text-red-300 transition">ลบโลโก้</button>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-gray-800 rounded-lg">
+                    <h4 class="font-bold text-red-400 mb-2">ข้อมูลระบบ (อันตราย!)</h4>
+                    <div class="flex gap-4">
+                        <button onclick="exportData()" class="bg-green-600 text-white px-4 py-1.5 rounded text-sm font-bold hover:bg-green-500 transition flex-1">Export ข้อมูล (JSON)</button>
+                        <input type="file" id="import-data-file" accept=".json" class="hidden" onchange="importData(this)">
+                        <button onclick="document.getElementById('import-data-file').click()" class="bg-yellow-600 text-white px-4 py-1.5 rounded text-sm font-bold hover:bg-yellow-500 transition flex-1">Import ข้อมูล (JSON)</button>
+                    </div>
+                    <button onclick="confirmClearAll()" class="w-full bg-red-600 text-white px-4 py-1.5 rounded text-sm font-bold hover:bg-red-500 transition mt-3">ล้างข้อมูลทั้งหมด</button>
                 </div>
             </div>
-        </div>
 
+            <button onclick="toggleSettings()" class="w-full bg-gray-600 py-2 rounded mt-6">ปิด</button>
         </div>
+    </div>
+
+    <div id="sched-modal" class="fixed inset-0 bg-black/90 hidden z-50 flex items-center justify-center">
+        <div class="glass p-6 rounded-xl w-full max-w-md">
+            <h3 class="text-xl font-bold mb-4" style="color: var(--primary-color);">เพิ่ม/แก้ไข โปรแกรมแข่ง</h3>
+            <form onsubmit="handleSchedSubmit(event)" class="space-y-3">
+                <input type="hidden" id="sc-id">
+                <div class="flex gap-4">
+                    <div class="flex-1">
+                        <label class="text-xs text-gray-400">วันที่แข่ง</label>
+                        <input type="date" id="sc-date" class="w-full bg-gray-800 p-2 rounded" required>
+                    </div>
+                    <div class="flex-1">
+                        <label class="text-xs text-gray-400">เวลาแข่ง</label>
+                        <input type="time" id="sc-time" class="w-full bg-gray-800 p-2 rounded" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400">สัปดาห์ที่ / รอบ</label>
+                    <input type="text" id="sc-week" placeholder="เช่น สัปดาห์ที่ 5 / รอบรองชนะเลิศ" class="w-full bg-gray-800 p-2 rounded">
+                </div>
+                <div class="flex items-center gap-4">
+                    <select id="sc-team-a" class="w-full bg-gray-800 p-2 rounded" required></select>
+                    <span class="text-lg font-bold text-gray-400">VS</span>
+                    <select id="sc-team-b" class="w-full bg-gray-800 p-2 rounded" required></select>
+                </div>
+                <label class="text-xs text-gray-400">กลุ่ม (ถ้ามี)</label>
+                <select id="sc-group" class="w-full bg-gray-800 p-2 rounded">
+                    <option value="">ไม่ระบุ</option>
+                    <option value="A">กลุ่ม A</option>
+                    <option value="B">กลุ่ม B</option>
+                    <option value="C">กลุ่ม C</option>
+                    <option value="D">กลุ่ม D</option>
+                </select>
+                <button class="w-full text-black py-2 rounded font-bold hover:opacity-90 transition" style="background-color: var(--primary-color);">บันทึก</button>
+                <button type="button" onclick="document.getElementById('sched-modal').classList.add('hidden')" class="w-full bg-gray-600 py-2 rounded mt-2">ปิด</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="player-modal" class="fixed inset-0 bg-black/90 hidden z-50 flex items-center justify-center">
+        <div class="glass p-6 rounded-xl w-full max-w-md">
+            <h3 id="player-modal-title" class="text-xl font-bold mb-4" style="color: var(--primary-color);">ข้อมูลนักเตะ</h3>
+            <form onsubmit="handlePlayerSubmit(event)" class="space-y-3">
+                <input type="hidden" id="p-id">
+                <input type="text" id="p-name" placeholder="ชื่อ-นามสกุล" class="w-full bg-gray-800 p-2 rounded" required>
+                <div class="flex gap-2">
+                    <input type="text" id="p-no" placeholder="เบอร์" class="w-20 bg-gray-800 p-2 rounded">
+                    <select id="p-team" class="flex-1 bg-gray-800 p-2 rounded" required></select>
+                </div>
+                <label class="flex gap-2 text-sm items-center"><input type="checkbox" id="p-manager" class="w-4 h-4 text-yellow-500 bg-gray-700 border-gray-600 rounded focus:ring-yellow-500"> เป็นผู้จัดการทีม</label>
+                <input type="file" id="p-img" accept="image/*" class="w-full text-xs text-gray-400">
+                <p class="text-xs text-gray-400 mt-1">อัปโหลดรูปภาพนักเตะเพื่อแสดงในหน้าต่าง ๆ (ขนาดแนะนำ 3:4)</p>
+                <img id="p-img-preview" src="" alt="Player Photo Preview" class="max-h-40 object-cover w-full rounded my-2 hidden">
+                <button id="btn-player-save" class="w-full text-black py-2 rounded font-bold hover:opacity-90 transition mt-4" style="background-color: var(--primary-color);">บันทึก</button>
+                <button type="button" onclick="document.getElementById('player-modal').classList.add('hidden')" class="w-full bg-gray-600 py-2 rounded mt-2">ปิด</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="storage-warning-modal" class="fixed inset-0 bg-black/90 hidden z-50 flex items-center justify-center">
+        <div class="glass p-6 rounded-xl w-full max-w-md text-center">
+            <h3 class="text-2xl font-bold text-red-500 mb-4">พื้นที่เก็บข้อมูลเต็ม! (Quota Exceeded)</h3>
+            <p class="text-sm text-yellow-300 font-bold mb-6">⚠️ **จำเป็นต้องล้างข้อมูลบางส่วน (เช่น รูปภาพเก่า) หรือ Export ข้อมูล และลบไฟล์ Local Storage ทิ้งเพื่อบันทึกข้อมูลต่อไป**</p>
+            <button onclick="document.getElementById('storage-warning-modal').classList.add('hidden')" class="bg-red-600 text-white px-6 py-2 rounded font-bold hover:bg-red-500 transition">รับทราบและปิด</button>
+        </div>
+    </div>
 
     <script>
-        // --- DATA STRUCTURES (Assume they exist or initialize as empty) ---
-        let teams = [];
-        let players = [];
-        let matches = [];
-        let stats = [];
-        let schedules = [];
-        let globalLogo = "https://i.ibb.co/5c0YV9c/Jakhong-Logo.png";
-        let themeName = 'JAKHONG SYSTEM';
-        let themeColor = '#facc15';
-        let secondaryColor = '#1c365b';
-        let isDarkMode = true;
+        // --- STATE & THEME (UPDATED) ---
+        let teams = JSON.parse(localStorage.getItem('jl_teams')) || [];
+        let players = JSON.parse(localStorage.getItem('jl_players')) || [];
+        let matches = JSON.parse(localStorage.getItem('jl_matches')) || [];
+        let stats = JSON.parse(localStorage.getItem('jl_stats')) || [];
+        let schedules = JSON.parse(localStorage.getItem('jl_schedules')) || [];
+        let globalLogo = localStorage.getItem('jl_logo') || "";
+        let themeName = localStorage.getItem('jl_theme_name') || 'JAKHONG SYSTEM';
+        let themeColor = localStorage.getItem('jl_theme_color') || '#facc15';
+        let secondaryColor = localStorage.getItem('jl_secondary_color') || '#1c365b';
+        let currentGroupFilter = 'All';
+        let currentTeamView = 'all';
 
-        // ... [ฟังก์ชัน load(), save(), exportData(), importData(), formatDate() ที่มีอยู่เดิม] ...
-        // ** ต้องมั่นใจว่าฟังก์ชันเหล่านี้มีอยู่ในโค้ดต้นฉบับของท่าน **
+        // ** CRITICAL FIX: Default Data Structure **
+        const DEFAULT_TEAMS = [
+            { id: 't1', name: 'Phoenix FC', color: '#ff4d4d', tel: '081-111-1111', logo: '' },
+            { id: 't2', name: 'Dragons United', color: '#4d79ff', tel: '081-222-2222', logo: '' },
+            { id: 't3', name: 'Thunder Bolts', color: '#ffff4d', tel: '081-333-3333', logo: '' },
+            { id: 't4', name: 'Forest Warriors', color: '#4dff4d', tel: '081-444-4444', logo: '' },
+        ];
+        const DEFAULT_PLAYERS = [
+            { id: 1, name: 'จอมยุทธ ชาญชัย', no: '10', teamId: 't1', img: '', manager: true },
+            { id: 2, name: 'มังกร ทะยานฟ้า', no: '9', teamId: 't2', img: '', manager: true },
+            { id: 3, name: 'สายฟ้า ฟาดเร็ว', no: '7', teamId: 't3', img: '', manager: false },
+            { id: 4, name: 'พฤกษา ลมพัด', no: '1', teamId: 't4', img: '', manager: true },
+        ];
+        
+        // --- UTILITY FUNCTIONS ---
+        function save() {
+            try {
+                localStorage.setItem('jl_teams', JSON.stringify(teams));
+                localStorage.setItem('jl_players', JSON.stringify(players));
+                localStorage.setItem('jl_matches', JSON.stringify(matches));
+                localStorage.setItem('jl_stats', JSON.stringify(stats));
+                localStorage.setItem('jl_schedules', JSON.stringify(schedules));
+                localStorage.setItem('jl_logo', globalLogo);
+                localStorage.setItem('jl_theme_name', themeName);
+                localStorage.setItem('jl_theme_color', themeColor);
+                localStorage.setItem('jl_secondary_color', secondaryColor);
+            } catch (e) {
+                if (e.name === 'QuotaExceededError') {
+                    document.getElementById('storage-warning-modal').classList.remove('hidden');
+                }
+            }
+            renderTheme();
+            renderAll();
+        }
 
-        // --- MAIN RENDER FUNCTION (MODIFIED) ---
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString + 'T00:00:00'); // Treat as UTC date to avoid timezone issues
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear() + 543; // Thai year
+            return `${day}/${month}/${year}`;
+        }
+        
+        function getPlayerStats(playerId) {
+            const playerStats = stats.filter(s => s.playerId == playerId);
+            return {
+                goals: playerStats.filter(s => s.type === 'goal').reduce((sum, s) => sum + s.count, 0),
+                yellows: playerStats.filter(s => s.type === 'yellow').reduce((sum, s) => sum + s.count, 0),
+                reds: playerStats.filter(s => s.type === 'red').reduce((sum, s) => sum + s.count, 0),
+                saves: playerStats.filter(s => s.type === 'save').reduce((sum, s) => sum + s.count, 0),
+                // Removed assists
+            };
+        }
+
+        // --- THEME & NAVIGATION ---
+        function nav(id, btn) {
+            document.querySelectorAll('.section').forEach(sec => sec.classList.add('hidden'));
+            document.getElementById(`page-${id}`).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+
+            // --- RENDER FUNCTIONS FOR NAVIGATION ---
+            if(id === 'home') renderDashboard();
+            if(id === 'daily') {
+                const viewMode = document.getElementById('daily-view-mode').value;
+                if (viewMode === 'daily') {
+                    renderDaily();
+                } else {
+                    renderAllStats();
+                }
+            }
+            if(id === 'leaderboard') renderLeaderboard();
+            if(id === 'stats') {
+                // FIX: Ensure the correct tab is shown
+                const matchTab = document.getElementById('hist-tab-match');
+                if (matchTab) { showHistory('match', matchTab); }
+                updateScheduleMatchDropdown();
+            }
+            if(id === 'teams') renderTeams();
+            if(id === 'players') {
+                renderTeamsTabs(currentTeamView); // Render tabs
+                renderPlayers(currentTeamView); // Render players
+            }
+            if(id === 'schedule') renderSchedule();
+        }
+
+        function renderAll() {
+            // FIX: Ensure all major rendering functions are called to refresh the UI
+            updateDropdowns();
+            renderLeaderboard();
+            renderSchedule();
+            renderTeams();
+            renderTeamsTabs(currentTeamView);
+            renderPlayers(currentTeamView);
+            renderMatchHistory();
+            renderStatHistory();
+            renderDashboard();
+            updateScheduleMatchDropdown();
+
+            // Re-render the active view for daily page
+            const viewMode = document.getElementById('daily-view-mode').value;
+            if (viewMode === 'daily') {
+                renderDaily();
+            } else {
+                renderAllStats();
+            }
+        }
+
+        function updateDropdowns() {
+            const opts = `<option value="">เลือกทีม</option>` + teams.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+            ['sc-team-a','sc-team-b','m-team-a','m-team-b','s-team','p-team'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = opts;
+            });
+        }
+        
+        function renderTheme() {
+            localStorage.setItem('jl_theme_color', themeColor);
+            localStorage.setItem('jl_secondary_color', secondaryColor);
+            localStorage.setItem('jl_theme_name', themeName);
+            document.documentElement.style.setProperty('--primary-color', themeColor);
+            document.documentElement.style.setProperty('--secondary-color', secondaryColor);
+            document.getElementById('nav-title').innerText = themeName;
+
+            // Update inputs in settings modal when opened
+            const themeInput = document.getElementById('theme-color-input');
+            if (themeInput) {
+                themeInput.value = themeColor;
+                document.getElementById('secondary-color-input').value = secondaryColor;
+                document.getElementById('theme-name-input').value = themeName;
+            }
+        }
+
+        function updateThemeAndSave() {
+            themeColor = document.getElementById('theme-color-input').value;
+            secondaryColor = document.getElementById('secondary-color-input').value;
+            themeName = document.getElementById('theme-name-input').value;
+            save(); // Save and trigger renderTheme
+        }
+
+        // *** Image Compression (Enhanced for saving storage) ***
+        const compressImage = (file) => {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const targetWidth = 300;
+                        const targetHeight = 400;
+                        const scale = Math.max(targetWidth / img.width, targetHeight / img.height);
+                        const x = (targetWidth / 2) - (img.width / 2) * scale;
+                        const y = (targetHeight / 2) - (img.height / 2) * scale;
+
+                        canvas.width = targetWidth;
+                        canvas.height = targetHeight;
+                        
+                        ctx.fillStyle = '#0c1626'; // Fill background
+                        ctx.fillRect(0, 0, targetWidth, targetHeight);
+
+                        // Draw image centered and covering the area
+                        ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+
+                        resolve(canvas.toDataURL('image/jpeg', 0.7)); // 70% quality
+                    };
+                };
+            });
+        };
+        
+        // --- DASHBOARD ---
+        function calculateDashboardStats() {
+            document.getElementById('stat-total-teams').innerText = teams.length;
+            document.getElementById('stat-total-stats').innerText = stats.length;
+            document.getElementById('stat-total-players').innerText = players.length;
+            
+            const totalGoals = stats.filter(s => s.type === 'goal').reduce((sum, s) => sum + s.count, 0);
+            document.getElementById('stat-total-goals').innerText = totalGoals;
+
+            // Leaderboard & Top Scorer
+            const lbData = calculateLeaderboardData();
+            const topTeam = lbData.sort((a, b) => b.pts - a.pts || (b.gd) - (a.gd) || a.name.localeCompare(b.name))[0];
+            
+            if (topTeam) {
+                document.getElementById('leader-team-name').innerText = topTeam.name;
+                document.getElementById('leader-team-pts').innerText = topTeam.pts;
+                document.getElementById('leader-team-card').style.borderColor = topTeam.color;
+            } else {
+                document.getElementById('leader-team-name').innerText = 'N/A';
+                document.getElementById('leader-team-pts').innerText = '0';
+                document.getElementById('leader-team-card').style.borderColor = themeColor;
+            }
+
+            const topScorer = getTopScorers(1)[0];
+            if (topScorer) {
+                document.getElementById('top-scorer-name').innerText = topScorer.name;
+                document.getElementById('top-scorer-goals').innerText = topScorer.goals;
+            } else {
+                document.getElementById('top-scorer-name').innerText = 'N/A';
+                document.getElementById('top-scorer-goals').innerText = '0';
+            }
+
+            // Manager List
+            const managerList = document.getElementById('manager-list');
+            const managers = players.filter(p => p.manager).map(p => {
+                const t = teams.find(t => t.id == p.teamId);
+                return { name: p.name, teamName: t?.name, teamTel: t?.tel, teamColor: t?.color };
+            });
+            managerList.innerHTML = managers.map(m => `
+                <div class="p-3 rounded-lg flex items-center gap-3 bg-gray-900 border-l-4" style="border-color: ${m.teamColor || themeColor};">
+                    <i class="fas fa-user-tie text-xl" style="color: ${m.teamColor || themeColor};"></i>
+                    <div>
+                        <div class="font-bold">${m.name}</div>
+                        <div class="text-sm text-gray-400">${m.teamName || 'ไม่ระบุทีม'} | Tel: ${m.teamTel || 'N/A'}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderDashboard() {
+            calculateDashboardStats();
+        }
+
+        // --- 1. LEADERBOARD ---
+        function calculateLeaderboardData() {
+            const data = teams.map(t => ({
+                id: t.id,
+                name: t.name,
+                color: t.color,
+                p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0
+            }));
+
+            matches.forEach(m => {
+                const idxA = data.findIndex(d => d.id == m.teamA);
+                const idxB = data.findIndex(d => d.id == m.teamB);
+
+                if (idxA === -1 || idxB === -1) return;
+
+                const scoreA = parseInt(m.scoreA);
+                const scoreB = parseInt(m.scoreB);
+
+                data[idxA].p++;
+                data[idxB].p++;
+                data[idxA].gf += scoreA;
+                data[idxA].ga += scoreB;
+                data[idxB].gf += scoreB;
+                data[idxB].ga += scoreA;
+
+                if (scoreA > scoreB) { // Team A wins
+                    data[idxA].w++;
+                    data[idxB].l++;
+                    data[idxA].pts += 3;
+                } else if (scoreA < scoreB) { // Team B wins
+                    data[idxB].w++;
+                    data[idxA].l++;
+                    data[idxB].pts += 3;
+                } else { // Draw
+                    data[idxA].d++;
+                    data[idxB].d++;
+                    data[idxA].pts += 1;
+                    data[idxB].pts += 1;
+                }
+            });
+
+            data.forEach(d => d.gd = d.gf - d.ga);
+
+            // Sort by points (desc), goal difference (desc), goals for (desc), then name (asc)
+            return data.sort((a, b) => 
+                b.pts - a.pts || 
+                b.gd - a.gd || 
+                b.gf - a.gf ||
+                a.name.localeCompare(b.name)
+            );
+        }
+
+        function renderLeaderboard() {
+            const sortedData = calculateLeaderboardData();
+            const body = document.getElementById('lb-body');
+            const cBgBody = document.getElementById('lb-bg-body').value;
+            const cBodyText = document.getElementById('lb-body-text-color').value;
+            const cPtsGrad1 = document.getElementById('lb-pts-grad-1').value;
+            const cPtsGrad2 = document.getElementById('lb-pts-grad-2').value;
+            const cHeaderGrad1 = document.getElementById('lb-header-grad-1').value;
+            const cHeaderGrad2 = document.getElementById('lb-header-grad-2').value;
+            const cHeaderText = document.getElementById('lb-header-text-color').value;
+
+            document.getElementById('lb-table').style.backgroundColor = cBgBody;
+            document.getElementById('lb-body').style.color = cBodyText;
+            document.getElementById('lb-thead-row').style.background = `linear-gradient(135deg, ${cHeaderGrad1}, ${cHeaderGrad2})`;
+            document.querySelectorAll('#lb-thead-row th').forEach(th => th.style.color = cHeaderText);
+            
+            body.innerHTML = sortedData.map((t, i) => `
+                <tr class="border-b border-white/5 hover:bg-white/5" style="background-color: ${i % 2 === 0 ? 'rgba(0,0,0,0.05)' : 'rgba(0,0,0,0)'};">
+                    <td class="p-4 text-center" style="color: ${t.color};">${i + 1}</td>
+                    <td class="p-4 font-bold uppercase">${t.name}</td>
+                    <td class="p-4 text-center">${t.p}</td>
+                    <td class="p-4 text-center">${t.w}</td>
+                    <td class="p-4 text-center">${t.d}</td>
+                    <td class="p-4 text-center">${t.l}</td>
+                    <td class="p-4 text-center">${t.gf}/${t.ga}</td>
+                    <td class="p-4 text-center">${t.gd > 0 ? '+' : ''}${t.gd}</td>
+                    <td class="p-0 text-center">
+                        <div class="h-full py-4 px-2 font-black text-xl" style="background: linear-gradient(135deg, ${cPtsGrad1}, ${cPtsGrad2}); color: black;">${t.pts}</div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // --- 2. SCHEDULE ---
+        function openAddSchedModal() {
+            // FIX: Ensure team dropdown is updated
+            updateDropdowns();
+            document.getElementById('sched-modal').classList.remove('hidden');
+        }
+
+        function handleSchedSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('sc-id').value;
+            const obj = {
+                id: id ? parseInt(id) : Date.now(),
+                date: document.getElementById('sc-date').value,
+                time: document.getElementById('sc-time').value,
+                week: document.getElementById('sc-week').value,
+                teamA: document.getElementById('sc-team-a').value,
+                teamB: document.getElementById('sc-team-b').value,
+                group: document.getElementById('sc-group').value,
+                result: null // Status: Pending
+            };
+
+            if (id) {
+                schedules = schedules.map(s => s.id == id ? obj : s);
+            } else {
+                schedules.push(obj);
+            }
+            
+            save();
+            document.getElementById('sched-modal').classList.add('hidden');
+            e.target.reset();
+            document.getElementById('sc-id').value = '';
+        }
+
+        function setGroupFilter(group, btn) {
+            currentGroupFilter = group;
+            document.querySelectorAll('.group-tab').forEach(b => {
+                b.classList.remove('active');
+                b.style.backgroundColor = '#4b5563';
+                b.style.color = 'white';
+            });
+            btn.classList.add('active');
+            btn.style.backgroundColor = themeColor;
+            btn.style.color = 'black';
+            renderSchedule();
+        }
+
+        function editSched(id) {
+            const s = schedules.find(x => x.id == id);
+            if (s) {
+                updateDropdowns();
+                document.getElementById('sc-id').value = s.id;
+                document.getElementById('sc-date').value = s.date;
+                document.getElementById('sc-time').value = s.time;
+                document.getElementById('sc-week').value = s.week;
+                document.getElementById('sc-team-a').value = s.teamA;
+                document.getElementById('sc-team-b').value = s.teamB;
+                document.getElementById('sc-group').value = s.group || '';
+                document.getElementById('sched-modal').classList.remove('hidden');
+            }
+        }
+
+        function delSched(id) {
+            if (confirm('ลบโปรแกรมแข่งนี้?')) {
+                schedules = schedules.filter(s => s.id != id);
+                save();
+            }
+        }
+
+        function renderSchedule() {
+            const list = document.getElementById('sched-list');
+            const cBgColorMain = document.getElementById('sc-bg-color-main').value;
+            const cBgColor = document.getElementById('sc-bg-color').value;
+            const cTextColor = document.getElementById('sc-text-color').value;
+            const cPillColor = document.getElementById('sc-pill-color').value;
+            const cHeaderText = document.getElementById('sc-header-text').value;
+
+            document.getElementById('schedule-main-container').style.backgroundColor = cBgColorMain;
+            document.getElementById('sc-bg-overlay').style.background = `linear-gradient(135deg, ${cBgColor}, #0c1626)`;
+            document.getElementById('sc-container').style.color = cTextColor;
+            document.getElementById('sc-pill').style.backgroundColor = cPillColor;
+            document.getElementById('sc-pill').innerText = cHeaderText;
+
+            const filteredSchedules = schedules
+                .filter(s => currentGroupFilter === 'All' || s.group === currentGroupFilter)
+                .sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort by date
+
+            const groupedSchedules = filteredSchedules.reduce((acc, s) => {
+                const groupKey = s.week || formatDate(s.date);
+                if (!acc[groupKey]) acc[groupKey] = [];
+                acc[groupKey].push(s);
+                return acc;
+            }, {});
+
+            let html = '';
+
+            for (const key in groupedSchedules) {
+                html += `<h3 class="schedule-group-header" style="background-color: ${cPillColor};">${key}</h3>`;
+                
+                groupedSchedules[key].forEach(s => {
+                    const tA = teams.find(t => t.id == s.teamA);
+                    const tB = teams.find(t => t.id == s.teamB);
+                    const groupDisplay = s.group ? `กลุ่ม ${s.group}` : '';
+                    
+                    let status = '<span class="text-yellow-400 font-medium">รอกำหนดผล</span>';
+                    let cardClasses = '';
+
+                    const recordedMatch = matches.find(m => m.scheduleId == s.id);
+                    if (recordedMatch) {
+                        const scoreA = parseInt(recordedMatch.scoreA);
+                        const scoreB = parseInt(recordedMatch.scoreB);
+                        const scoreText = `${scoreA} - ${scoreB}`;
+                        status = `<span class="text-white font-black text-xl">${scoreText}</span>`;
+                        cardClasses = 'show-actions'; // Keep actions visible for easy editing
+                    }
+
+                    html += `
+                        <div class="schedule-match-card ${cardClasses}" onmouseenter="this.classList.add('show-actions')" onmouseleave="this.classList.remove('show-actions')">
+                            <div class="schedule-team-container team-a" style="color: ${cTextColor};">
+                                <div class="text-right">
+                                    <div class="font-bold text-lg uppercase">${tA?.name || 'N/A'}</div>
+                                    <div class="text-xs text-gray-400 hidden sm:block">${groupDisplay}</div>
+                                </div>
+                                <img src="${tA?.logo || ''}" class="schedule-team-logo" style="border-color: ${tA?.color || themeColor};" alt="${tA?.name || 'Team A'} Logo">
+                                <div class="block sm:hidden text-center mt-2">
+                                    <div class="font-bold text-sm uppercase">${tA?.name || 'N/A'}</div>
+                                </div>
+                            </div>
+                            <div class="schedule-center-info" style="color: ${cTextColor};">
+                                <div class="font-extrabold text-3xl italic tracking-wider text-red-500 outline-text" style="color: ${cTextColor};">VS</div>
+                                <div class="text-xl font-black mt-1">${s.time}</div>
+                                <div class="text-sm font-medium text-gray-400">${formatDate(s.date)}</div>
+                                <div class="mt-1">${status}</div>
+                            </div>
+                            <div class="schedule-team-container team-b" style="color: ${cTextColor};">
+                                <img src="${tB?.logo || ''}" class="schedule-team-logo" style="border-color: ${tB?.color || themeColor};" alt="${tB?.name || 'Team B'} Logo">
+                                <div class="text-left">
+                                    <div class="font-bold text-lg uppercase">${tB?.name || 'N/A'}</div>
+                                    <div class="text-xs text-gray-400 hidden sm:block">${groupDisplay}</div>
+                                </div>
+                                <div class="block sm:hidden text-center mt-2">
+                                    <div class="font-bold text-sm uppercase">${tB?.name || 'N/A'}</div>
+                                </div>
+                            </div>
+                            <div class="schedule-actions">
+                                <button onclick="delSched(${s.id})" class="text-red-400 hover:text-red-300 text-sm"><i class="fas fa-trash"></i> ลบ</button>
+                                <button onclick="editSched(${s.id})" class="text-blue-400 hover:text-blue-300 text-sm ml-4"><i class="fas fa-edit"></i> แก้ไข</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            list.innerHTML = html || '<p class="text-center text-gray-500 py-10">ไม่มีโปรแกรมแข่งที่ถูกบันทึก</p>';
+        }
+
+
+        // --- 3. DAILY SUMMARY / TOP SCORER / ALL STATS (UPDATED) ---
+
+        function getTopScorers(limit = 5, dateFilter = null) {
+            const allGoalStats = stats.filter(s => s.type === 'goal');
+            
+            // Apply date filter if provided
+            const filteredStats = dateFilter 
+                ? allGoalStats.filter(s => s.date === dateFilter)
+                : allGoalStats;
+
+            // Group by player and sum goals
+            const goalCounts = filteredStats.reduce((acc, s) => {
+                acc[s.playerId] = (acc[s.playerId] || 0) + s.count;
+                return acc;
+            }, {});
+
+            // Prepare final data structure
+            const scorerData = Object.entries(goalCounts).map(([playerId, goals]) => {
+                const p = players.find(x => x.id == playerId);
+                return {
+                    playerId: playerId,
+                    name: p?.name || 'N/A',
+                    number: p?.no || '',
+                    img: p?.img || '',
+                    teamId: p?.teamId,
+                    goals: goals,
+                    // Note: full stats (yellow, red, save) are not used for sorting here
+                };
+            }).filter(data => data.goals > 0);
+
+            // Sort logic: goals (desc), name (asc), number (asc)
+            const sortedData = scorerData.sort((a, b) => {
+                if (b.goals !== a.goals) return b.goals - a.goals;
+                if (a.name.localeCompare(b.name) !== 0) return a.name.localeCompare(b.name);
+                return (parseInt(a.number) || 999) - (parseInt(b.number) || 999);
+            });
+
+            return { sortedData: sortedData.slice(0, limit) };
+        }
+
         function renderDaily() {
             const date = document.getElementById('daily-date').value;
             const sortKey = document.getElementById('daily-scorer-sort').value;
+            const cTeamName = document.getElementById('daily-team-name-color').value;
+            const cBg1 = document.getElementById('daily-row-bg-1').value;
+            const cBg2 = document.getElementById('daily-row-bg-2').value;
 
-            // Visibility checks
-            const showMatches = document.getElementById('daily-show-matches').checked;
-            const showTopScorers = document.getElementById('daily-show-top-scorers').checked;
-            const showTodayScorers = document.getElementById('daily-show-today-scorers').checked;
+            // 4. UPDATED: Score text color
+            const cScoreGrad1 = document.getElementById('daily-score-grad-1').value;
+            const cScoreGrad2 = document.getElementById('daily-score-grad-2').value;
+            const cScoreText = document.getElementById('daily-score-text-color')?.value || '#000000'; // NEW: Score number color
 
-            document.getElementById('daily-matches-section').style.display = showMatches ? 'block' : 'none';
-            document.getElementById('top-scorer-section').style.display = showTopScorers ? 'flex' : 'none';
-            document.getElementById('today-scorer-section').style.display = showTodayScorers ? 'block' : 'none';
-
-            // --- Color Retrievals (Existing) ---
             const cGrad1 = document.getElementById('daily-banner-grad-1').value;
             const cGrad2 = document.getElementById('daily-banner-grad-2').value;
             const cText = document.getElementById('daily-banner-text').value;
             const cBorder = document.getElementById('daily-banner-border').value;
-            const cScoreGrad1 = document.getElementById('daily-score-grad-1').value;
-            const cScoreGrad2 = document.getElementById('daily-score-grad-2').value;
-            const cScoreText = document.getElementById('daily-score-text').value;
+            
+            const dailyContent = document.getElementById('daily-content');
+            const allStatsContent = document.getElementById('all-stats-content');
+            const dailyControls = document.getElementById('daily-controls');
+            const allStatsControls = document.getElementById('all-stats-controls');
 
-            // --- NEW: Scorer Card & Detail Colors ---
-            const cCardBg = document.getElementById('daily-card-bg').value;
-            const cScorerBannerBg = document.getElementById('daily-scorer-banner-bg').value;
-            const cDetailText = document.getElementById('daily-detail-text').value;
-            const cFrameColor = document.getElementById('daily-frame-color').value;
+            // Show/Hide relevant sections
+            dailyContent.classList.remove('hidden');
+            allStatsContent.classList.add('hidden');
+            dailyControls.classList.remove('hidden');
+            allStatsControls.classList.add('hidden');
 
-            // 1. Banner Styles & Scorer Section Background
+            // 1. Banner Styles
             const headerEl = document.getElementById('daily-header');
             headerEl.style.background = `linear-gradient(to right, ${cGrad1}, ${cGrad2})`;
             headerEl.style.borderColor = cBorder;
             document.getElementById('daily-title-edit').style.color = cText;
             document.getElementById('daily-logo-img').style.borderColor = cBorder;
+            
+            // Set default date if none selected (to today's date)
+            const currentDate = date || new Date().toISOString().slice(0, 10);
+            if (!date) document.getElementById('daily-date').value = currentDate;
+            document.getElementById('daily-title-edit').innerText = `สรุปผลการแข่งขัน ${formatDate(currentDate)} ${themeName}`;
             document.getElementById('daily-logo-img').src = globalLogo;
-            document.getElementById('daily-title-edit').innerText = `สรุปผลการแข่งขัน ${formatDate(date)} ${themeName}`;
+            
+            // 2. Matches Today
+            const todayMatches = matches.filter(m => m.date === currentDate)
+                                        .sort((a, b) => b.id - a.id); // Sort by most recent ID
 
-            // Apply custom background/text color to Scorer Headers
-            document.getElementById('top-scorer-section').style.backgroundColor = cScorerBannerBg;
-            document.getElementById('top-scorer-section').querySelector('h3').style.color = cDetailText;
-            document.getElementById('daily-scorer-header').style.color = cDetailText; // Ensure span text also changes
+            const container = document.getElementById('daily-matches-container');
 
-            document.getElementById('today-scorer-section').style.backgroundColor = cScorerBannerBg;
-            document.getElementById('today-scorer-section').querySelector('h3').style.color = cDetailText;
-
-            // 2. Matches List (Summary)
-            const dailyMatchesCont = document.getElementById('daily-matches');
-            const filteredMatches = matches.filter(m => m.date === date && m.scoreA !== null);
-
-            dailyMatchesCont.innerHTML = filteredMatches.map(m => {
-                const teamA = teams.find(t => t.id === m.teamAId);
-                const teamB = teams.find(t => t.id === m.teamBId);
-                const scoreA = m.scoreA !== null ? m.scoreA : '-';
-                const scoreB = m.scoreB !== null ? m.scoreB : '-';
-                const scoreStyle = `background: linear-gradient(to right, ${cScoreGrad1}, ${cScoreGrad2}); color: ${cScoreText};`;
-
-                return `
-                <div class="flex justify-between items-center p-3 rounded-lg shadow-md" style="background-color: ${cCardBg};">
-                    <div class="flex items-center gap-3 w-1/3">
-                        <img src="${teamA?.logo || ''}" class="team-logo" alt="${teamA?.name || 'A'} Logo">
-                        <span class="font-medium truncate" style="color: ${cDetailText};">${teamA?.name || 'ทีม A'}</span>
-                    </div>
-                    
-                    <div class="daily-score-box mx-4">
-                        <div class="flex items-center gap-1">
-                            <span class="daily-score-number" style="${scoreStyle}">${scoreA}</span>
-                            <span class="text-2xl font-bold text-gray-400">-</span>
-                            <span class="daily-score-number" style="${scoreStyle}">${scoreB}</span>
-                        </div>
-                        <span class="daily-score-text">${m.status === 'FT' ? 'FT' : 'เล่นแล้ว'}</span>
-                    </div>
-
-                    <div class="flex items-center gap-3 justify-end w-1/3 text-right">
-                        <span class="font-medium truncate" style="color: ${cDetailText};">${teamB?.name || 'ทีม B'}</span>
-                        <img src="${teamB?.logo || ''}" class="team-logo" alt="${teamB?.name || 'B'} Logo">
-                    </div>
-                </div>`;
-            }).join('') || '<p class="text-center text-gray-500 py-4 col-span-full">ไม่มีสรุปผลการแข่งขันในวันนี้</p>';
-
-            // 3. Top Scorers (Vertical/Grid)
-            const topScorersCont = document.getElementById('daily-top-scorers');
-            const allScorers = players.map(p => ({
-                ...p,
-                goals: stats.filter(s => s.playerId === p.id && s.statType === 'goals').reduce((sum, s) => sum + s.value, 0)
-            })).filter(p => p.goals > 0);
-
-            let sortedData = [];
-            if (sortKey === 'goals') {
-                sortedData = allScorers.sort((a, b) => b.goals - a.goals || a.name.localeCompare(b.name)).slice(0, 5);
+            if (todayMatches.length === 0) {
+                container.innerHTML = `<p class="text-center text-gray-500 py-10">ไม่มีผลการแข่งขันที่บันทึกสำหรับวันนี้</p>`;
             } else {
-                sortedData = allScorers.sort((a, b) => a.name.localeCompare(b.name)).slice(0, 5);
+                container.innerHTML = todayMatches.map((m, i) => {
+                    const tA = teams.find(t => t.id == m.teamA);
+                    const tB = teams.find(t => t.id == m.teamB);
+                    const scoreA = parseInt(m.scoreA);
+                    const scoreB = parseInt(m.scoreB);
+                    
+                    const rowBg = i % 2 === 0 ? cBg1 : cBg2;
+                    const winningTeam = scoreA > scoreB ? tA : (scoreB > scoreA ? tB : null);
+                    const winningColor = winningTeam?.color || cTeamName;
+                    
+                    const scoreStyle = `background: linear-gradient(135deg, ${cScoreGrad1}, ${cScoreGrad2}); color: ${cScoreText};`;
+                    const teamAStyle = `color: ${tA?.color || cTeamName};`;
+                    const teamBStyle = `color: ${tB?.color || cTeamName};`;
+
+                    return `
+                        <div class="flex items-center p-3 rounded-lg shadow-lg border-l-4" style="background-color: ${rowBg}; border-color: ${winningTeam ? winningColor : cTeamName};">
+                            <div class="flex-1 text-right pr-4">
+                                <div class="font-bold text-lg uppercase truncate" style="${teamAStyle}">${tA?.name || 'N/A'}</div>
+                                <div class="text-xs text-gray-400">${tA?.group ? `กลุ่ม ${tA.group}` : ''}</div>
+                            </div>
+                            <div class="daily-score-box">
+                                <span class="daily-score-number shadow-lg" style="${scoreStyle}">${scoreA}</span>
+                                <span class="daily-vs">VS</span>
+                                <span class="daily-score-number shadow-lg" style="${scoreStyle}">${scoreB}</span>
+                            </div>
+                            <div class="flex-1 text-left pl-4">
+                                <div class="font-bold text-lg uppercase truncate" style="${teamBStyle}">${tB?.name || 'N/A'}</div>
+                                <div class="text-xs text-gray-400">${tB?.group ? `กลุ่ม ${tB.group}` : ''}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
             }
+            
+            // 3. Top Scorers (Top 5 Overall)
+            const topScorersData = getTopScorers(5).sortedData;
+            const topScorersCont = document.getElementById('daily-top-scorers');
+            const topScorerHeader = document.getElementById('daily-scorer-header');
+            
+            const overallScorer = getTopScorers(1).sortedData[0];
+            const overallScorerName = overallScorer ? overallScorer.name : 'ดาวซัลโวสูงสุด (Top 5)';
+            topScorerHeader.innerText = overallScorerName === 'N/A' ? 'ดาวซัลโวสูงสุด (Top 5)' : `👑 ${overallScorerName} (${overallScorer.goals} ประตู)`;
 
-            // Assign rank after sorting by goals
-            sortedData = sortedData.map((d, index) => ({...d, rank: index + 1}));
 
-
-            topScorersCont.innerHTML = sortedData.map((data) => {
+            topScorersCont.innerHTML = topScorersData.map((data, i) => {
                 const t = teams.find(x => x.id == data.teamId);
-                
-                // --- Rank Color Logic (NEW) ---
-                let rankClass = '';
-                if (data.rank === 1) rankClass = 'rank-gold';
-                else if (data.rank === 2) rankClass = 'rank-silver';
-                else if (data.rank === 3) rankClass = 'rank-bronze';
-
-                // --- Custom Styles (NEW) ---
-                const cardStyle = `background-color: ${cCardBg};`;
-                const nameStyle = `color: ${cDetailText};`;
-                const teamStyle = `color: ${cDetailText}99;`; // Opacity for detail text
-                // Apply frame color to the image border
-                const imageBorderStyle = `border-color: ${cFrameColor};`; 
-                const goalStyle = `background: linear-gradient(to right, ${cScoreGrad1}, ${cScoreGrad2}); color: ${cScoreText};`;
+                const isTop = i === 0;
+                const scoreStyle = `background: linear-gradient(135deg, ${cScoreGrad1}, ${cScoreGrad2}); color: ${cScoreText};`;
 
                 return `
-                <div class="scorer-card" style="${cardStyle}">
-                    <div class="scorer-photo-wrapper">
-                        <div class="scorer-rank-tag ${rankClass}">${data.rank}</div>
-                        <img src="${data.img || ''}" class="scorer-card-img" style="${imageBorderStyle}" alt="${data.name}"> 
-                    </div>
-                    <div class="mt-2 w-full">
-                        <div class="font-bold text-sm truncate" style="${nameStyle}">${data.name} (#${data.number||'-'})</div>
-                        <div class="text-xs truncate mb-2" style="${teamStyle}">${t?.name || 'ไม่ระบุทีม'}</div>
-                        <div class="font-black text-2xl leading-tight inline-block px-3 py-1 rounded shadow-md" style="${goalStyle}">
-                            ${data.goals} <span class="text-xs font-normal">ประตู</span>
+                    <div class="scorer-card ${isTop ? 'is-top' : ''}">
+                        <div class="scorer-rank-tag">${i + 1}</div>
+                        <img src="${data.img || ''}" class="scorer-card-img" style="border-color: ${t?.color || 'white'};" alt="${data.name}">
+                        <div class="mt-2 w-full">
+                            <div class="text-white font-bold text-sm truncate">${data.name} (#${data.number||'-'})</div>
+                            <div class="text-gray-400 text-xs truncate mb-2">${t?.name || 'ไม่ระบุทีม'}</div>
+                            <div class="font-black text-2xl leading-tight inline-block px-3 py-1 rounded shadow-md" style="${scoreStyle}">
+                                ${data.goals} <span class="text-xs font-normal">ประตู</span>
+                            </div>
                         </div>
-                    </div>
-                </div>`;
+                    </div>`;
             }).join('') || '<p class="text-center text-gray-500 py-4 col-span-full">ไม่มีข้อมูลดาวซัลโว</p>';
 
-
             // 4. Scorers Today (Horizontal Grid)
+            const todays = stats.filter(s => s.type === 'goal' && s.date === currentDate);
+            const todayCounts = {};
+            todays.forEach(s => todayCounts[s.playerId] = (todayCounts[s.playerId]||0)+s.count);
+
             const todayScorersCont = document.getElementById('daily-today-scorers');
-            const todayStats = stats.filter(s => s.statType === 'goals' && s.date === date);
-            
-            const groupedScorers = todayStats.reduce((acc, current) => {
-                const existing = acc.find(item => item.playerId === current.playerId);
-                if (existing) {
-                    existing.goalsToday += current.value;
-                } else {
-                    const player = players.find(p => p.id === current.playerId);
-                    const team = teams.find(t => t.id === player?.teamId);
-                    acc.push({
-                        playerId: current.playerId,
-                        name: player?.name || 'Unknown Player',
-                        number: player?.number,
-                        img: player?.img,
-                        teamName: team?.name || 'Unknown Team',
-                        goalsToday: current.value
-                    });
-                }
-                return acc;
-            }, []).sort((a, b) => b.goalsToday - a.goalsToday);
 
-            todayScorersCont.innerHTML = groupedScorers.map((data) => {
-                // --- Custom Styles (NEW) ---
-                const cardStyle = `background-color: ${cCardBg};`;
-                const nameStyle = `color: ${cDetailText};`;
-                const teamStyle = `color: ${cDetailText}99;`;
-                const imageBorderStyle = `border-color: ${cFrameColor};`; 
-                const goalStyle = `background: linear-gradient(to right, ${cScoreGrad1}, ${cScoreGrad2}); color: ${cScoreText};`;
-                // Using custom colors for the Today Goals Tag (Top Right)
-                const todayScoreTagStyle = `background: ${cScorerBannerBg}; color: ${cDetailText}; border-color: ${cFrameColor}; right: 5px; left: auto; top: 5px;`; 
+            // Get player details for today's scorers
+            let todayScorerData = Object.entries(todayCounts).map(([pid, c]) => {
+                const p = players.find(x => x.id == pid);
+                const t = teams.find(x => x.id == p?.teamId);
+                return {
+                    name: p?.name, 
+                    number: p?.no, 
+                    img: p?.img, 
+                    teamName: t?.name, 
+                    teamColor: t?.color, 
+                    goals: c 
+                };
+            }).filter(data => data.goals > 0);
 
+            // Sort logic for today's scorers
+            if (sortKey === 'name') {
+                todayScorerData.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (sortKey === 'number') {
+                todayScorerData.sort((a, b) => (parseInt(a.number) || 999) - (parseInt(b.number) || 999));
+            } else { // default to 'goals'
+                todayScorerData.sort((a, b) => b.goals - a.goals);
+            }
+
+            todayScorersCont.innerHTML = todayScorerData.map((data, i) => {
+                const scoreStyle = `background: linear-gradient(135deg, ${cScoreGrad1}, ${cScoreGrad2}); color: ${cScoreText};`;
                 return `
-                <div class="scorer-card" style="${cardStyle}">
-                    <div class="scorer-photo-wrapper">
-                        <div class="today-scorer-num-tag" style="${todayScoreTagStyle}">${data.goalsToday}</div>
-                        <img src="${data.img || ''}" class="scorer-card-img" style="${imageBorderStyle}" alt="${data.name}"> 
-                    </div>
-                    <div class="mt-2 w-full">
-                        <div class="font-bold text-sm truncate" style="${nameStyle}">${data.name} (#${data.number||'-'})</div>
-                        <div class="text-xs truncate mb-2" style="${teamStyle}">${data.teamName || 'ไม่ระบุทีม'}</div>
-                        <div class="font-black text-2xl leading-tight inline-block px-3 py-1 rounded shadow-md" style="${goalStyle}">
-                            ${data.goalsToday} <span class="text-xs font-normal">ประตู</span>
+                    <div class="scorer-card">
+                        <img src="${data.img || ''}" class="scorer-card-img" style="border-color: ${data.teamColor || 'white'};" alt="${data.name}">
+                        <div class="today-scorer-num-tag">${data.goals}</div>
+                        <div class="mt-2 w-full">
+                            <div class="text-white font-bold text-sm truncate">${data.name} (#${data.number||'-'})</div>
+                            <div class="text-gray-400 text-xs truncate mb-2">${data.teamName || 'ไม่ระบุทีม'}</div>
+                            <div class="font-black text-xl leading-tight inline-block px-2 py-0.5 rounded shadow-md" style="${scoreStyle}">
+                                ${data.goals} <span class="text-xs font-normal">ประตู</span>
+                            </div>
                         </div>
-                    </div>
-                </div>`;
-            }).join('') || '<p class="text-center text-gray-500 py-4 col-span-full">ไม่มีนักเตะทำประตูในวันนี้</p>';
-
+                    </div>`;
+            }).join('') || '<p class="text-center text-gray-500 py-4 col-span-full">ไม่มีผู้ทำประตูที่บันทึกในวันนี้</p>';
         }
 
-        // Initialize date picker to today and render
+        function renderAllStats() {
+            const currentStatType = document.getElementById('stat-filter-type').value;
+            const dailyContent = document.getElementById('daily-content');
+            const allStatsContent = document.getElementById('all-stats-content');
+            const dailyControls = document.getElementById('daily-controls');
+            const allStatsControls = document.getElementById('all-stats-controls');
+
+            // Show/Hide relevant sections
+            dailyContent.classList.add('hidden');
+            allStatsContent.classList.remove('hidden');
+            dailyControls.classList.add('hidden');
+            allStatsControls.classList.remove('hidden');
+
+            const statTypes = {
+                goal: { label: 'ประตู', icon: '⚽', color: 'text-red-400', header: 'จำนวนประตู' },
+                yellow: { label: 'ใบเหลือง', icon: '🟨', color: 'text-yellow-400', header: 'จำนวนใบเหลือง' },
+                red: { label: 'ใบแดง', icon: '🟥', color: 'text-red-600', header: 'จำนวนใบแดง' },
+                save: { label: 'เซฟ', icon: '🧤', color: 'text-blue-400', header: 'จำนวนเซฟ' }
+            };
+
+            const currentStat = statTypes[currentStatType] || statTypes.goal;
+            document.getElementById('all-stats-header').innerText = currentStat.header;
+
+            const body = document.getElementById('all-stats-body');
+            
+            // 1. Calculate combined player stats
+            const combinedStats = players.map(p => {
+                const t = teams.find(x => x.id == p.teamId);
+                const count = stats.filter(s => s.playerId == p.id && s.type === currentStatType)
+                                   .reduce((sum, s) => sum + s.count, 0);
+                return {
+                    name: p.name,
+                    teamName: t?.name || 'N/A',
+                    teamColor: t?.color || '#ffffff',
+                    count: count
+                };
+            }).filter(p => p.count > 0);
+
+            // 2. Sort data
+            const filteredAndSorted = combinedStats
+                .sort((a, b) => { 
+                    // Sort by count (desc) then name (asc)
+                    if (b.count !== a.count) return b.count - a.count;
+                    return a.name.localeCompare(b.name);
+                });
+
+            // 3. Render table rows
+            body.innerHTML = filteredAndSorted.map((p, i) => `
+                <tr class="all-stats-row border-b border-gray-800">
+                    <td class="p-2 text-center text-gray-400">${i + 1}</td>
+                    <td class="p-2 font-bold text-white">${p.name}</td>
+                    <td class="p-2 text-center text-xs" style="color: ${p.teamColor};">${p.teamName}</td>
+                    <td class="p-2 text-center font-black text-lg ${currentStat.color}">${p.count}</td>
+                </tr>
+            `).join('') || `<tr><td colspan="4" class="text-center text-gray-500 py-8">ไม่มีสถิติ ${currentStat.label} ที่ถูกบันทึก</td></tr>`;
+        }
+
+
+        // --- 4. STATS & HISTORY ---
+        // 1. UPDATED: handleStatSubmit - Removed assist logic/validation
+        function handleStatSubmit(e) {
+            e.preventDefault();
+            const type = document.getElementById('s-type').value;
+            const id = document.getElementById('edit-stat-id').value;
+            const scorerId = document.getElementById('s-player').value;
+            const teamId = document.getElementById('s-team').value;
+
+            // Simple validation: ensure player belongs to the selected team (optional but good practice)
+            const player = players.find(p => p.id == scorerId);
+            if (player && player.teamId !== teamId) {
+                alert('ข้อผิดพลาด: นักเตะที่เลือกไม่ได้อยู่ในทีมที่ระบุ');
+                return;
+            }
+
+            const obj = {
+                id: id ? parseInt(id) : Date.now(),
+                date: document.getElementById('s-date').value,
+                type: type,
+                teamId: teamId,
+                playerId: scorerId,
+                count: parseInt(document.getElementById('s-count').value),
+                note: document.getElementById('s-note').value
+            };
+
+            if (id) {
+                stats = stats.map(s => s.id == id ? obj : s);
+            } else {
+                stats.push(obj);
+            }
+
+            save();
+            resetStatForm();
+        }
+
+        function resetStatForm() {
+            document.getElementById('edit-stat-id').value = '';
+            document.getElementById('s-player').value = '';
+            document.getElementById('s-team').value = '';
+            document.getElementById('s-date').value = '';
+            document.getElementById('s-type').value = 'goal';
+            document.getElementById('s-count').value = '1';
+            document.getElementById('s-note').value = '';
+            document.getElementById('btn-stat-save').innerText = 'บันทึกสถิติ';
+            document.getElementById('btn-stat-cancel').classList.add('hidden');
+        }
+        
+        function editStat(id) {
+            const s = stats.find(x => x.id == id);
+            if (s) {
+                document.getElementById('edit-stat-id').value = s.id;
+                document.getElementById('s-date').value = s.date;
+                document.getElementById('s-type').value = s.type;
+                document.getElementById('s-team').value = s.teamId;
+                updatePlayerDropdown('s-team', 's-player'); // Must update dropdown first
+                document.getElementById('s-player').value = s.playerId;
+                document.getElementById('s-count').value = s.count;
+                document.getElementById('s-note').value = s.note;
+                document.getElementById('btn-stat-save').innerText = 'อัปเดตสถิติ';
+                document.getElementById('btn-stat-cancel').classList.remove('hidden');
+            }
+        }
+
+        function delStat(id) {
+            if (confirm('ลบสถิตินี้?')) {
+                stats = stats.filter(s => s.id != id);
+                save();
+            }
+        }
+
+        function updatePlayerDropdown(teamDropdownId, playerDropdownId) {
+            const teamId = document.getElementById(teamDropdownId).value;
+            const playerDropdown = document.getElementById(playerDropdownId);
+            const filteredPlayers = teamId 
+                ? players.filter(p => p.teamId == teamId) 
+                : players;
+
+            playerDropdown.innerHTML = '<option value="">เลือกนักเตะ</option>' + 
+                filteredPlayers.map(p => `<option value="${p.id}">${p.no ? `(#${p.no}) ` : ''}${p.name}</option>`).join('');
+        }
+        
+        // 2. Match Score Submission
+        function handleMatchSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('match-edit-id').value;
+            const obj = {
+                id: id ? parseInt(id) : Date.now(),
+                scheduleId: document.getElementById('m-schedule-id').value || null, // Link to schedule if prefilled
+                date: document.getElementById('m-date').value,
+                teamA: document.getElementById('m-team-a').value,
+                scoreA: document.getElementById('m-score-a').value,
+                teamB: document.getElementById('m-team-b').value,
+                scoreB: document.getElementById('m-score-b').value,
+                group: document.getElementById('m-group').value || null
+            };
+
+            if (obj.teamA === obj.teamB) {
+                alert("ข้อผิดพลาด: ทีม A และ ทีม B ต้องไม่เป็นทีมเดียวกัน");
+                return;
+            }
+
+            if (id) {
+                matches = matches.map(m => m.id == id ? obj : m);
+            } else {
+                matches.push(obj);
+            }
+
+            save();
+            resetMatchForm();
+            updateScheduleMatchDropdown(); // Update dropdown to remove recorded match
+        }
+
+        function resetMatchForm() {
+            document.getElementById('match-edit-id').value = '';
+            document.getElementById('m-date').value = '';
+            document.getElementById('m-team-a').value = '';
+            document.getElementById('m-score-a').value = '0';
+            document.getElementById('m-team-b').value = '';
+            document.getElementById('m-score-b').value = '0';
+            document.getElementById('m-group').value = '';
+            document.getElementById('m-schedule-id').value = '';
+            document.getElementById('btn-match-save').innerText = 'บันทึกผลการแข่ง';
+            document.getElementById('btn-match-cancel').classList.add('hidden');
+        }
+
+        function prefillMatchFromSchedule() {
+            const dropdown = document.getElementById('m-schedule-id');
+            const selectedOption = dropdown.options[dropdown.selectedIndex];
+            
+            if (selectedOption.value) {
+                const teamA = selectedOption.getAttribute('data-team-a');
+                const teamB = selectedOption.getAttribute('data-team-b');
+                const date = selectedOption.getAttribute('data-date');
+                
+                document.getElementById('m-date').value = date;
+                document.getElementById('m-team-a').value = teamA;
+                document.getElementById('m-team-b').value = teamB;
+                // Leave scores at 0 for initial entry
+            } else {
+                resetMatchForm();
+            }
+        }
+        
+        function editMatch(id) {
+            const m = matches.find(x => x.id == id);
+            if (m) {
+                updateDropdowns();
+                document.getElementById('match-edit-id').value = m.id;
+                document.getElementById('m-date').value = m.date;
+                document.getElementById('m-team-a').value = m.teamA;
+                document.getElementById('m-score-a').value = m.scoreA;
+                document.getElementById('m-team-b').value = m.teamB;
+                document.getElementById('m-score-b').value = m.scoreB;
+                document.getElementById('m-group').value = m.group || '';
+                document.getElementById('btn-match-save').innerText = 'อัปเดตผลการแข่ง';
+                document.getElementById('btn-match-cancel').classList.remove('hidden');
+            }
+        }
+
+        function delMatch(id) {
+            if (confirm('ลบผลการแข่งขันนี้?')) {
+                matches = matches.filter(m => m.id != id);
+                save();
+            }
+        }
+        
+        // 3. History Display
+        function showHistory(type, tab) {
+            document.getElementById('history-match-list').classList.add('hidden');
+            document.getElementById('history-stat-list').classList.add('hidden');
+            
+            document.querySelectorAll('.hist-tab').forEach(t => {
+                t.style.borderColor = 'transparent';
+                t.style.color = '#9ca3af'; // gray-400
+            });
+            
+            tab.style.borderColor = themeColor;
+            tab.style.color = themeColor;
+            
+            if (type === 'match') {
+                document.getElementById('history-match-list').classList.remove('hidden');
+            } else if (type === 'stat') {
+                document.getElementById('history-stat-list').classList.remove('hidden');
+            }
+        }
+
+        function renderMatchHistory() {
+            const list = document.getElementById('history-match-list');
+            list.innerHTML = matches.sort((a,b) => b.id - a.id).map(m => {
+                const tA = teams.find(x => x.id == m.teamA);
+                const tB = teams.find(x => x.id == m.teamB);
+                const winningColor = parseInt(m.scoreA) > parseInt(m.scoreB) ? tA?.color : (parseInt(m.scoreB) > parseInt(m.scoreA) ? tB?.color : '#ffffff');
+
+                return `
+                    <div class="bg-gray-800 p-2 rounded flex justify-between items-center text-sm border-l-4 border-yellow-400/20 group" style="border-color: ${winningColor};">
+                        <div class="flex items-center gap-2">
+                            <span class="text-gray-500 text-xs">${formatDate(m.date)}</span>
+                            <div>
+                                <div class="font-bold">${tA?.name} ${m.scoreA} - ${m.scoreB} ${tB?.name}</div>
+                                <div class="text-xs text-gray-400">${m.group ? `กลุ่ม ${m.group}` : 'ไม่ระบุกลุ่ม'}</div>
+                            </div>
+                        </div>
+                        <div class="opacity-0 group-hover:opacity-100 transition flex gap-2">
+                            <button onclick="editMatch(${m.id})" class="text-blue-400 hover:text-blue-300"><i class="fas fa-edit"></i></button>
+                            <button onclick="delMatch(${m.id})" class="text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            }).join('') || '<p class="text-center text-gray-500 py-4">ไม่มีผลการแข่งขันที่ถูกบันทึก</p>';
+        }
+
+        // 1. UPDATED: renderStatHistory - Removed assist display
+        function renderStatHistory() {
+            const list = document.getElementById('history-stat-list');
+            const iconMap = { goal:'⚽', yellow:'🟨', red:'🟥', save:'🧤' }; // Removed assist
+            
+            list.innerHTML = stats.sort((a,b) => b.id - a.id).map(s => {
+                const p = players.find(x => x.id == s.playerId);
+                const t = teams.find(x => x.id == s.teamId);
+                const titleText = `${p?.name}`; // Only player name
+
+                return `
+                    <div class="bg-gray-800 p-2 rounded flex justify-between items-center text-sm border border-yellow-400/20 group">
+                        <div class="flex items-center gap-2">
+                            <span class="text-gray-500 text-xs">${formatDate(s.date)}</span>
+                            <span>${iconMap[s.type]}</span>
+                            <div>
+                                <div class="font-bold">${titleText}</div>
+                                <div class="text-xs text-gray-400">จำนวน: ${s.count} | ทีม: ${t?.name || 'N/A'} | ${s.note}</div>
+                            </div>
+                        </div>
+                        <div class="opacity-0 group-hover:opacity-100 transition flex gap-2">
+                            <button onclick="editStat(${s.id})" class="text-blue-400 hover:text-blue-300"><i class="fas fa-edit"></i></button>
+                            <button onclick="delStat(${s.id})" class="text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            }).join('') || '<p class="text-center text-gray-500 py-4">ไม่มีสถิติผู้เล่นที่ถูกบันทึก</p>';
+        }
+
+
+        // --- 5. TEAMS ---
+        function handleTeamSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('team-edit-id').value;
+            const newTeam = {
+                id: id || 't' + Date.now(),
+                name: document.getElementById('team-name').value,
+                color: document.getElementById('team-color').value || themeColor,
+                tel: document.getElementById('team-tel').value,
+                logo: teams.find(t => t.id == id)?.logo || '' // Keep existing logo if editing
+            };
+
+            if (id) {
+                teams = teams.map(t => t.id == id ? newTeam : t);
+            } else {
+                teams.push(newTeam);
+            }
+            save();
+            resetTeamForm();
+        }
+
+        function renderTeams() {
+            const list = document.getElementById('teams-list');
+            list.innerHTML = teams.map(t => {
+                return `
+                    <div class="glass p-4 rounded-xl shadow-lg border-l-4 relative" style="border-color: ${t.color};">
+                        <div class="flex items-center gap-3">
+                            <img src="${t.logo}" class="w-10 h-10 logo-circle bg-white p-1 border" style="border-color: ${t.color};" alt="Team Logo">
+                            <div>
+                                <div class="font-bold text-lg uppercase">${t.name}</div>
+                                <div class="text-sm text-gray-400">Tel: ${t.tel || 'N/A'}</div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 mt-3">
+                            <button onclick="editTeam('${t.id}')" class="text-blue-400 hover:text-blue-300 text-sm"><i class="fas fa-edit"></i> แก้ไข</button>
+                            <button onclick="delTeam('${t.id}')" class="text-red-400 hover:text-red-300 text-sm"><i class="fas fa-trash"></i> ลบ</button>
+                        </div>
+                    </div>`;
+            }).join('') || '<p class="text-center text-gray-400 py-10">ยังไม่มีการเพิ่มทีม</p>';
+        }
+
+        function delTeam(id) {
+            if(confirm('ลบทีมนี้? จะลบนักเตะและสถิติทั้งหมดที่เกี่ยวข้อง!')) {
+                teams = teams.filter(t => t.id != id);
+                players = players.filter(p => p.teamId != id);
+                matches = matches.filter(m => m.teamA != id && m.teamB != id);
+                stats = stats.filter(s => s.teamId != id);
+                schedules = schedules.filter(s => s.teamA != id && s.teamB != id);
+                save();
+            }
+        }
+
+        function editTeam(id) {
+            const t = teams.find(x => x.id == id);
+            if (t) {
+                document.getElementById('team-edit-id').value = t.id;
+                document.getElementById('team-name').value = t.name;
+                document.getElementById('team-color').value = t.color;
+                document.getElementById('team-tel').value = t.tel;
+                document.getElementById('btn-team-save').innerText = 'อัปเดต';
+                document.getElementById('btn-team-cancel').classList.remove('hidden');
+            }
+        }
+
+        function resetTeamForm() {
+            document.getElementById('team-edit-id').value = '';
+            document.getElementById('team-name').value = '';
+            document.getElementById('team-color').value = themeColor;
+            document.getElementById('team-tel').value = '';
+            document.getElementById('btn-team-save').innerText = '+ เพิ่มทีม';
+            document.getElementById('btn-team-cancel').classList.add('hidden');
+        }
+
+        // --- 6. PLAYERS ---
+        function handlePlayerSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('p-id').value;
+            const file = document.getElementById('p-img').files[0];
+            const pManager = document.getElementById('p-manager').checked;
+            
+            const savePlayer = (imageUrl = '') => {
+                const newPlayer = {
+                    id: id ? parseInt(id) : Date.now(),
+                    name: document.getElementById('p-name').value,
+                    no: document.getElementById('p-no').value,
+                    teamId: document.getElementById('p-team').value,
+                    img: imageUrl || players.find(p => p.id == id)?.img || '', // Keep old image if no new file
+                    manager: pManager
+                };
+            
+                if (id) {
+                    players = players.map(p => p.id == id ? newPlayer : p);
+                } else {
+                    players.push(newPlayer);
+                }
+                save();
+                document.getElementById('player-modal').classList.add('hidden');
+                e.target.reset();
+                renderPlayers(currentTeamView);
+            };
+
+            if (file) {
+                // Upload/Compress and then save
+                compressImage(file).then(savePlayer);
+            } else {
+                savePlayer();
+            }
+        }
+        
+        function renderTeamsTabs(selectedId) {
+            const tabsContainer = document.getElementById('team-tabs-container');
+            let html = `<button onclick="renderPlayers('all', this)" class="team-tab ${selectedId === 'all' ? 'active' : ''} text-black px-4 py-1 rounded-full text-sm font-bold transition hover:bg-yellow-600" style="background-color: ${selectedId === 'all' ? themeColor : '#4b5563'}; color: ${selectedId === 'all' ? 'black' : 'white'};">ทั้งหมด</button>`;
+            
+            html += teams.map(t => `
+                <button onclick="renderPlayers('${t.id}', this)" class="team-tab ${selectedId == t.id ? 'active' : ''} text-black px-4 py-1 rounded-full text-sm font-bold transition hover:opacity-80" style="background-color: ${selectedId == t.id ? themeColor : '#4b5563'}; color: ${selectedId == t.id ? 'black' : 'white'};">
+                    ${t.name}
+                </button>
+            `).join('');
+
+            tabsContainer.innerHTML = html;
+        }
+
+        function renderPlayers(teamId = 'all') {
+            currentTeamView = teamId;
+            const list = document.getElementById('players-list');
+            const filteredPlayers = teamId === 'all' 
+                ? players.sort((a,b) => a.name.localeCompare(b.name))
+                : players.filter(p => p.teamId === teamId).sort((a,b) => a.no - b.no || a.name.localeCompare(b.name));
+
+            document.getElementById('team-tabs-container').querySelectorAll('.team-tab').forEach(btn => {
+                const btnTeamId = btn.getAttribute('onclick').match(/'(.*?)'/)[1];
+                if (btnTeamId === teamId) {
+                    btn.classList.add('active');
+                    btn.style.backgroundColor = themeColor;
+                    btn.style.color = 'black';
+                } else {
+                    btn.classList.remove('active');
+                    btn.style.backgroundColor = '#4b5563';
+                    btn.style.color = 'white';
+                }
+            });
+
+            list.innerHTML = `
+                <div class="player-card rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:shadow-xl transition" onclick="openPlayerModal()">
+                    <i class="fas fa-plus-circle text-4xl mb-2" style="color: var(--primary-color);"></i>
+                    <div class="font-bold text-sm" style="color: var(--primary-color);">เพิ่มนักเตะใหม่</div>
+                </div>
+            ` + filteredPlayers.map(p => {
+                const t = teams.find(x => x.id == p.teamId);
+                const pStats = getPlayerStats(p.id);
+
+                return `
+                    <div class="player-card rounded-xl shadow-lg relative">
+                        <button onclick="openPlayerModal(${p.id})" class="player-photo-container block w-full relative">
+                            <img src="${p.img || ''}" alt="${p.name}" class="player-photo">
+                            <div class="player-num-tag" style="background-color: ${t?.color || themeColor};">${p.no || '-'}</div>
+                        </button>
+                        <div class="p-3">
+                            <div class="font-bold text-sm truncate" style="color: ${t?.color || 'white'}">${p.name}</div>
+                            <div class="text-xs text-gray-400 truncate">${t?.name || 'ไม่ระบุทีม'}</div>
+                            <div class="mt-2 flex justify-between text-xs font-semibold">
+                                <span class="text-red-400"><i class="fas fa-futbol"></i> ${pStats.goals}</span>
+                                <span class="text-yellow-400"><i class="fas fa-grip-lines"></i> ${pStats.yellows}</span>
+                                <span class="text-red-600"><i class="fas fa-stop"></i> ${pStats.reds}</span>
+                                <span class="text-blue-400"><i class="fas fa-shield-alt"></i> ${pStats.saves}</span>
+                            </div>
+                            <div class="absolute top-2 right-2 opacity-100 transition flex gap-1">
+                                <button onclick="openPlayerModal(${p.id})" class="text-blue-400 bg-black/50 rounded-full w-6 h-6 text-sm hover:text-blue-300"><i class="fas fa-edit"></i></button>
+                                <button onclick="delPlayer(${p.id})" class="text-red-400 bg-black/50 rounded-full w-6 h-6 text-sm hover:text-red-300"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>`;
+            }).join('') || '<p class="text-center text-gray-400 py-10 col-span-full">ไม่มีนักเตะในทีมนี้หรือยังไม่ได้เพิ่มนักเตะ</p>';
+        }
+
+        function openPlayerModal(id = null) {
+            document.getElementById('player-modal').classList.remove('hidden');
+            document.getElementById('p-img-preview').classList.add('hidden');
+            document.getElementById('p-id').value = '';
+            document.getElementById('p-name').value = '';
+            document.getElementById('p-no').value = '';
+            document.getElementById('p-team').value = '';
+            document.getElementById('p-manager').checked = false;
+            document.getElementById('p-img').value = '';
+            document.getElementById('player-modal-title').innerText = 'เพิ่มนักเตะใหม่';
+            document.getElementById('btn-player-save').innerText = 'บันทึก';
+
+            updateDropdowns(); // Ensure team dropdown is up to date
+
+            if (id) {
+                const p = players.find(x => x.id == id);
+                if (p) {
+                    document.getElementById('p-id').value = p.id;
+                    document.getElementById('p-name').value = p.name;
+                    document.getElementById('p-no').value = p.no;
+                    document.getElementById('p-team').value = p.teamId;
+                    document.getElementById('p-manager').checked = p.manager;
+                    document.getElementById('player-modal-title').innerText = 'แก้ไขข้อมูลนักเตะ';
+                    document.getElementById('btn-player-save').innerText = 'อัปเดต';
+                    if (p.img) {
+                        document.getElementById('p-img-preview').src = p.img;
+                        document.getElementById('p-img-preview').classList.remove('hidden');
+                    }
+                }
+            }
+        }
+        
+        function delPlayer(id) {
+            if(confirm('ลบนักเตะนี้? สถิติที่เกี่ยวข้องทั้งหมดจะถูกลบไปด้วย!')) {
+                players = players.filter(p => p.id != id);
+                stats = stats.filter(s => s.playerId != id);
+                save();
+            }
+        }
+        
+        // --- 7. GLOBAL SETTINGS ---
+        function toggleSettings() {
+            document.getElementById('settings-modal').classList.toggle('hidden');
+            if (!document.getElementById('settings-modal').classList.contains('hidden')) {
+                document.getElementById('global-logo-preview').src = globalLogo;
+            }
+        }
+
+        async function uploadGlobalLogo() {
+            const input = document.getElementById('global-logo-input');
+            const file = input.files[0];
+            if (!file) return;
+
+            // Compress the image before saving to storage
+            const compressedBase64 = await compressImage(file);
+            globalLogo = compressedBase64;
+            save();
+            document.getElementById('global-logo-preview').src = globalLogo;
+            input.value = null; // Clear file input
+        }
+
+        function clearGlobalLogo() {
+            globalLogo = "";
+            save();
+            document.getElementById('global-logo-preview').src = '';
+        }
+        
+        function exportData() {
+            const data = {
+                teams,
+                players,
+                matches,
+                stats,
+                schedules,
+                globalLogo,
+                themeName,
+                themeColor,
+                secondaryColor
+            };
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `jakhong_league_data_${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(input) {
+            if (!input.files.length) return;
+            
+            if (!confirm("การนำเข้าข้อมูลจะเขียนทับข้อมูลที่มีอยู่ทั้งหมด คุณแน่ใจหรือไม่ว่าต้องการแทนที่ข้อมูลทั้งหมดด้วยไฟล์นี้?")) {
+                input.value = null;
+                return;
+            }
+
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    teams = importedData.teams || [];
+                    players = importedData.players || [];
+                    matches = importedData.matches || [];
+                    stats = importedData.stats || [];
+                    schedules = importedData.schedules || [];
+                    globalLogo = importedData.globalLogo || "";
+                    themeName = importedData.themeName || 'JAKHONG SYSTEM';
+                    themeColor = importedData.themeColor || '#facc15';
+                    secondaryColor = importedData.secondaryData || '#1c365b';
+
+                    save(); 
+                    alert("นำเข้าข้อมูลเสร็จสิ้น! ข้อมูลถูกกู้คืนแล้ว");
+                    document.getElementById('settings-modal').classList.add('hidden');
+                    input.value = null;
+
+                } catch (error) {
+                    alert("ข้อผิดพลาดในการนำเข้าไฟล์: ไฟล์ไม่ใช่รูปแบบ JSON ที่ถูกต้อง หรือเสียหาย");
+                    console.error("Import Error:", error);
+                    input.value = null;
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        function confirmClearAll() {
+            if (confirm("คุณแน่ใจหรือไม่ที่จะลบข้อมูลทั้งหมดใน Local Storage? การดำเนินการนี้ไม่สามารถยกเลิกได้!")) {
+                localStorage.clear();
+                teams = DEFAULT_TEAMS;
+                players = DEFAULT_PLAYERS;
+                matches = [];
+                stats = [];
+                schedules = [];
+                globalLogo = "";
+                themeName = 'JAKHONG SYSTEM';
+                themeColor = '#facc15';
+                secondaryColor = '#1c365b';
+
+                save(); // Re-save defaults
+                alert("ล้างข้อมูลทั้งหมดแล้ว! ระบบถูกรีเซ็ตเป็นค่าเริ่มต้น");
+                document.getElementById('settings-modal').classList.add('hidden');
+            }
+        }
+        
+        function updateScheduleMatchDropdown() {
+            const dropdown = document.getElementById('m-schedule-id');
+            const recordedMatchIds = matches.map(m => m.scheduleId).filter(id => id !== null);
+            const pendingSchedules = schedules.filter(s => !recordedMatchIds.includes(s.id.toString()));
+
+            dropdown.innerHTML = '<option value="">--- เลือกแมทช์เพื่อกรอกข้อมูลอัตโนมัติ ---</option>' + 
+                pendingSchedules.map(s => {
+                    const teamA = teams.find(t => t.id == s.teamA);
+                    const teamB = teams.find(t => t.id == s.teamB);
+                    return `<option value="${s.id}" data-team-a="${s.teamA}" data-team-b="${s.teamB}" data-date="${s.date}">[${formatDate(s.date)}] ${teamA?.name || 'ทีม A'} vs ${teamB?.name || 'ทีม B'}</option>`;
+                }).join('');
+        }
+        
+        // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('daily-date').value = today;
-            // load(); // Assume load() exists and loads data from localStorage
-            // renderDaily(); // Call render once data is loaded
+            if (teams.length === 0) teams = DEFAULT_TEAMS;
+            if (players.length === 0) players = DEFAULT_PLAYERS;
+            
+            // Set default date for daily page
+            const dailyDateInput = document.getElementById('daily-date');
+            if (dailyDateInput && !dailyDateInput.value) {
+                dailyDateInput.value = new Date().toISOString().slice(0, 10);
+            }
+
+            renderTheme();
+            renderAll();
+            nav('home', document.querySelector('.nav-btn.active')); // Ensure dashboard is rendered
         });
-
-        // ... [ฟังก์ชันอื่นๆ ที่มีอยู่เดิม] ...
-
+        
     </script>
 </body>
 </html>
