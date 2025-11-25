@@ -168,6 +168,105 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
         }
 
+        /* --- SCHEDULE CARD NEW DESIGN --- */
+        .schedule-match-card {
+            background: #111827; /* gray-900 */
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 150px 1fr; /* Team A | Center Info | Team B */
+            align-items: center;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        .schedule-match-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+        }
+        
+        .schedule-team-logo {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            border-radius: 50%;
+            background-color: white;
+            padding: 4px;
+            border: 3px solid transparent;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Center Info Style */
+        .schedule-center-info {
+            position: relative;
+            text-align: center;
+            padding: 1rem 0;
+            z-index: 10;
+        }
+        /* VS Separator (Cooler effect) */
+        .schedule-center-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: repeating-linear-gradient(to bottom, var(--primary-color), var(--primary-color) 4px, transparent 4px, transparent 8px);
+            opacity: 0.2;
+            z-index: 5;
+        }
+
+        /* Action Buttons Container (Hidden by default) */
+        .schedule-actions {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--primary-color);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .schedule-match-card.show-actions .schedule-actions {
+            opacity: 1;
+            visibility: visible;
+        }
+        /* Team Containers */
+        .schedule-team-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+        }
+        .schedule-team-container.team-a { text-align: right; }
+        .schedule-team-container.team-b { text-align: left; }
+        .schedule-team-container .flex { margin-top: 8px; }
+
+        /* Media Query for larger screens */
+        @media (min-width: 640px) {
+            .schedule-team-container.team-a { 
+                flex-direction: row; 
+                justify-content: flex-end;
+                text-align: right;
+                gap: 12px;
+            }
+            .schedule-team-container.team-b { 
+                flex-direction: row; 
+                justify-content: flex-start;
+                text-align: left;
+                gap: 12px;
+            }
+            /* Adjust padding on larger screens */
+            .schedule-team-container { padding: 1.5rem 1rem; }
+        }
+
     </style>
 </head>
 <body class="flex flex-col">
@@ -768,6 +867,20 @@
             } else {
                 renderDashboard();
             }
+            
+            // NEW: Add event listener for schedule card (simulated)
+            document.getElementById('sched-list').addEventListener('click', (e) => {
+                const card = e.target.closest('.schedule-match-card');
+                if (card) {
+                    // Hide all others and toggle this one
+                    document.querySelectorAll('.schedule-match-card').forEach(c => {
+                        if (c !== card) {
+                            c.classList.remove('show-actions');
+                        }
+                    });
+                    card.classList.toggle('show-actions');
+                }
+            });
         }
 
         function nav(id, button) {
@@ -1005,12 +1118,12 @@
         function renderSchedule() {
             const cont = document.getElementById('sched-list');
             const cBgColor = document.getElementById('sc-bg-color').value;
-            const cTextColor = document.getElementById('sc-text-color').value;
+            const cTextColor = document.getElementById('sc-text-color').value; // สีที่ผู้ใช้เลือก
             const cPillColor = document.getElementById('sc-pill-color').value;
             const cHeaderText = document.getElementById('sc-header-text').value;
 
             document.getElementById('sc-bg-overlay').style.background = `linear-gradient(to br, ${cBgColor}, #0c1626)`;
-            document.getElementById('sc-container').style.color = cTextColor;
+            // document.getElementById('sc-container').style.color = cTextColor; // **REMOVED: Use inline style for text color**
             document.getElementById('sc-pill').style.backgroundColor = cPillColor;
             document.getElementById('sc-pill').innerText = cHeaderText;
 
@@ -1030,24 +1143,46 @@
                 const matchesHtml = grouped[key].map(s => {
                     const tA = teams.find(t => t.id == s.teamA);
                     const tB = teams.find(t => t.id == s.teamB);
-                    // 3. UPDATED: Hide 'รอแข่ง' (If s.result is null/false, status is empty)
                     const matchExists = matches.some(m => m.teamA === s.teamA && m.teamB === s.teamB && m.date === s.date) || 
                                         matches.some(m => m.teamA === s.teamB && m.teamB === s.teamA && m.date === s.date);
-                    const status = matchExists ? `<span class="text-sm font-bold text-green-400">แข่งแล้ว</span>` : ``; 
+                    const status = matchExists ? `<span class="text-sm font-bold text-green-400">แข่งแล้ว</span>` : `<span class="text-sm font-bold text-gray-500">รอแข่ง</span>`; 
                     
+                    // NEW: Schedule Card HTML Structure
                     return `
-                        <div class="flex justify-between items-center p-3 rounded-lg bg-gray-900 border-l-4 border-gray-700 hover:bg-gray-700 transition">
-                            <div class="flex-1 min-w-0 pr-2">
-                                <div class="font-bold truncate" style="color: ${tA?.color || cTextColor}">${tA?.name}</div>
-                                <div class="font-bold truncate" style="color: ${tB?.color || cTextColor}">${tB?.name}</div>
+                        <div class="schedule-match-card" data-id="${s.id}">
+                            
+                            <div class="schedule-team-container team-a" style="color: ${cTextColor};">
+                                <div class="hidden sm:block text-right">
+                                    <div class="font-bold text-lg uppercase">${tA?.name || 'N/A'}</div>
+                                    <div class="text-xs text-gray-400">${s.group ? `กลุ่ม ${s.group}` : 'N/A'}</div>
+                                </div>
+                                <img src="${tA?.logo || ''}" class="schedule-team-logo" style="border-color: ${tA?.color || themeColor};" alt="${tA?.name || 'Team A'} Logo">
+                                <div class="block sm:hidden text-center mt-2">
+                                    <div class="font-bold text-sm uppercase">${tA?.name || 'N/A'}</div>
+                                </div>
                             </div>
-                            <div class="text-center w-24">
-                                <div class="text-sm font-bold">${s.time}</div>
-                                <div class="text-xs text-gray-400">${s.group ? s.group : 'N/A'}</div>
+
+                            <div class="schedule-center-info" style="color: ${cTextColor};">
+                                <div class="font-extrabold text-3xl italic tracking-wider text-red-500 outline-text" style="color: ${cTextColor};">VS</div>
+                                <div class="text-xl font-black mt-1">${s.time}</div>
+                                <div class="text-sm font-medium text-gray-400">${formatDate(s.date)}</div>
+                                <div class="mt-1">${status}</div>
                             </div>
-                            <div class="w-20 text-right">
-                                ${status}
-                                <button onclick="delSched(${s.id})" class="text-xs text-red-500 hover:text-red-400 ml-2"><i class="fas fa-trash"></i></button>
+
+                            <div class="schedule-team-container team-b" style="color: ${cTextColor};">
+                                <img src="${tB?.logo || ''}" class="schedule-team-logo" style="border-color: ${tB?.color || themeColor};" alt="${tB?.name || 'Team B'} Logo">
+                                <div class="text-left">
+                                    <div class="font-bold text-lg uppercase">${tB?.name || 'N/A'}</div>
+                                    <div class="text-xs text-gray-400 hidden sm:block">${s.group ? `กลุ่ม ${s.group}` : 'N/A'}</div>
+                                </div>
+                                <div class="block sm:hidden text-center mt-2">
+                                    <div class="font-bold text-sm uppercase">${tB?.name || 'N/A'}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="schedule-actions">
+                                <button onclick="editSched(${s.id})" class="text-blue-400 hover:text-blue-300 px-2 py-1"><i class="fas fa-edit"></i> แก้ไข</button>
+                                <button onclick="delSched(${s.id})" class="text-red-400 hover:text-red-300 px-2 py-1"><i class="fas fa-trash"></i> ลบ</button>
                             </div>
                         </div>
                     `;
@@ -1060,6 +1195,12 @@
             }).join('');
 
             cont.innerHTML = html || '<p class="text-center text-gray-500 py-10">ไม่มีโปรแกรมการแข่งขันที่ถูกกรองในขณะนี้</p>';
+        }
+        
+        // ** NEW: Dummy function for editSched to prevent error **
+        function editSched(id) {
+            alert('ฟังก์ชันแก้ไขแมทช์ยังไม่ถูกใช้งานเต็มรูปแบบ: ' + id);
+            // Implement logic to open modal and prefill data later
         }
 
         function delSched(id) {
@@ -1199,7 +1340,8 @@
                 <div class="bg-black border border-gray-600 rounded overflow-hidden flex flex-col">
                     <div class="aspect-[3/4] w-full bg-gray-800 relative">
                         <img src="${p?.img||''}" class="w-full h-full object-cover">
-                        ${playerNumberTag} <div class="absolute bottom-0 w-full bg-gradient-to-t from-black to-transparent h-1/2"></div>
+                        <div class="player-num-tag" style="top: 5px; right: 5px; left: auto; background-color: ${themeColor}; border-color: black; color: black; z-index: 20;">${p.no || '-'}</div>
+                        <div class="absolute bottom-0 w-full bg-gradient-to-t from-black to-transparent h-1/2"></div>
                         <div class="absolute bottom-1 right-1 font-bold px-1.5 rounded" style="background-image: linear-gradient(to right, ${cScoreGrad1}, ${cScoreGrad2}); color: ${cScoreText}; font-size: 10px;">${c} ลูก</div>
                     </div>
                     <div class="p-1 text-center bg-gray-900">
@@ -1760,7 +1902,7 @@
                     globalLogo = importedData.globalLogo || "";
                     themeName = importedData.themeName || 'JAKHONG SYSTEM';
                     themeColor = importedData.themeColor || '#facc15';
-                    secondaryColor = importedData.secondaryColor || '#1c365b';
+                    secondaryColor = importedData.secondaryData || '#1c365b';
 
                     save(); 
                     alert("นำเข้าข้อมูลเสร็จสิ้น! ข้อมูลถูกกู้คืนแล้ว");
