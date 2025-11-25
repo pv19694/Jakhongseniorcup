@@ -130,14 +130,13 @@
             letter-spacing: -0.05em; /* tracking-tighter */
             position: relative;
         }
+        /* --- FIX: REMOVED TEXT SHADOW ON SCORE NUMBERS --- */
         .daily-score-number {
             padding: 0 0.5rem;
             border-radius: 6px;
-            text-shadow: 2px 2px 0 #000;
+            /* text-shadow: 2px 2px 0 #000;  <--- REMOVED */
             line-height: 1;
-            /* FIX: Ensure score numbers don't overlap */
             z-index: 10; 
-            /* NEW: Score text color will be set inline */
         }
         .daily-vs {
             /* FIX: Make VS smaller and central */
@@ -267,6 +266,77 @@
             .schedule-team-container { padding: 1.5rem 1rem; }
         }
 
+        /* --- NEW: Daily Top Scorer Grid Design (Desktop) --- */
+        .top-scorer-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr); /* Default to 1 column */
+            gap: 1rem;
+        }
+        @media (min-width: 768px) { /* md: */
+            .top-scorer-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (min-width: 1024px) { /* lg: */
+            .top-scorer-grid {
+                grid-template-columns: repeat(5, 1fr); /* 5 columns for top 5 */
+            }
+        }
+        .scorer-card {
+            background: #1f2937;
+            border-radius: 12px;
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+        .scorer-card.is-top {
+            border-color: var(--primary-color);
+        }
+        .scorer-card-img {
+            width: 100%;
+            height: auto;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 3px solid white;
+            margin-bottom: 0.5rem;
+            aspect-ratio: 3/4;
+        }
+        .scorer-rank-tag {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(-50%);
+            background: var(--primary-color);
+            color: black;
+            font-size: 1.25rem;
+            font-weight: 900;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 3px solid black;
+            z-index: 20;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        /* --- NEW: All Stats Filter Styles --- */
+        .all-stats-row {
+            transition: all 0.1s;
+        }
+        .all-stats-row:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
     </style>
 </head>
 <body class="flex flex-col">
@@ -438,33 +508,52 @@
         <div id="page-daily" class="section hidden fade-in">
             <div class="glass p-4 rounded-xl mb-6 flex flex-wrap gap-6 items-end">
                 <div>
-                    <label class="text-xs text-gray-400 block mb-1">เลือกวันที่</label>
-                    <input type="date" id="daily-date" class="bg-black border border-gray-600 p-2 rounded text-white text-sm w-full" onchange="renderDaily()">
-                </div>
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">เรียงดาวซัลโว</label>
-                    <select id="daily-scorer-sort" class="bg-black border border-gray-600 p-2 rounded text-white text-sm" onchange="renderDaily()">
-                        <option value="goals">ประตู (สูงสุด)</option>
-                        <option value="name">ชื่อ</option>
-                        <option value="number">เบอร์เสื้อ</option>
+                    <label class="text-xs text-gray-400 block mb-1">แสดงผล (Daily/Stats)</label>
+                    <select id="daily-view-mode" class="bg-black border border-gray-600 p-2 rounded text-white text-sm w-full" onchange="renderDaily() || renderAllStats()">
+                        <option value="daily">สรุปผลประจำวัน</option>
+                        <option value="stats">สถิติรวมผู้เล่น (ทั้งลีก)</option>
                     </select>
                 </div>
+                <div id="daily-controls" class="flex flex-wrap gap-6 items-end">
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">เลือกวันที่</label>
+                        <input type="date" id="daily-date" class="bg-black border border-gray-600 p-2 rounded text-white text-sm w-full" onchange="renderDaily()">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">เรียงดาวซัลโว</label>
+                        <select id="daily-scorer-sort" class="bg-black border border-gray-600 p-2 rounded text-white text-sm" onchange="renderDaily()">
+                            <option value="goals">ประตู (สูงสุด)</option>
+                            <option value="name">ชื่อ</option>
+                            <option value="number">เบอร์เสื้อ</option>
+                        </select>
+                    </div>
 
-                <div class="flex gap-2">
-                    <div><label class="text-xs text-gray-400 block mb-1">สีตัวเลขสกอร์</label><input type="color" id="daily-score-text-color" value="#000000" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
-                    
-                    <div><label class="text-xs text-gray-400 block mb-1">สีสกอร์ 1</label><input type="color" id="daily-score-grad-1" value="#facc15" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
-                    <div><label class="text-xs text-gray-400 block mb-1">สีสกอร์ 2</label><input type="color" id="daily-score-grad-2" value="#e3a008" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
-                    
-                    <div><label class="text-xs text-gray-400 block mb-1">สีชื่อทีม</label><input type="color" id="daily-team-name-color" value="#ffffff" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div> 
-                    <div><label class="text-xs text-gray-400 block mb-1">สีพื้นแถบ 1</label><input type="color" id="daily-row-bg-1" value="#1f2937" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
-                    <div><label class="text-xs text-gray-400 block mb-1">สีพื้นแถบ 2</label><input type="color" id="daily-row-bg-2" value="#0c1626" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                    <div class="flex gap-2">
+                        <div><label class="text-xs text-gray-400 block mb-1">สีตัวเลขสกอร์</label><input type="color" id="daily-score-text-color" value="#000000" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                        
+                        <div><label class="text-xs text-gray-400 block mb-1">สีสกอร์ 1</label><input type="color" id="daily-score-grad-1" value="#facc15" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                        <div><label class="text-xs text-gray-400 block mb-1">สีสกอร์ 2</label><input type="color" id="daily-score-grad-2" value="#e3a008" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                        
+                        <div><label class="text-xs text-gray-400 block mb-1">สีชื่อทีม</label><input type="color" id="daily-team-name-color" value="#ffffff" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div> 
+                        <div><label class="text-xs text-gray-400 block mb-1">สีพื้นแถบ 1</label><input type="color" id="daily-row-bg-1" value="#1f2937" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                        <div><label class="text-xs text-gray-400 block mb-1">สีพื้นแถบ 2</label><input type="color" id="daily-row-bg-2" value="#0c1626" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                    </div>
+                    <div class="flex gap-2">
+                        <div><label class="text-xs text-gray-400 block mb-1">แบนเนอร์ 1</label><input type="color" id="daily-banner-grad-1" value="#1c365b" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                        <div><label class="text-xs text-gray-400 block mb-1">แบนเนอร์ 2</label><input type="color" id="daily-banner-grad-2" value="#0c1626" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                        <div><label class="text-xs text-gray-400 block mb-1">อักษรแบนเนอร์</label><input type="color" id="daily-banner-text" value="#facc15" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                        <div><label class="text-xs text-gray-400 block mb-1">ขอบแบนเนอร์</label><input type="color" id="daily-banner-border" value="#facc15" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+                    </div>
                 </div>
-                <div class="flex gap-2">
-                    <div><label class="text-xs text-gray-400 block mb-1">แบนเนอร์ 1</label><input type="color" id="daily-banner-grad-1" value="#1c365b" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
-                    <div><label class="text-xs text-gray-400 block mb-1">แบนเนอร์ 2</label><input type="color" id="daily-banner-grad-2" value="#0c1626" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
-                    <div><label class="text-xs text-gray-400 block mb-1">อักษรแบนเนอร์</label><input type="color" id="daily-banner-text" value="#facc15" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
-                    <div><label class="text-xs text-gray-400 block mb-1">ขอบแบนเนอร์</label><input type="color" id="daily-banner-border" value="#facc15" class="w-8 h-8 rounded cursor-pointer" oninput="renderDaily()"></div>
+
+                <div id="all-stats-controls" class="hidden">
+                    <label class="text-xs text-gray-400 block mb-1">สถิติที่ต้องการกรอง</label>
+                    <select id="stat-filter-type" class="bg-black border border-gray-600 p-2 rounded text-white text-sm" onchange="renderAllStats()">
+                        <option value="goal">⚽ ประตู (สูงสุด)</option>
+                        <option value="yellow">🟨 ใบเหลือง (สูงสุด)</option>
+                        <option value="red">🟥 ใบแดง (สูงสุด)</option>
+                        <option value="save">🧤 เซฟ (สูงสุด)</option>
+                    </select>
                 </div>
             </div>
 
@@ -479,24 +568,46 @@
                     </div>
                 </div>
 
-                <div class="p-4 md:p-8 bg-gray-900 min-h-[200px] space-y-3" id="daily-matches-container"></div>
+                <div id="daily-content">
+                    <div class="p-4 md:p-8 bg-gray-900 min-h-[200px] space-y-3" id="daily-matches-container"></div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-0 border-t-4 border-black mt-4">
-                    
-                    <div class="md:col-span-1 bg-gray-800 p-4 border-r border-gray-700 flex flex-col">
-                        <h3 class="text-center font-bold text-yellow-400 uppercase text-base mb-4 border-b border-gray-700 pb-2">
-                            <span id="daily-scorer-header">ดาวซัลโวสูงสุด</span>
-                        </h3>
-                        <div id="daily-top-scorers" class="space-y-3 overflow-y-auto max-h-[500px] pr-1 custom-scrollbar"></div>
-                    </div>
+                    <div class="grid grid-cols-1 mt-4">
+                        
+                        <div class="bg-gray-800 p-4 border-b border-gray-700 flex flex-col">
+                            <h3 class="text-center font-bold text-yellow-400 uppercase text-lg mb-4 border-b border-gray-700 pb-2">
+                                <span id="daily-scorer-header">ดาวซัลโวสูงสุด (Top 5)</span>
+                            </h3>
+                            <div id="daily-top-scorers" class="top-scorer-grid">
+                                </div>
+                        </div>
 
-                    <div class="md:col-span-2 bg-gradient-to-br from-gray-900 to-black p-4">
-                        <h3 class="text-center font-bold text-green-400 uppercase text-base mb-4 border-b border-gray-700 pb-2">
-                            ผู้ที่ทำประตูวันนี้
-                        </h3>
-                        <div id="daily-today-scorers" class="grid grid-cols-3 sm:grid-cols-4 gap-3"></div>
+                        <div class="bg-gradient-to-br from-gray-900 to-black p-4">
+                            <h3 class="text-center font-bold text-green-400 uppercase text-lg mb-4 border-b border-gray-700 pb-2">
+                                ผู้ที่ทำประตูวันนี้
+                            </h3>
+                            <div id="daily-today-scorers" class="top-scorer-grid">
+                                </div>
+                        </div>
                     </div>
                 </div>
+
+                <div id="all-stats-content" class="hidden">
+                    <div class="p-4 md:p-8 bg-gray-900 min-h-[200px]">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="uppercase text-xs tracking-wider border-b border-white/10 text-gray-400">
+                                    <th class="p-2">อันดับ</th>
+                                    <th class="p-2">นักเตะ</th>
+                                    <th class="p-2 text-center">ทีม</th>
+                                    <th class="p-2 text-center" id="all-stats-header">จำนวน</th>
+                                </tr>
+                            </thead>
+                            <tbody id="all-stats-body" class="text-sm font-medium">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -882,6 +993,22 @@
                     card.classList.toggle('show-actions');
                 }
             });
+            
+            // Set initial view for daily page
+            const viewMode = document.getElementById('daily-view-mode').value;
+            if (viewMode === 'daily') {
+                document.getElementById('daily-content').classList.remove('hidden');
+                document.getElementById('all-stats-content').classList.add('hidden');
+                document.getElementById('daily-controls').classList.remove('hidden');
+                document.getElementById('all-stats-controls').classList.add('hidden');
+                renderDaily();
+            } else {
+                document.getElementById('daily-content').classList.add('hidden');
+                document.getElementById('all-stats-content').classList.remove('hidden');
+                document.getElementById('daily-controls').classList.add('hidden');
+                document.getElementById('all-stats-controls').classList.remove('hidden');
+                renderAllStats();
+            }
         }
 
         function nav(id, button) {
@@ -891,7 +1018,14 @@
             if(button) button.classList.add('active');
 
             if(id === 'home') renderDashboard();
-            if(id === 'daily') renderDaily();
+            if(id === 'daily') {
+                const viewMode = document.getElementById('daily-view-mode').value;
+                if (viewMode === 'daily') {
+                    renderDaily();
+                } else {
+                    renderAllStats();
+                }
+            }
             if(id === 'leaderboard') renderLeaderboard();
             if(id === 'stats') {
                 // FIX: Ensure the correct tab is shown
@@ -921,6 +1055,13 @@
             renderStatHistory();
             renderDashboard(); 
             updateScheduleMatchDropdown(); 
+            // Re-render the active view for daily page
+            const viewMode = document.getElementById('daily-view-mode').value;
+            if (viewMode === 'daily') {
+                renderDaily();
+            } else {
+                renderAllStats();
+            }
         }
 
         function updateDropdowns() {
@@ -941,6 +1082,7 @@
                 assists: 0, // Assist system removed
                 yellows: playerStats.filter(s => s.type === 'yellow').reduce((sum, s) => sum + s.count, 0),
                 reds: playerStats.filter(s => s.type === 'red').reduce((sum, s) => sum + s.count, 0),
+                saves: playerStats.filter(s => s.type === 'save').reduce((sum, s) => sum + s.count, 0),
             };
         }
         
@@ -1218,13 +1360,42 @@
             }
         }
 
-        // --- 3. DAILY SUMMARY ---
+        // --- 3. DAILY SUMMARY / ALL STATS (UPDATED) ---
+
+        // NEW: Toggle between Daily Summary and All Stats view
+        function toggleDailyView(mode) {
+            const dailyContent = document.getElementById('daily-content');
+            const allStatsContent = document.getElementById('all-stats-content');
+            const dailyControls = document.getElementById('daily-controls');
+            const allStatsControls = document.getElementById('all-stats-controls');
+
+            if (mode === 'daily') {
+                dailyContent.classList.remove('hidden');
+                allStatsContent.classList.add('hidden');
+                dailyControls.classList.remove('hidden');
+                allStatsControls.classList.add('hidden');
+                renderDaily();
+            } else {
+                dailyContent.classList.add('hidden');
+                allStatsContent.classList.remove('hidden');
+                dailyControls.classList.add('hidden');
+                allStatsControls.classList.remove('hidden');
+                renderAllStats();
+            }
+        }
+        
+        // Call the new function based on dropdown change
+        document.getElementById('daily-view-mode').onchange = (e) => toggleDailyView(e.target.value);
+
+
         // 1. UPDATED: calculateTopScorer - Simplified to only focus on goals, and removed assist logic
-        function calculateTopScorer(sortKey) {
+        function calculateTopScorer(sortKey, limit = 5) {
             const playerStatsData = players.map(p => ({
                 playerId: p.id,
                 name: p.name,
                 number: p.no,
+                img: p.img,
+                teamId: p.teamId,
                 ...getPlayerCardStats(p.id)
             }));
             
@@ -1241,7 +1412,7 @@
                  sortedData = playerStatsData.sort((a, b) => b.goals - a.goals || a.name.localeCompare(b.name)).filter(p => p.goals > 0);
             }
 
-            return { sortedData };
+            return { sortedData: sortedData.slice(0, limit) };
         }
 
         function renderDaily() {
@@ -1278,7 +1449,7 @@
                 const t2 = teams.find(x => x.id == m.teamB);
                 const styleBg = i % 2 === 0 ? cBg1 : cBg2;
                 
-                // 4. UPDATED: Apply Score Text Color to score numbers
+                // 4. UPDATED: Apply Score Text Color to score numbers - No text shadow
                 const scoreStyle = `background: linear-gradient(135deg, ${cScoreGrad1}, ${cScoreGrad2}); color: ${cScoreText}; font-weight: 900;`;
                 const scoreABox = `
                     <div class="daily-score-box w-[20%]">
@@ -1301,8 +1472,8 @@
                 </div>`;
             }).join('');
 
-            // 3. Top Scorers 
-            const topScorerData = calculateTopScorer(sortKey); 
+            // 3. Top Scorers (Top 5 Horizontal Grid)
+            const topScorerData = calculateTopScorer(sortKey, 5); // Limit to Top 5
             
             const headerText = {
                 'goals': 'ผู้ที่ยิงประตูได้สูงสุด (ดาวซัลโว)',
@@ -1311,52 +1482,116 @@
             };
             document.getElementById('daily-scorer-header').innerText = headerText[sortKey] || 'ดาวซัลโวสูงสุด';
 
-            document.getElementById('daily-top-scorers').innerHTML = topScorerData.sortedData.map((data, i) => {
-                const p = players.find(x => x.id == data.playerId);
-                const t = teams.find(x => x.id == p?.teamId);
-
-                const mainStat = data.goals;
+            const topScorersCont = document.getElementById('daily-top-scorers');
+            topScorersCont.innerHTML = topScorerData.sortedData.map((data, i) => {
+                const t = teams.find(x => x.id == data.teamId);
+                const isTop = i === 0 ? 'is-top' : '';
+                const rankText = i === 0 ? '👑' : `#${i + 1}`;
                 
-                // 4. UPDATED: Use solid color for score text
+                // NEW: Score Gradient Style
+                const scoreStyle = `background-image: linear-gradient(to right, ${cScoreGrad1}, ${cScoreGrad2}); color: ${cScoreText};`;
+
                 return `
-                <div class="flex items-center gap-3 mb-3 bg-black/30 p-2 rounded border border-gray-600">
-                    <div class="relative">
-                        <img src="${p?.img||''}" class="w-12 h-14 object-cover rounded bg-gray-800 block">
-                        <div class="absolute -top-1 -left-1 w-5 h-5 text-black text-xs font-bold flex items-center justify-center rounded-full border border-white" style="background-color: ${themeColor}">${i+1}</div>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="text-white font-bold text-sm truncate">${p?.name}</div>
-                        <div class="text-gray-400 text-xs truncate">${t?.name} | #${p?.no||'-'}</div>
-                    </div>
-                    <div class="text-right">
-                        <div class="font-black text-xl leading-tight" style="color: ${cScoreText}; background-image: linear-gradient(to right, ${cScoreGrad1}, ${cScoreGrad2}); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${mainStat} <span class="text-xs opacity-70 text-white">ประตู</span></div>
+                <div class="scorer-card ${isTop}">
+                    <div class="scorer-rank-tag" style="background-color: ${t?.color || themeColor};">${rankText}</div>
+                    <img src="${data.img || ''}" class="scorer-card-img" style="border-color: ${t?.color || 'white'};" alt="${data.name}">
+                    <div class="mt-2 w-full">
+                        <div class="text-white font-bold text-sm truncate">${data.name} (#${data.number||'-'})</div>
+                        <div class="text-gray-400 text-xs truncate mb-2">${t?.name || 'ไม่ระบุทีม'}</div>
+                        <div class="font-black text-2xl leading-tight inline-block px-3 py-1 rounded shadow-md" style="${scoreStyle}">
+                             ${data.goals}
+                             <span class="text-xs font-normal">ประตู</span>
+                        </div>
                     </div>
                 </div>`;
-            }).join('');
+            }).join('') || '<p class="text-center text-gray-500 py-4 col-span-full">ไม่มีข้อมูลดาวซัลโว</p>';
 
-            // 4. Scorers Today 
+            // 4. Scorers Today (Horizontal Grid)
             const todays = stats.filter(s => s.type === 'goal' && s.date === date);
             const todayCounts = {};
             todays.forEach(s => todayCounts[s.playerId] = (todayCounts[s.playerId]||0)+s.count);
             
-            document.getElementById('daily-today-scorers').innerHTML = Object.entries(todayCounts).map(([pid, c]) => {
+            const todayScorersCont = document.getElementById('daily-today-scorers');
+            
+            // Get player details for today's scorers
+            const todayScorerData = Object.entries(todayCounts).map(([pid, c]) => {
                 const p = players.find(x => x.id == pid);
-                
-                const playerNumberTag = (p?.no && p.no.trim() !== '') ? `<div class="today-scorer-num-tag">${p.no}</div>` : ''; 
+                const t = teams.find(x => x.id == p?.teamId);
+                return {
+                    name: p?.name,
+                    number: p?.no,
+                    img: p?.img,
+                    teamName: t?.name,
+                    teamColor: t?.color,
+                    goalsToday: c
+                };
+            }).sort((a,b) => b.goalsToday - a.goalsToday); // Sort by goals today
 
+            todayScorersCont.innerHTML = todayScorerData.map((data) => {
+                // NEW: Score Gradient Style
+                const scoreStyle = `background-image: linear-gradient(to right, ${cScoreGrad1}, ${cScoreGrad2}); color: ${cScoreText};`;
+                
                 return `
-                <div class="bg-black border border-gray-600 rounded overflow-hidden flex flex-col">
-                    <div class="aspect-[3/4] w-full bg-gray-800 relative">
-                        <img src="${p?.img||''}" class="w-full h-full object-cover">
-                        <div class="player-num-tag" style="top: 5px; right: 5px; left: auto; background-color: ${themeColor}; border-color: black; color: black; z-index: 20;">${p.no || '-'}</div>
-                        <div class="absolute bottom-0 w-full bg-gradient-to-t from-black to-transparent h-1/2"></div>
-                        <div class="absolute bottom-1 right-1 font-bold px-1.5 rounded" style="background-image: linear-gradient(to right, ${cScoreGrad1}, ${cScoreGrad2}); color: ${cScoreText}; font-size: 10px;">${c} ลูก</div>
-                    </div>
-                    <div class="p-1 text-center bg-gray-900">
-                        <div class="text-white text-[10px] truncate font-bold">${p?.name}</div>
+                <div class="scorer-card border-gray-700">
+                    <img src="${data.img || ''}" class="scorer-card-img" style="border-color: ${data.teamColor || 'white'};" alt="${data.name}">
+                    <div class="player-num-tag" style="background-color: ${data.teamColor || themeColor};">${data.number || '-'}</div>
+                    <div class="mt-2 w-full">
+                        <div class="text-white font-bold text-sm truncate">${data.name}</div>
+                        <div class="text-gray-400 text-xs truncate mb-2">${data.teamName || 'ไม่ระบุทีม'}</div>
+                        <div class="font-black text-xl leading-tight inline-block px-3 py-1 rounded shadow-md" style="${scoreStyle}">
+                            ${data.goalsToday}
+                            <span class="text-xs font-normal">ประตู</span>
+                        </div>
                     </div>
                 </div>`;
-            }).join('');
+            }).join('') || '<p class="text-center text-gray-500 py-4 col-span-full">ไม่มีผู้ทำประตูในวันนี้</p>';
+        }
+
+        // --- NEW: All Stats Filtering Function ---
+        function renderAllStats() {
+            const filterType = document.getElementById('stat-filter-type').value; 
+            const body = document.getElementById('all-stats-body');
+            const header = document.getElementById('all-stats-header');
+            
+            const statMap = {
+                'goal': { label: 'ประตู', icon: '⚽', color: 'text-red-400', key: 'goals' },
+                'yellow': { label: 'ใบเหลือง', icon: '🟨', color: 'text-yellow-400', key: 'yellows' },
+                'red': { label: 'ใบแดง', icon: '🟥', color: 'text-red-600', key: 'reds' },
+                'save': { label: 'เซฟ', icon: '🧤', color: 'text-blue-400', key: 'saves' },
+            };
+            const currentStat = statMap[filterType];
+
+            header.innerHTML = `${currentStat.icon} จำนวน${currentStat.label} (สูงสุด)`;
+
+            const allPlayerStats = players.map(p => {
+                const statsData = getPlayerCardStats(p.id);
+                const team = teams.find(t => t.id == p.teamId);
+                return {
+                    id: p.id,
+                    name: p.name,
+                    teamName: team?.name || 'N/A',
+                    teamColor: team?.color || '#ffffff',
+                    count: statsData[currentStat.key],
+                };
+            });
+
+            // Filter out players with 0 count (unless it's saves, where 0 is still relevant)
+            const filteredAndSorted = allPlayerStats
+                .filter(p => p.count > 0 || filterType === 'save')
+                .sort((a, b) => {
+                    // Sort by count (desc) then name (asc)
+                    if (b.count !== a.count) return b.count - a.count;
+                    return a.name.localeCompare(b.name);
+                });
+
+            body.innerHTML = filteredAndSorted.map((p, i) => `
+                <tr class="all-stats-row border-b border-gray-800">
+                    <td class="p-2 text-center text-gray-400">${i + 1}</td>
+                    <td class="p-2 font-bold text-white">${p.name}</td>
+                    <td class="p-2 text-center text-xs" style="color: ${p.teamColor};">${p.teamName}</td>
+                    <td class="p-2 text-center font-black text-lg ${currentStat.color}">${p.count}</td>
+                </tr>
+            `).join('') || `<tr><td colspan="4" class="text-center text-gray-500 py-8">ไม่มีสถิติ ${currentStat.label} ที่ถูกบันทึก</td></tr>`;
         }
 
         // --- 4. STATS & HISTORY ---
@@ -1459,7 +1694,7 @@
         // 1. UPDATED: renderStatHistory - Removed assist display
         function renderStatHistory() {
             const list = document.getElementById('history-stat-list');
-            const iconMap = { goal:'⚽', assist:'👟', yellow:'🟨', red:'🟥', save:'🧤' };
+            const iconMap = { goal:'⚽', yellow:'🟨', red:'🟥', save:'🧤' }; // Removed assist
             
             list.innerHTML = stats.sort((a,b) => b.id - a.id).map(s => {
                 const p = players.find(x => x.id == s.playerId);
