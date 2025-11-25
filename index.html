@@ -60,44 +60,55 @@
         }
 
         /* Player Card Design (Kept minimal style) */
-        .player-card {
-            background: linear-gradient(145deg, #1f2937, #0c1626);
-            transition: all 0.3s;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .player-photo-container {
-            position: relative;
-            overflow: hidden;
-            background-color: #0c1626;
-            border-bottom: 3px solid var(--primary-color);
-            aspect-ratio: 3 / 4; 
-        }
-        .player-photo-container img {
-            height: 100%;
-            width: 100%;
-            object-fit: cover;
-            object-position: top center;
-        }
+.player-card {
+    /* *** ADD/EDIT: กำหนดความกว้างของการ์ด *** */
+    width: 140px; /* ปรับขนาดตามที่ต้องการ เช่น 150px หรือ 120px */
+    
+    /* เพิ่ม: กำหนดขนาดขั้นต่ำเพื่อให้แสดงผลได้เสมอ (ทางเลือก) */
+    min-height: 220px; 
+    
+    /* หากใน HTML มี padding: p-4/p-3 ให้ใช้ margin/padding ใน HTML แทน */
+    /* ถ้าไม่มี padding ใน HTML อาจจะต้องเพิ่ม padding เข้าไปเอง */
+    
+    background: linear-gradient(145deg, #1f2937, #0c1626);
+    transition: all 0.3s;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.player-photo-container {
+    position: relative;
+    overflow: hidden;
+    background-color: #0c1626;
+    border-bottom: 3px solid var(--primary-color);
+    /* aspect-ratio: 3 / 4; จะช่วยให้รูปภาพปรับขนาดตามความกว้างของ card-width: 140px อัตโนมัติ */
+    aspect-ratio: 3 / 4;
+}
+.player-photo-container img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    object-position: top center;
+}
+        
         /* Player Number Style (Circular only) */
-        .player-num-tag {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            background: var(--primary-color); 
-            color: black;
-            font-size: 0.9rem;
-            font-weight: 900;
-            width: 32px; /* Slightly larger circle */
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            border: 2px solid white;
-            z-index: 20;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-        }
+.player-num-tag {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background: var(--primary-color); 
+    color: white; /* เปลี่ยนเป็นสีขาว เพื่อตัดกับพื้นหลังสีเข้ม */
+    font-size: 0.9rem;
+    font-weight: 900;
+    width: 32px; 
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 2px solid white;
+    z-index: 20;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
