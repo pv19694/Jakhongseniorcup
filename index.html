@@ -1574,46 +1574,65 @@
                 </div>`;
             }).join('') || '<p class="text-center text-gray-500 py-4 col-span-full">ไม่มีข้อมูลดาวซัลโว</p>';
 
-            // 4. Scorers Today (Horizontal Grid)
-            const todays = stats.filter(s => s.type === 'goal' && s.date === date);
-            const todayCounts = {};
-            todays.forEach(s => todayCounts[s.playerId] = (todayCounts[s.playerId]||0)+s.count);
-            
-            const todayScorersCont = document.getElementById('daily-today-scorers');
-            
-            // Get player details for today's scorers
-            const todayScorerData = Object.entries(todayCounts).map(([pid, c]) => {
-                const p = players.find(x => x.id == pid);
-                const t = teams.find(x => x.id == p?.teamId);
-                return {
-                    name: p?.name,
-                    number: p?.no,
-                    img: p?.img,
-                    teamName: t?.name,
-                    teamColor: t?.color,
-                    goalsToday: c
-                };
-            }).sort((a,b) => b.goalsToday - a.goalsToday); // Sort by goals today
+          // --- ส่วนที่ 4: Scorers Today (ผู้ที่ทำประตูวันนี้) ---
 
-            todayScorersCont.innerHTML = todayScorerData.map((data) => {
-                // NEW: Score Gradient Style
-                const scoreStyle = `background-image: linear-gradient(to right, ${cScoreGrad1}, ${cScoreGrad2}); color: ${cScoreText};`;
-                
-                return `
-                <div class="scorer-card border-gray-700">
-                    <img src="${data.img || ''}" class="scorer-card-img" style="border-color: ${data.teamColor || 'white'};" alt="${data.name}">
-                    <div class="player-num-tag" style="background-color: ${data.teamColor || themeColor};">${data.number || '-'}</div>
-                    <div class="mt-2 w-full">
-                        <div class="text-white font-bold text-sm truncate">${data.name}</div>
-                        <div class="text-gray-400 text-xs truncate mb-2">${data.teamName || 'ไม่ระบุทีม'}</div>
-                        <div class="font-black text-xl leading-tight inline-block px-3 py-1 rounded shadow-md" style="${scoreStyle}">
-                            ${data.goalsToday}
-                            <span class="text-xs font-normal">ประตู</span>
-                        </div>
-                    </div>
-                </div>`;
-            }).join('') || '<p class="text-center text-gray-500 py-4 col-span-full">ไม่มีผู้ทำประตูในวันนี้</p>';
-        }
+// *********** (ส่วนประมวลผลข้อมูล ยังคงเหมือนเดิม) ***********
+
+// 4. Scorers Today (Horizontal Grid)
+const selectedDate = document.getElementById('daily-date').value; // ใช้ selectedDate แทน date
+
+const todays = stats.filter(s => s.type === 'goal' && s.date === selectedDate);
+const todayCounts = {};
+todays.forEach(s => todayCounts[s.playerId] = (todayCounts[s.playerId]||0)+s.count);
+           
+const todayScorersCont = document.getElementById('daily-today-scorers');
+           
+// Get player details for today's scorers
+const todayScorerData = Object.entries(todayCounts).map(([pid, c]) => {
+    const p = players.find(x => x.id == pid);
+    // เพิ่มการตรวจสอบ p (Player) เพื่อป้องกัน Error (ตามที่เคยแนะนำ)
+    if (!p) return null; 
+    const t = teams.find(x => x.id == p.teamId);
+    return {
+        name: p.name, // ใช้ p.name แทน p?.name
+        number: p.no, // ใช้ p.no แทน p?.no
+        img: p.img, // ใช้ p.img แทน p?.img
+        teamName: t?.name,
+        teamColor: t?.color,
+        goalsToday: c
+    };
+}).filter(d => d).sort((a,b) => b.goalsToday - a.goalsToday); // Sort by goals today
+
+// *********** (ส่วนสร้าง HTML ที่ถูกแก้ไข) ***********
+
+todayScorersCont.innerHTML = todayScorerData.map((data) => {
+    // NEW: Score Gradient Style
+    const scoreStyle = `background-image: linear-gradient(to right, ${cScoreGrad1}, ${cScoreGrad2}); color: ${cScoreText};`;
+    
+    return `
+    <div class="scorer-card" style="border: none;"> <img src="${data.img || ''}" class="scorer-card-img" style="border: none;" alt="${data.name}"> <div class="mt-2 w-full">
+            <div class="text-white font-bold text-sm truncate">${data.name}</div> 
+            <div class="text-gray-400 text-xs truncate mb-2">${data.teamName || 'ไม่ระบุทีม'}</div>
+            <div class="font-black text-xl leading-tight inline-block px-3 py-1 rounded shadow-md" style="${scoreStyle}">
+                ${data.goalsToday}
+                <span class="text-xs font-normal">ประตู</span>
+            </div>
+        </div>
+    </div>`;
+}).join('') || '<p class="text-center text-gray-500 py-4 col-span-full">ไม่มีผู้ทำประตูในวันนี้</p>';
+
+// *********** (อย่าลืมเพิ่มโค้ดอัปเดต Header ตามที่เคยแนะนำ) ***********
+
+/*
+// อัปเดตชื่อคู่แข่งขัน
+document.getElementById('daily-today-match-names').innerText = matchTitle;
+
+// อัปเดตสีหัวข้อ
+const todayHeader = document.getElementById('daily-today-header');
+if (todayHeader) {
+    todayHeader.style.color = cBannerText; 
+}
+*/
 
         // --- NEW: All Stats Filtering Function ---
         function renderAllStats() {
