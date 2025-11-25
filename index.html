@@ -61,12 +61,13 @@
 
       /* Player Card Design (Kept minimal style) */
 .player-card {
-    /* *** เพิ่มโค้ดนี้เพื่อลบช่องว่างภายนอกการ์ด *** */
-    margin: 0 !important; 
-    /* ****************************************** */
+    /* FIX 1: บังคับลบ Margin ภายนอก */
+    margin: 0 !important;
+    
+    /* FIX 2 (สำคัญที่สุด): บังคับลบ Padding ภายในที่อาจมีอยู่ (จากคลาส Tailwind ที่ซ่อน) */
+    padding: 0 !important; 
     
     width: 140px; 
-    /* ... */
     min-height: 220px; 
     
     background: linear-gradient(145deg, #1f2937, #0c1626);
@@ -74,13 +75,22 @@
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.08);
 }
-        
+
+/* FIX 3: บังคับล้าง Margin/Padding ของแท็ก <button> ที่ครอบรูปภาพ (สำคัญมาก) */
+.player-card button {
+    /* ล้างสไตล์เริ่มต้นของปุ่มทั้งหมด */
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: none !important;
+    line-height: 1; /* ป้องกัน line-height ที่อาจเพิ่มความสูง */
+}
+ 
 .player-photo-container {
     position: relative;
     overflow: hidden;
     background-color: #0c1626;
     border-bottom: 3px solid var(--primary-color);
-    /* aspect-ratio: 3 / 4; จะช่วยให้รูปภาพปรับขนาดตามความกว้างของ card-width: 140px อัตโนมัติ */
     aspect-ratio: 3 / 4;
 }
 .player-photo-container img {
