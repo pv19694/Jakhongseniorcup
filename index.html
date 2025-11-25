@@ -61,14 +61,14 @@
 
         /* Player Card Design (Kept minimal style) */
 .player-card {
-    /* *** ADD/EDIT: กำหนดความกว้างของการ์ด *** */
-    width: 140px; /* ปรับขนาดตามที่ต้องการ เช่น 150px หรือ 120px */
+   /* *** ADD/EDIT: กำหนดความกว้างของการ์ด *** */
+    width: 140px; 
+    
+    /* FIX: เพิ่ม Margin เพื่อสร้างช่องว่างระหว่างการ์ด */
+    margin: 4px; /* กำหนดช่องว่าง 4px รอบการ์ดแต่ละใบ */
     
     /* เพิ่ม: กำหนดขนาดขั้นต่ำเพื่อให้แสดงผลได้เสมอ (ทางเลือก) */
-    min-height: 220px; 
-    
-    /* หากใน HTML มี padding: p-4/p-3 ให้ใช้ margin/padding ใน HTML แทน */
-    /* ถ้าไม่มี padding ใน HTML อาจจะต้องเพิ่ม padding เข้าไปเอง */
+    min-height: 220px;
     
     background: linear-gradient(145deg, #1f2937, #0c1626);
     transition: all 0.3s;
