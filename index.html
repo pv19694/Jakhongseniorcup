@@ -194,14 +194,20 @@
         }
         
         .schedule-team-logo {
-            width: 60px;
-            height: 60px;
-            object-fit: contain;
-            border-radius: 50%;
-            background-color: white;
-            padding: 4px;
-            border: 3px solid transparent;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        width: 60px;
+        height: 60px;
+    
+        /* เลือกใช้ตามความต้องการ */
+        object-fit: cover; 
+        /* หรือ object-fit: contain; หากต้องการให้เห็นภาพทั้งหมด แต่มีโอกาสมีขอบว่างเล็กน้อยถ้าโลโก้ไม่สมมาตร */
+    
+        border-radius: 50%;
+    
+        /* *** ส่วนที่ถูกลบออกเพื่อให้ไม่มีขอบ/พื้นที่ว่าง *** */
+        /* background-color: white;    (ลบ) */
+        /* padding: 4px;              (ลบ) ทำให้ภาพใหญ่ขึ้นจนชิดขอบ */
+        /* border: 3px solid transparent; (ลบ) */
+        /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); (ลบ) */
         }
         
         /* Center Info Style */
