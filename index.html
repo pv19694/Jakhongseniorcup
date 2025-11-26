@@ -1231,11 +1231,18 @@
             const cHeaderGrad2 = document.getElementById('lb-header-grad-2').value;
             const cHeaderText = document.getElementById('lb-header-text-color').value;
 
-            // Apply Header Theme
-            document.getElementById('lb-banner').style.background = `linear-gradient(135deg, ${cHeaderGrad1}, ${cHeaderGrad2})`;
-            document.getElementById('lb-thead-row').style.background = `linear-gradient(to right, ${cHeaderGrad1}, ${cHeaderGrad2})`;
-            document.querySelectorAll('#lb-thead-row th').forEach(th => th.style.color = cHeaderText);
-            document.getElementById('lb-thead-row').lastElementChild.children[0].style.background = `linear-gradient(135deg, ${cPtsGrad1}, ${cPtsGrad2})`;
+          // Apply Header Theme
+// *** แก้ไข: เปลี่ยนไปใช้สีพื้นหลังทึบ (backgroundColor) ตามสีทีม cHeaderGrad1 แทนการไล่เฉด ***
+document.getElementById('lb-banner').style.backgroundColor = cHeaderGrad1; 
+
+// คงส่วนหัวตารางให้มีการไล่เฉดตามสีทีมไว้
+document.getElementById('lb-thead-row').style.background = `linear-gradient(to right, ${cHeaderGrad1}, ${cHeaderGrad2})`;
+
+// กำหนดสีตัวอักษรในส่วนหัวตาราง
+document.querySelectorAll('#lb-thead-row th').forEach(th => th.style.color = cHeaderText);
+
+// ส่วนของคอลัมน์แต้ม
+document.getElementById('lb-thead-row').lastElementChild.children[0].style.background = `linear-gradient(135deg, ${cPtsGrad1}, ${cPtsGrad2})`;
 
 
             // 2. UPDATED: Removed color classes for W/D/L
