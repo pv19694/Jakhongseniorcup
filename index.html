@@ -154,25 +154,35 @@
             color: #ccc;
         }
 
-        /* FIX: Today Scorer Number Tag */
-        .today-scorer-num-tag {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: black; 
-            color: white; 
-            font-size: 0.7rem;
-            font-weight: 900;
-            width: 22px;
-            height: 22px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            border: 2px solid var(--primary-color);
-            z-index: 20;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-        }
+       /* FIX: Today Scorer Number Tag */
+.today-scorer-num-tag {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    
+    /* 1. เปลี่ยนพื้นหลังของป้ายเป็นสีขาว */
+    background: white; 
+    
+    /* 2. เปลี่ยนสีตัวเลขเป็นสีดำ เพื่อให้อ่านออกบนพื้นหลังสีขาว */
+    color: black; 
+    
+    font-size: 0.7rem;
+    font-weight: 900;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    
+    /* 3. เปลี่ยนกรอบให้เป็นสีขาว */
+    border: 2px solid white; 
+    
+    z-index: 20;
+    /* แนะนำให้คง box-shadow ไว้ เพื่อให้ป้ายสีขาวลอยขึ้นมาจากรูปภาพ */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+        
 
         /* --- SCHEDULE CARD NEW DESIGN --- */
         .schedule-match-card {
