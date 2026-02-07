@@ -497,6 +497,57 @@
             </div>
         </div>
 
+<div id="random-generator-section" class="max-w-4xl mx-auto px-4 mb-20">
+    <div class="glass p-6 rounded-2xl border-t-4 border-yellow-500 shadow-2xl">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-yellow-400"><i class="fas fa-magic mr-2"></i>สุ่มโปรแกรมรายสัปดาห์</h3>
+            <span class="text-xs text-gray-400 bg-gray-800 px-3 py-1 rounded-full border border-gray-700">Auto Matchmaker</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div>
+                <label class="block text-xs text-gray-400 mb-1">วันที่เริ่มสัปดาห์แรก</label>
+                <input type="date" id="gen-start-date" class="w-full bg-gray-900 border border-gray-700 p-2 rounded text-sm text-white focus:outline-none focus:border-yellow-500">
+            </div>
+            <div>
+                <label class="block text-xs text-gray-400 mb-1">เวลาเริ่มคู่แรก</label>
+                <input type="time" id="gen-start-time" class="w-full bg-gray-900 border border-gray-700 p-2 rounded text-sm text-white" value="18:00">
+            </div>
+            <div>
+                <label class="block text-xs text-gray-400 mb-1">ระยะเวลาต่อคู่ (นาที)</label>
+                <input type="number" id="gen-duration" class="w-full bg-gray-900 border border-gray-700 p-2 rounded text-sm text-white" value="30">
+            </div>
+            <div>
+                <label class="block text-xs text-gray-400 mb-1">แบ่งเป็นกี่สัปดาห์</label>
+                <select id="gen-weeks" class="w-full bg-gray-900 border border-gray-700 p-2 rounded text-sm text-white">
+                    <option value="1">1 สัปดาห์</option>
+                    <option value="2">2 สัปดาห์</option>
+                    <option value="4">4 สัปดาห์</option>
+                    <option value="8">8 สัปดาห์</option>
+                </select>
+            </div>
+        </div>
+
+        <button onclick="generateLeagueSchedule()" class="w-full bg-yellow-500 text-black px-8 py-3 rounded-xl font-bold hover:bg-yellow-400 transition-all shadow-lg mb-6">
+            <i class="fas fa-random mr-2"></i>เริ่มสุ่มจับคู่และแบ่งสัปดาห์
+        </button>
+
+        <div id="gen-preview-container" class="hidden animate-fade-in">
+            <hr class="border-gray-800 mb-6">
+            <h4 class="text-lg font-bold mb-4 text-white">ตรวจสอบผลการสุ่ม:</h4>
+            <div id="gen-preview-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                </div>
+            <div class="mt-8 flex gap-3">
+                <button onclick="saveGeneratedMatches()" class="flex-1 bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-colors shadow-lg">
+                    <i class="fas fa-check-circle mr-2"></i>บันทึกโปรแกรมทั้งหมด
+                </button>
+                <button onclick="document.getElementById('gen-preview-container').classList.add('hidden')" class="px-6 py-3 bg-gray-700 rounded-xl hover:bg-gray-600">
+                    ยกเลิก
+                </button>
+            </div>
+        </div>
+
+
         <div id="page-schedule" class="section hidden fade-in">
             <div class="glass p-3 rounded-xl mb-4 flex flex-wrap gap-4 items-center text-xs">
                 <button onclick="openAddSchedModal()" class="bg-green-600 text-white px-3 py-1 rounded font-bold hover:bg-green-500 transition">+ เพิ่มแมทช์</button>
@@ -865,56 +916,6 @@
             <button onclick="document.getElementById('storage-warning-modal').classList.add('hidden')" class="bg-red-600 text-white px-6 py-2 rounded font-bold hover:bg-red-500 transition">รับทราบและปิด</button>
         </div>
     </div>
-
-<div id="random-generator-section" class="max-w-4xl mx-auto px-4 mb-20">
-    <div class="glass p-6 rounded-2xl border-t-4 border-yellow-500 shadow-2xl">
-        <div class="flex items-center justify-between mb-6">
-            <h3 class="text-2xl font-bold text-yellow-400"><i class="fas fa-magic mr-2"></i>สุ่มโปรแกรมรายสัปดาห์</h3>
-            <span class="text-xs text-gray-400 bg-gray-800 px-3 py-1 rounded-full border border-gray-700">Auto Matchmaker</span>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div>
-                <label class="block text-xs text-gray-400 mb-1">วันที่เริ่มสัปดาห์แรก</label>
-                <input type="date" id="gen-start-date" class="w-full bg-gray-900 border border-gray-700 p-2 rounded text-sm text-white focus:outline-none focus:border-yellow-500">
-            </div>
-            <div>
-                <label class="block text-xs text-gray-400 mb-1">เวลาเริ่มคู่แรก</label>
-                <input type="time" id="gen-start-time" class="w-full bg-gray-900 border border-gray-700 p-2 rounded text-sm text-white" value="18:00">
-            </div>
-            <div>
-                <label class="block text-xs text-gray-400 mb-1">ระยะเวลาต่อคู่ (นาที)</label>
-                <input type="number" id="gen-duration" class="w-full bg-gray-900 border border-gray-700 p-2 rounded text-sm text-white" value="30">
-            </div>
-            <div>
-                <label class="block text-xs text-gray-400 mb-1">แบ่งเป็นกี่สัปดาห์</label>
-                <select id="gen-weeks" class="w-full bg-gray-900 border border-gray-700 p-2 rounded text-sm text-white">
-                    <option value="1">1 สัปดาห์</option>
-                    <option value="2">2 สัปดาห์</option>
-                    <option value="4">4 สัปดาห์</option>
-                    <option value="8">8 สัปดาห์</option>
-                </select>
-            </div>
-        </div>
-
-        <button onclick="generateLeagueSchedule()" class="w-full bg-yellow-500 text-black px-8 py-3 rounded-xl font-bold hover:bg-yellow-400 transition-all shadow-lg mb-6">
-            <i class="fas fa-random mr-2"></i>เริ่มสุ่มจับคู่และแบ่งสัปดาห์
-        </button>
-
-        <div id="gen-preview-container" class="hidden animate-fade-in">
-            <hr class="border-gray-800 mb-6">
-            <h4 class="text-lg font-bold mb-4 text-white">ตรวจสอบผลการสุ่ม:</h4>
-            <div id="gen-preview-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                </div>
-            <div class="mt-8 flex gap-3">
-                <button onclick="saveGeneratedMatches()" class="flex-1 bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-colors shadow-lg">
-                    <i class="fas fa-check-circle mr-2"></i>บันทึกโปรแกรมทั้งหมด
-                </button>
-                <button onclick="document.getElementById('gen-preview-container').classList.add('hidden')" class="px-6 py-3 bg-gray-700 rounded-xl hover:bg-gray-600">
-                    ยกเลิก
-                </button>
-            </div>
-        </div>
     </div>
 </div>
     
