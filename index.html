@@ -498,6 +498,52 @@
             </div>
         </div>
 
+</div> <div id="random-generator-section" class="max-w-4xl mx-auto px-4 mt-10 mb-20">
+                <div class="glass p-6 rounded-2xl border-t-4 border-yellow-500 shadow-2xl">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-2xl font-bold text-yellow-400"><i class="fas fa-magic mr-2"></i>สุ่มโปรแกรมรายสัปดาห์</h3>
+                        <span class="text-xs text-gray-400 bg-gray-800 px-3 py-1 rounded-full border border-gray-700">Auto Matchmaker</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">วันที่เริ่มสัปดาห์แรก</label>
+                            <input type="date" id="gen-start-date" class="w-full bg-gray-900 border border-gray-700 p-2 rounded text-sm text-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">เวลาเริ่มคู่แรก</label>
+                            <input type="time" id="gen-start-time" class="w-full bg-gray-900 border border-gray-700 p-2 rounded text-sm text-white" value="18:00">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">ระยะเวลาต่อคู่ (นาที)</label>
+                            <input type="number" id="gen-duration" class="w-full bg-gray-900 border border-gray-700 p-2 rounded text-sm text-white" value="30">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">แบ่งเป็นกี่สัปดาห์</label>
+                            <select id="gen-weeks" class="w-full bg-gray-900 border border-gray-700 p-2 rounded text-sm text-white">
+                                <option value="1">1 สัปดาห์</option>
+                                <option value="2">2 สัปดาห์</option>
+                                <option value="4">4 สัปดาห์</option>
+                                <option value="8">8 สัปดาห์</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button onclick="generateLeagueSchedule()" class="w-full bg-yellow-500 text-black px-8 py-3 rounded-xl font-bold hover:bg-yellow-400 transition-all shadow-lg mb-6">
+                        <i class="fas fa-random mr-2"></i>เริ่มสุ่มจับคู่และแบ่งสัปดาห์
+                    </button>
+
+                    <div id="gen-preview-container" class="hidden animate-fade-in">
+                        <hr class="border-gray-800 mb-6">
+                        <h4 class="text-lg font-bold mb-4 text-white">ตรวจสอบผลการสุ่ม:</h4>
+                        <div id="gen-preview-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                        <div class="mt-8 flex gap-3">
+                            <button onclick="saveGeneratedMatches()" class="flex-1 bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl shadow-lg">บันทึกโปรแกรม</button>
+                        </div>
+                    </div>
+                </div>
+            </div> </div> ```
+
 
         <div id="page-schedule" class="section hidden fade-in">
             <div class="glass p-3 rounded-xl mb-4 flex flex-wrap gap-4 items-center text-xs">
@@ -531,61 +577,9 @@
                         </div>
                 </div>
 
-<!-- ส่วนปิดท้าย Container ตารางแข่งและ Overlay -->
                 <div id="sc-bg-overlay" class="absolute inset-0 z-0 bg-gradient-to-br from-blue-900 to-black opacity-90"></div>
-            </div> <!-- ปิด schedule-main-container -->
-
-           <div id="random-generator-section" class="max-w-4xl mx-auto px-4 mt-10 mb-20">
-    <div class="glass p-6 rounded-2xl border-t-4 border-yellow-500 shadow-2xl">
-        <div class="flex items-center justify-between mb-6">
-            <h3 class="text-2xl font-bold text-yellow-400">
-                <i class="fas fa-list-ol mr-2"></i>จัดตารางแข่งแบบพบกันหมด (League Mode)
-            </h3>
-            <span class="text-xs text-gray-400 bg-gray-800 px-3 py-1 rounded-full border border-gray-700">Premier League Style</span>
-        </div>
-
-        <!-- ส่วนตั้งค่าการสุ่ม -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div>
-                <label class="block text-xs text-gray-400 mb-1">วันที่เริ่ม (สัปดาห์แรก)</label>
-                <input type="date" id="gen-start-date" class="w-full bg-gray-900 border border-gray-700 p-2 rounded text-sm text-white focus:border-yellow-500 outline-none">
-            </div>
-            <div>
-                <label class="block text-xs text-gray-400 mb-1">เวลาเริ่ม (คู่แรก)</label>
-                <input type="time" id="gen-start-time" class="w-full bg-gray-900 border border-gray-700 p-2 rounded text-sm text-white focus:border-yellow-500 outline-none" value="18:00">
-            </div>
-            <div>
-                <label class="block text-xs text-gray-400 mb-1">ระยะเวลา/คู่ (นาที)</label>
-                <input type="number" id="gen-duration" class="w-full bg-gray-900 border border-gray-700 p-2 rounded text-sm text-white focus:border-yellow-500 outline-none" value="30">
-            </div>
-            <div>
-                <label class="block text-xs text-gray-400 mb-1">จำนวนคู่ต่อสัปดาห์</label>
-                <input type="number" id="gen-matches-per-week" class="w-full bg-gray-900 border border-gray-700 p-2 rounded text-sm text-white focus:border-yellow-500 outline-none" value="4">
             </div>
         </div>
-
-        <button onclick="generateLeagueSchedule()" class="w-full bg-yellow-500 text-black px-8 py-3 rounded-xl font-bold hover:bg-yellow-400 transition-all shadow-lg mb-6 active:scale-95">
-            <i class="fas fa-calendar-check mr-2"></i>สร้างตารางแข่งพบกันหมดทันที
-        </button>
-
-        <!-- ส่วนแสดง Preview ก่อนบันทึก -->
-        <div id="gen-preview-container" class="hidden animate-fade-in bg-black/20 p-4 rounded-xl border border-white/5">
-            <div id="gen-summary" class="mb-4 text-sm text-gray-300 bg-gray-800/50 p-3 rounded-lg border border-gray-700"></div>
-            
-            <div id="gen-preview-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[500px] overflow-y-auto pr-2 no-scrollbar"></div>
-
-            <div class="mt-8 flex gap-3">
-                <button onclick="clearGenPreview()" class="px-6 py-3 rounded-xl border border-red-500 text-red-500 hover:bg-red-500/10 font-bold transition">ยกเลิก</button>
-                <button onclick="saveGeneratedMatches()" class="flex-1 bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl shadow-lg transition-all active:scale-95">
-                    <i class="fas fa-save mr-2"></i>บันทึกตารางลงระบบ
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-                
 
         <div id="page-daily" class="section hidden fade-in">
             <div class="glass p-4 rounded-xl mb-6 flex flex-wrap gap-6 items-end">
@@ -2311,168 +2305,97 @@ document.getElementById('lb-thead-row').lastElementChild.children[0].style.backg
             reader.readAsText(file);
         }
 
-let tempMatches = []; // ตัวแปรเก็บข้อมูลชั่วคราวก่อนกดเซฟ
-
-let tempMatches = []; // เก็บข้อมูลชั่วคราวก่อนกดบันทึก
+// --- ระบบสุ่มโปรแกรมรายสัปดาห์ (New Logic) ---
+let tempMatches = []; 
 
 function generateLeagueSchedule() {
+    if (teams.length < 2) return alert("กรุณาเพิ่มทีมในระบบก่อนสุ่ม (อย่างน้อย 2 ทีม)");
+    
     const startDateVal = document.getElementById('gen-start-date').value;
     const startTime = document.getElementById('gen-start-time').value;
-    const duration = parseInt(document.getElementById('gen-duration').value) || 30;
-    const matchesPerWeek = parseInt(document.getElementById('gen-matches-per-week').value) || 4;
+    const duration = parseInt(document.getElementById('gen-duration').value);
+    const numWeeks = parseInt(document.getElementById('gen-weeks').value);
 
-    if (!startDateVal) {
-        alert("กรุณาเลือกวันที่เริ่มสัปดาห์แรก");
-        return;
-    }
+    if (!startDateVal) return alert("กรุณาระบุวันที่เริ่มแข่งขันสัปดาห์แรก");
 
-    // 1. ดึงรายชื่อทีมจากระบบ (สมมติว่าคุณมี 8 ทีม)
-    let teamNames = teams.map(t => t.name);
-    if (teamNames.length < 2) {
-        alert("ต้องมีทีมอย่างน้อย 2 ทีมขึ้นไป");
-        return;
-    }
-
-    // 2. เตรียมคู่แข่งขันแบบพบกันหมด (Round Robin)
-    let tempTeamNames = [...teamNames];
-    if (tempTeamNames.length % 2 !== 0) tempTeamNames.push("พักการแข่ง (BYE)");
-    
-    const numTeams = tempTeamNames.length;
-    let allPairings = [];
-    let rotation = [...tempTeamNames];
-
-    // อัลกอริทึม Berger Table เพื่อให้ทุกคนเจอหน้ากันครบ
-    for (let r = 0; r < numTeams - 1; r++) {
-        for (let i = 0; i < numTeams / 2; i++) {
-            const home = rotation[i];
-            const away = rotation[numTeams - 1 - i];
-            // ไม่เอาคู่ที่มีทีมพัก (BYE)
-            if (home !== "พักการแข่ง (BYE)" && away !== "พักการแข่ง (BYE)") {
-                allPairings.push({ teamA: home, teamB: away });
-            }
+    // 1. สร้างคู่แข่งทั้งหมด (Round Robin)
+    let allPairs = [];
+    for (let i = 0; i < teams.length; i++) {
+        for (let j = i + 1; j < teams.length; j++) {
+            allPairs.push([teams[i], teams[j]]);
         }
-        // หมุนทีมคงที่ตำแหน่งแรก
-        rotation.splice(1, 0, rotation.pop());
     }
 
-    // 3. สุ่มลำดับคู่ทั้งหมด (Shuffle) เพื่อให้ทีมไม่เตะซ้ำๆ ในสัปดาห์เดียว
-    allPairings = allPairings.sort(() => Math.random() - 0.5);
+    // 2. สุ่มลำดับคู่แข่ง (Shuffle)
+    allPairs.sort(() => Math.random() - 0.5);
 
-    // 4. จัดลงสัปดาห์ละ 4 คู่ วนไปเรื่อยๆ จนครบ
+    // 3. แบ่งคู่แข่งลงสัปดาห์
+    const matchesPerWeek = Math.ceil(allPairs.length / numWeeks);
     tempMatches = [];
-    let baseDate = new Date(startDateVal);
+    let currentBaseDate = new Date(startDateVal);
 
-    allPairings.forEach((pair, index) => {
-        // หาเลขสัปดาห์ (คู่ที่ 0-3 = Week 1, 4-7 = Week 2, ...)
-        let currentWeek = Math.floor(index / matchesPerWeek) + 1;
+    for (let w = 0; w < numWeeks; w++) {
+        let weekPairs = allPairs.slice(w * matchesPerWeek, (w + 1) * matchesPerWeek);
         
-        // คำนวณวันที่ (บวกเพิ่มทีละ 7 วันตามสัปดาห์)
-        let matchDate = new Date(baseDate);
-        matchDate.setDate(baseDate.getDate() + (currentWeek - 1) * 7);
-        let dateStr = matchDate.toISOString().split('T')[0];
+        weekPairs.forEach((pair, index) => {
+            let [h, m] = startTime.split(':').map(Number);
+            let timeObj = new Date();
+            timeObj.setHours(h, m + (index * duration));
+            let matchTimeStr = timeObj.toTimeString().substring(0, 5);
 
-        // คำนวณเวลาแข่งในแต่ละสัปดาห์ (วน 4 คู่ตามเวลาที่กำหนด)
-        let matchIndexInWeek = index % matchesPerWeek;
-        let [startH, startM] = startTime.split(':').map(Number);
-        let totalMinutes = (startH * 60) + startM + (matchIndexInWeek * duration);
-        let h = Math.floor(totalMinutes / 60) % 24;
-        let m = totalMinutes % 60;
-        let timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+            let matchDate = new Date(currentBaseDate);
+            matchDate.setDate(currentBaseDate.getDate() + (w * 7));
 
-        tempMatches.push({
-            id: 'league-' + Math.random().toString(36).substr(2, 9),
-            week: currentWeek,
-            date: dateStr,
-            time: timeStr,
-            teamA: pair.teamA,
-            teamB: pair.teamB,
-            scoreA: '',
-            scoreB: '',
-            status: 'pending',
-            group: teams.find(t => t.name === pair.teamA)?.group || 'A'
+            tempMatches.push({
+                id: Date.now() + Math.random(),
+                date: matchDate.toISOString().split('T')[0],
+                time: matchTimeStr,
+                teamA: pair[0].name,
+                teamB: pair[1].name,
+                group: pair[0].group || "ทั่วไป",
+                week: w + 1 // ระบุสัปดาห์
+            });
         });
-    });
-
-    // แสดงข้อมูลสรุป
-    const summaryEl = document.getElementById('gen-summary');
-    if (summaryEl) {
-        summaryEl.innerHTML = `สร้างตารางพบกันหมดสำเร็จ: ทั้งหมด <b>${allPairings.length}</b> คู่ | แบ่งเป็น <b>${Math.ceil(allPairings.length / matchesPerWeek)}</b> สัปดาห์ (สัปดาห์ละ ${matchesPerWeek} คู่)`;
     }
-    
-    renderGenPreview();
+    renderGenPreview(numWeeks);
 }
 
-function renderGenPreview() {
+function renderGenPreview(numWeeks) {
     const container = document.getElementById('gen-preview-list');
-    const previewContainer = document.getElementById('gen-preview-container');
-    
-    if (previewContainer) previewContainer.classList.remove('hidden');
+    document.getElementById('gen-preview-container').classList.remove('hidden');
     container.innerHTML = '';
 
-    if (tempMatches.length === 0) return;
-
-    // หาจำนวนสัปดาห์ที่มีทั้งหมด
-    const weeks = [...new Set(tempMatches.map(m => m.week))].sort((a, b) => a - b);
-
-    weeks.forEach(w => {
+    for (let w = 1; w <= numWeeks; w++) {
         let weekMatches = tempMatches.filter(m => m.week === w);
-        
+        if (weekMatches.length === 0) continue;
+
         let weekHTML = `
-            <div class="bg-black/60 border border-gray-700 p-4 rounded-xl relative group overflow-hidden shadow-lg hover:border-yellow-500/30 transition">
-                <div class="absolute top-0 left-0 w-1 h-full bg-yellow-500"></div>
-                <h5 class="text-yellow-400 font-bold mb-3 border-b border-gray-700 pb-2 flex justify-between items-center text-[12px]">
+            <div class="bg-black/40 border border-gray-700 p-4 rounded-xl">
+                <h5 class="text-yellow-400 font-bold mb-3 border-b border-gray-700 pb-2 flex justify-between">
                     <span>WEEK ${w}</span>
-                    <span class="text-gray-500 font-normal italic">${weekMatches[0].date}</span>
+                    <span class="text-xs text-gray-400">${weekMatches[0].date}</span>
                 </h5>
                 <div class="space-y-2">
                     ${weekMatches.map(m => `
-                        <div class="flex items-center justify-between bg-white/5 p-2 rounded text-[11px] group/item hover:bg-white/10 transition">
-                            <span class="text-gray-400 w-10 font-mono">${m.time}</span>
+                        <div class="flex items-center justify-between bg-white/5 p-2 rounded text-[11px]">
+                            <span class="text-gray-400 w-12">${m.time}</span>
                             <span class="flex-1 text-center font-bold truncate mx-1">${m.teamA} vs ${m.teamB}</span>
-                            <button onclick="removeTempMatch('${m.id}')" class="text-gray-600 hover:text-red-500 transition ml-2 opacity-0 group-hover/item:opacity-100">
-                                <i class="fas fa-times-circle"></i>
-                            </button>
                         </div>
                     `).join('')}
                 </div>
             </div>
         `;
         container.innerHTML += weekHTML;
-    });
-}
-
-function removeTempMatch(id) {
-    tempMatches = tempMatches.filter(m => m.id !== id);
-    renderGenPreview();
-}
-
-function clearGenPreview() {
-    if(confirm("ยกเลิกตารางแข่งที่เพิ่งสร้างขึ้นทั้งหมด?")) {
-        tempMatches = [];
-        const previewContainer = document.getElementById('gen-preview-container');
-        if (previewContainer) previewContainer.classList.add('hidden');
     }
 }
 
 function saveGeneratedMatches() {
-    if (tempMatches.length === 0) return;
-    if (confirm(`บันทึกตารางแข่งจำนวน ${tempMatches.length} คู่ลงระบบ?`)) {
+    if (confirm("ยืนยันการเพิ่มแมทช์ที่สุ่มทั้งหมดนี้ลงในระบบ?")) {
         schedules = [...schedules, ...tempMatches];
         save();
-        
-        // ตรวจสอบชื่อฟังก์ชันแสดงผลหลักในไฟล์ของคุณ
-        if (typeof renderSchedule === 'function') renderSchedule();
-        else if (typeof renderSchedules === 'function') renderSchedules();
-        
-        tempMatches = [];
-        const previewContainer = document.getElementById('gen-preview-container');
-        if (previewContainer) previewContainer.classList.add('hidden');
-        
-        const notify = document.createElement('div');
-        notify.className = "fixed bottom-5 left-1/2 -translate-x-1/2 bg-yellow-500 text-black font-bold px-8 py-3 rounded-full shadow-2xl z-[9999] animate-bounce";
-        notify.innerHTML = "🎉 บันทึกตารางแข่งขันเรียบร้อยแล้ว!";
-        document.body.appendChild(notify);
-        setTimeout(() => notify.remove(), 3000);
+        renderSchedules(); // รีเฟรชตารางแข่งหลัก
+        document.getElementById('gen-preview-container').classList.add('hidden');
+        alert("บันทึกโปรแกรมเรียบร้อยแล้ว!");
     }
 }
 
