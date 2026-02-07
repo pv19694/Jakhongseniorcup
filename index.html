@@ -2308,76 +2308,26 @@ document.getElementById('lb-thead-row').lastElementChild.children[0].style.backg
 // --- ระบบสุ่มโปรแกรมรายสัปดาห์ (New Logic) ---
 let tempMatches = []; 
 
-function generateLeagueSchedule() {
-    // 1. ตรวจสอบเงื่อนไขทีม (ต้องมี 8 ทีม)
-    if (teams.length < 8) {
-        return alert("ต้องมีอย่างน้อย 8 ทีมตามเงื่อนไขที่คุณระบุ (ปัจจุบันมี " + teams.length + " ทีม)");
-    }
-
-    const startDateVal = document.getElementById('gen-start-date').value;
-    const startTime = document.getElementById('gen-start-time').value;
-    const duration = parseInt(document.getElementById('gen-duration').value) || 30;
-
-    if (!startDateVal) return alert("กรุณาระบุวันที่เริ่มแข่งขันสัปดาห์แรก");
-
-    // เตรียมรายชื่อ 8 ทีมแรก
-    let leagueTeams = [...teams.slice(0, 8)];
-    
-    // อัลกอริทึม Round Robin (Circle Method)
-    // สำหรับ 8 ทีม จะมีทั้งหมด 7 สัปดาห์ (n-1)
-    const numWeeks = 7; 
-    tempMatches = [];
-    let currentBaseDate = new Date(startDateVal);
-
-    for (let w = 0; w < numWeeks; w++) {
-        let matchDate = new Date(currentBaseDate);
-        matchDate.setDate(currentBaseDate.getDate() + (w * 7));
-        
-        // ในแต่ละสัปดาห์จะมี 4 คู่ (n/2)
-        for (let i = 0; i < 4; i++) {
-            const teamA = leagueTeams[i];
-            const teamB = leagueTeams[7 - i]; // จับคู่หัว-ท้าย
-
-            // คำนวณเวลา
-            let [h, m] = startTime.split(':').map(Number);
-            let timeObj = new Date();
-            timeObj.setHours(h, m + (i * duration));
-            let matchTimeStr = timeObj.toTimeString().substring(0, 5);
-
-            tempMatches.push({
-                id: Date.now() + Math.random(),
-                date: matchDate.toISOString().split('T')[0],
-                time: matchTimeStr,
-                teamA: teamA.name,
-                teamB: teamB.name,
-                group: "League",
-                week: w + 1
-            });
-        }
-
-        // --- หัวใจสำคัญ: การหมุนทีม (Circle Rotation) ---
-        // ล็อกทีมแรกไว้ตำแหน่งเดิม (index 0) แล้วหมุนทีมที่เหลือ
-        let fixed = leagueTeams[0];
-        let rest = leagueTeams.slice(1);
-        // เอาคนสุดท้ายมาไว้ข้างหน้าสุดของกลุ่มที่เหลือ
-        rest.unshift(rest.pop()); 
-        leagueTeams = [fixed, ...rest];
-    }
-
-    renderGenPreview(numWeeks);
-}
-
 function renderGenPreview(numWeeks) {
     const container = document.getElementById('gen-preview-list');
-    document.getElementById('gen-preview-container').classList.remove('hidden');
+    const previewWrapper = document.getElementById('gen-preview-container');
+    
+    // ถ้าไม่มีข้อมูลแมตช์ ให้ซ่อนกล่องพรีวิวแล้วออกเลย
+    if (!tempMatches || tempMatches.length === 0) {
+        previewWrapper.classList.add('hidden');
+        return;
+    }
+
+    previewWrapper.classList.remove('hidden');
     container.innerHTML = '';
 
     for (let w = 1; w <= numWeeks; w++) {
         let weekMatches = tempMatches.filter(m => m.week === w);
         if (weekMatches.length === 0) continue;
 
+        
         let weekHTML = `
-            <div class="bg-black/40 border border-gray-700 p-4 rounded-xl">
+            <div class="bg-black/40 border border-gray-700 p-4 rounded-xl mb-4">
                 <h5 class="text-yellow-400 font-bold mb-3 border-b border-gray-700 pb-2 flex justify-between">
                     <span>WEEK ${w}</span>
                     <span class="text-xs text-gray-400">${weekMatches[0].date}</span>
@@ -2385,7 +2335,7 @@ function renderGenPreview(numWeeks) {
                 <div class="space-y-2">
                     ${weekMatches.map(m => `
                         <div class="flex items-center justify-between bg-white/5 p-2 rounded text-[11px]">
-                            <span class="text-gray-400 w-12">${m.time}</span>
+                            <span class="text-gray-400 w-12 font-mono">${m.time}</span>
                             <span class="flex-1 text-center font-bold truncate mx-1">${m.teamA} vs ${m.teamB}</span>
                         </div>
                     `).join('')}
@@ -2397,11 +2347,17 @@ function renderGenPreview(numWeeks) {
 }
 
 function saveGeneratedMatches() {
+    if (tempMatches.length === 0) return;
+    
     if (confirm("ยืนยันการเพิ่มแมทช์ที่สุ่มทั้งหมดนี้ลงในระบบ?")) {
         schedules = [...schedules, ...tempMatches];
         save();
-        renderSchedules(); // รีเฟรชตารางแข่งหลัก
+        renderSchedules(); // รีเฟรชตารางหลัก
+        
+        // ล้างค่าและซ่อนกล่องพรีวิวทันที
+        tempMatches = [];
         document.getElementById('gen-preview-container').classList.add('hidden');
+        
         alert("บันทึกโปรแกรมเรียบร้อยแล้ว!");
     }
 }
