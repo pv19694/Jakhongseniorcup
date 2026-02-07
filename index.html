@@ -2382,6 +2382,75 @@ function generateLeagueSchedule() {
     renderGenPreview();
 } // ปิดฟังก์ชัน generateLeagueSchedule
 
+function generateLeagueSchedule() {
+    // 1. เตรียมข้อมูลทีม (ต้องมี 8 ทีม)
+    let allTeams = [...teams];
+    if (allTeams.length !== 8) {
+        alert("ระบบนี้ออกแบบมาสำหรับ 8 ทีมพอดี (ปัจจุบันมี " + allTeams.length + " ทีม)");
+        return;
+    }
+
+    // 2. ดึงค่าจาก UI
+    const startDateInput = document.getElementById('gen-start-date').value;
+    const startTimeInput = document.getElementById('gen-start-time').value;
+    const duration = parseInt(document.getElementById('gen-duration').value) || 30;
+    
+    if (!startDateInput) {
+        alert("กรุณาเลือกวันที่เริ่มสัปดาห์แรก");
+        return;
+    }
+
+    tempMatches = []; // ล้างข้อมูลเก่า
+    
+    // 3. สร้างตารางแบบพบกันหมด (Circle Method)
+    let teamsCopy = [...allTeams];
+    let numWeeks = 7;  // 8 ทีม ต้องแข่ง 7 สัปดาห์ถึงจะครบ
+    let matchesPerWeek = 4;
+
+    for (let w = 0; w < numWeeks; w++) {
+        let weekDate = new Date(startDateInput);
+        weekDate.setDate(weekDate.getDate() + (w * 7));
+        let dateStr = weekDate.toISOString().split('T')[0];
+
+        let currentMatchTime = new Date(`${dateStr}T${startTimeInput}`);
+
+        for (let i = 0; i < matchesPerWeek; i++) {
+            // สูตรจับคู่แบบวงกลม
+            let teamA = teamsCopy[i];
+            let teamB = teamsCopy[7 - i];
+
+            const timeStr = currentMatchTime.toTimeString().substring(0, 5);
+
+            tempMatches.push({
+                id: 'league-' + Math.random().toString(36).substr(2, 9),
+                week: w + 1,
+                date: dateStr,
+                time: timeStr,
+                teamA: teamA.name,
+                teamB: teamB.name,
+                scoreA: '',
+                scoreB: '',
+                status: 'pending',
+                group: teamA.group || 'ทั่วไป'
+            });
+
+            // เพิ่มเวลาในแต่ละคู่ของวันนั้น
+            currentMatchTime.setMinutes(currentMatchTime.getMinutes() + duration);
+        }
+        // หมุนทีม (ยกเว้นทีมแรก) เพื่อเปลี่ยนคู่ในสัปดาห์ถัดไป
+        teamsCopy.splice(1, 0, teamsCopy.pop());
+    }
+
+    // 4. แสดงผลสรุป
+    const summaryEl = document.getElementById('gen-summary');
+    if (summaryEl) {
+        summaryEl.innerHTML = `สร้างตารางสำเร็จ: ทั้งหมด <b>${tempMatches.length}</b> คู่ | <b>${numWeeks}</b> สัปดาห์ (สัปดาห์ละ 4 คู่)`;
+    }
+    
+    // 5. เรียกใช้ฟังก์ชันวาด Preview (ระวังอย่าพิมพ์ rfunction)
+    renderGenPreview();
+}
+
 function renderGenPreview() {
     const container = document.getElementById('gen-preview-list');
     const previewContainer = document.getElementById('gen-preview-container');
@@ -2390,7 +2459,6 @@ function renderGenPreview() {
     if (!container) return;
     container.innerHTML = '';
 
-    // สร้างกลุ่มข้อมูลตามสัปดาห์ (1-7)
     const weeks = [...new Set(tempMatches.map(m => m.week))].sort((a, b) => a - b);
 
     weeks.forEach(w => {
@@ -2416,15 +2484,6 @@ function renderGenPreview() {
             </div>`;
         container.innerHTML += weekHTML;
     });
-}
-
-function removeTempMatch(id) {
-    tempMatches = tempMatches.filter(m => m.id !== id);
-    renderGenPreview();
-    const summaryEl = document.getElementById('gen-summary');
-    if (summaryEl) {
-        summaryEl.innerHTML = `สร้างตารางสำเร็จ: ทั้งหมด <b>${tempMatches.length}</b> คู่`;
-    }
 }
 
         
