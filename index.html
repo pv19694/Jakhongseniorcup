@@ -2276,7 +2276,6 @@ function clearSchedule() {
     }
 }
 
-// ค้นหาฟังก์ชันเดิมแล้วแทนที่ส่วนท้าย หรือวางทับด้วยชุดนี้ครับ
 function autoGenerateLeague() {
     if (typeof teams === 'undefined' || teams.length < 8) {
         return alert("กรุณาเพิ่มทีมให้ครบ 8 ทีมก่อน");
@@ -2286,7 +2285,9 @@ function autoGenerateLeague() {
 
     try {
         let tempTeams = [...teams].slice(0, 8);
+        // สุ่มลำดับทีมตั้งต้นก่อน เพื่อไม่ให้ทีมเดิมอยู่ตำแหน่งเดิมทุกครั้งที่กดสุ่มใหม่
         tempTeams.sort(() => Math.random() - 0.5); 
+
         let newGenerated = [];
         let startDate = new Date(startDateStr);
 
@@ -2294,31 +2295,42 @@ function autoGenerateLeague() {
             let matchDay = new Date(startDate);
             matchDay.setDate(startDate.getDate() + (round * 7));
             let dateStr = matchDay.toISOString().split('T')[0];
+            
+            let roundMatches = []; // เก็บแมตช์ของสัปดาห์นี้ไว้ก่อนเพื่อสุ่มลำดับ
+
             for (let i = 0; i < 4; i++) {
                 let teamA = tempTeams[i];
                 let teamB = tempTeams[7 - i];
-                newGenerated.push({
+                
+                roundMatches.push({
                     id: Date.now() + Math.random(),
                     date: dateStr,
                     week: round + 1,
                     teamA: teamA.id, 
                     teamB: teamB.id,
-                    time: `${17 + i}:00`,
-                    group: (i < 2) ? 'A' : 'B',
+                    group: 'All', // หรือ (i < 2) ? 'A' : 'B' ตามที่คุณต้องการ
                     scoreA: "", scoreB: "", played: false
                 });
             }
+
+            // --- หัวใจสำคัญ: สุ่มลำดับคู่ในสัปดาห์นี้ (Shuffle matches in round) ---
+            roundMatches.sort(() => Math.random() - 0.5);
+
+            // หลังจากสุ่มลำดับคู่แล้ว ค่อยกำหนด "เวลาแข่ง" (Time)
+            roundMatches.forEach((match, index) => {
+                match.time = `${17 + index}:00`; // คู่แรก 17:00, คู่สอง 18:00... แบบคละทีมกันแล้ว
+                newGenerated.push(match);
+            });
+
+            // หมุนทีมตามสูตร Circle Method
             tempTeams.splice(1, 0, tempTeams.pop()); 
         }
 
-        if (confirm(`สุ่มสำเร็จ 28 แมตช์! ต้องการบันทึกหรือไม่?`)) {
+        if (confirm(`สุ่มสำเร็จ 28 แมตช์! (คละลำดับเวลาให้แล้ว) ต้องการบันทึกหรือไม่?`)) {
             schedules = [...schedules, ...newGenerated];
-
-            // --- จุดที่แก้ไข: ใช้ชื่อฟังก์ชันที่ไฟล์คุณมีจริงๆ ---
-            saveData();       // บันทึกข้อมูล
-            renderSchedule(); // วาดตาราง (ในไฟล์คุณใช้ชื่อนี้แบบไม่มี s)
-            
-            alert("จัดตารางแข่งสำเร็จ! ข้อมูลจะปรากฏใน Dashboard ทันที");
+            saveData();       
+            renderSchedule(); 
+            alert("จัดตารางแข่งสำเร็จ! ทีมจะคละเวลาแข่งกันแล้วครับ");
         }
     } catch (err) {
         alert("เกิดข้อผิดพลาด: " + err.message);
