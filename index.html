@@ -2273,51 +2273,54 @@ function clearSchedule() {
     }
 }
 
-// ฟังก์ชันจัดตารางลีกอัตโนมัติสำหรับ 8 ทีม
 function autoGenerateLeague() {
-    if (teams.length !== 8) {
-        return alert("ต้องมีทีมครบ 8 ทีมก่อน (ปัจจุบันมี " + teams.length + " ทีม)");
+    // 1. ตรวจสอบว่ามีทีมครบ 8 ไหม
+    if (!teams || teams.length < 8) {
+        return alert("กรุณาเพิ่มทีมให้ครบ 8 ทีมก่อนสุ่ม (ปัจจุบันมี " + (teams ? teams.length : 0) + " ทีม)");
     }
-
-    const startDateStr = prompt("ระบุวันที่เริ่มแข่งวันอาทิตย์แรก (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
+    
+    // 2. ถามวันที่เริ่มแข่ง
+    const startDateStr = prompt("ระบุวันที่เริ่มแข่ง (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
     if (!startDateStr) return;
 
-    let tempTeams = [...teams];
-    // สุ่มลำดับทีมก่อนเพื่อให้แต่ละครั้งที่สุ่มใหม่จะได้คู่ไม่ซ้ำลำดับเดิม
-    tempTeams.sort(() => Math.random() - 0.5);
-
-    let newSchedules = [];
+    let tempTeams = [...teams].slice(0, 8); // ดึงมาแค่ 8 ทีม
     let startDate = new Date(startDateStr);
-    
-    // Logic: Round Robin 8 ทีม ต้องแข่ง 7 สัปดาห์ (Rounds)
+    let newGeneratedSchedules = [];
+
+    // อัลกอริทึมสุ่มแบบพบกันหมด 7 สัปดาห์ (Circle Method)
     for (let round = 0; round < 7; round++) {
         let matchDay = new Date(startDate);
         matchDay.setDate(startDate.getDate() + (round * 7));
         let dateStr = matchDay.toISOString().split('T')[0];
 
-        // ในแต่ละสัปดาห์จะมี 4 คู่
         for (let i = 0; i < 4; i++) {
             let teamA = tempTeams[i];
             let teamB = tempTeams[7 - i];
 
-            newSchedules.push({
+            newGeneratedSchedules.push({
                 id: Date.now() + Math.random(),
                 date: dateStr,
-                teamA: teamA.name,
-                teamB: teamB.name,
-                time: `1${i+7}:00`, // ตั้งเวลาสมมติ 17:00, 18:00...
-                group: (i < 2) ? 'A' : 'B' // แบ่งกลุ่มสมมติ
+                week: round + 1,
+                // ตรวจสอบชื่อทีม (ใช้ .name ตามมาตรฐานไฟล์ของคุณ)
+                teamA: teamA.name || teamA.teamName, 
+                teamB: teamB.name || teamB.teamName,
+                time: `${18 + i}:00`, // คู่แรก 18:00, 19:00, 20:00, 21:00
+                group: 'All' 
             });
         }
-        
-        // หมุนทีม (Fixed ทีมแรกไว้ แล้วหมุนที่เหลือตามเข็มนาฬิกา)
+        // หมุนทีมเพื่อให้เจอคนใหม่ในสัปดาห์ถัดไป
         tempTeams.splice(1, 0, tempTeams.pop());
     }
 
-    schedules = newSchedules;
-    save();
-    renderSchedule();
-    alert("จัดตารางแข่ง 7 สัปดาห์ (28 แมทช์) เรียบร้อยแล้ว!");
+    // 3. ยืนยันการบันทึกเข้าสู่ตารางหลัก
+    if (confirm(`สุ่มโปรแกรม 28 แมตช์เรียบร้อย (7 สัปดาห์) ต้องการบันทึกลงตารางหลักทันทีหรือไม่?`)) {
+        // นำแมตช์ที่สุ่มได้ ไปรวมกับแมตช์ที่มีอยู่เดิม (หรือจะล้างอันเก่าก่อนก็ได้)
+        schedules = [...schedules, ...newGeneratedSchedules]; 
+        
+        saveData();           // บันทึกลง LocalStorage (ฟังก์ชันเดิมในไฟล์คุณ)
+        renderSchedules();    // สั่งวาดตารางที่หน้าจอใหม่ทันที
+        alert("จัดตารางแข่งสำเร็จ!");
+    }
 }
 
 // ฟังก์ชันสำหรับลบแมทช์รายคู่
