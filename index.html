@@ -2273,80 +2273,71 @@ function clearSchedule() {
     }
 }
 
-// --- 1. ฟังก์ชันจัดลีกอัตโนมัติ (แก้ไขการเก็บค่าเป็น ID ทีม) ---
+// --- ฟังก์ชันจัดลีกอัตโนมัติ 8 ทีม ---
 function autoGenerateLeague() {
-    if (!teams || teams.length < 8) {
-        return alert("กรุณาเพิ่มทีมให้ครบ 8 ทีมก่อนสุ่ม (ปัจจุบันมี " + (teams ? teams.length : 0) + " ทีม)");
+    // 1. ตรวจสอบว่ามีตัวแปร teams และ schedules หรือไม่
+    if (typeof teams === 'undefined' || teams.length < 8) {
+        return alert("กรุณาเพิ่มทีมให้ครบ 8 ทีมก่อน (ปัจจุบันมี " + (typeof teams !== 'undefined' ? teams.length : 0) + " ทีม)");
     }
     
+    // 2. ถามวันที่
     const startDateStr = prompt("ระบุวันที่เริ่มแข่ง (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
     if (!startDateStr) return;
 
-    let tempTeams = [...teams].slice(0, 8);
-    tempTeams.sort(() => Math.random() - 0.5); // Shuffle ทีม
+    try {
+        let tempTeams = [...teams].slice(0, 8);
+        tempTeams.sort(() => Math.random() - 0.5); // Shuffle
 
-    let newGeneratedSchedules = [];
-    let startDate = new Date(startDateStr);
+        let newGenerated = [];
+        let startDate = new Date(startDateStr);
 
-    for (let round = 0; round < 7; round++) {
-        let matchDay = new Date(startDate);
-        matchDay.setDate(startDate.getDate() + (round * 7));
-        let dateStr = matchDay.toISOString().split('T')[0];
+        for (let round = 0; round < 7; round++) {
+            let matchDay = new Date(startDate);
+            matchDay.setDate(startDate.getDate() + (round * 7));
+            let dateStr = matchDay.toISOString().split('T')[0];
 
-        for (let i = 0; i < 4; i++) {
-            let teamA = tempTeams[i];
-            let teamB = tempTeams[7 - i];
+            for (let i = 0; i < 4; i++) {
+                let teamA = tempTeams[i];
+                let teamB = tempTeams[7 - i];
 
-            newGeneratedSchedules.push({
-                id: Date.now() + Math.random(),
-                date: dateStr,
-                week: round + 1,
-                // สำคัญ: ต้องเก็บเป็น .id เพื่อให้หน้าตารางดึงข้อมูลทีมมาแสดงได้ถูก
-                teamA: teamA.id, 
-                teamB: teamB.id,
-                time: `${17 + i}:00`, // เริ่ม 17:00, 18:00...
-                group: (i < 2) ? 'A' : 'B',
-                scoreA: "",
-                scoreB: "",
-                played: false
-            });
+                newGenerated.push({
+                    id: Date.now() + Math.random(),
+                    date: dateStr,
+                    week: round + 1,
+                    teamA: teamA.id, 
+                    teamB: teamB.id,
+                    time: `${17 + i}:00`,
+                    group: (i < 2) ? 'A' : 'B',
+                    scoreA: "",
+                    scoreB: "",
+                    played: false
+                });
+            }
+            tempTeams.splice(1, 0, tempTeams.pop()); // Rotate
         }
-        tempTeams.splice(1, 0, tempTeams.pop());
-    }
 
-    if (confirm(`สุ่มโปรแกรม 28 แมตช์เรียบร้อย ต้องการบันทึกลงตารางหลักหรือไม่?`)) {
-        schedules = [...schedules, ...newGeneratedSchedules]; 
-        saveData();       // เปลี่ยนจาก save() เป็น saveData()
-        renderSchedules(); // เปลี่ยนจาก renderSchedule() เป็น renderSchedules()
-        alert("จัดตารางแข่งสำเร็จ!");
-    }
-}
+        // 3. บันทึก (ตรวจสอบชื่อฟังก์ชันที่มีในไฟล์ index 67 จริงๆ)
+        if (confirm(`สุ่มสำเร็จ 28 แมตช์! ต้องการบันทึกหรือไม่?`)) {
+            // มั่นใจว่า schedules ถูกประกาศไว้แล้ว
+            if (typeof schedules !== 'undefined') {
+                schedules = [...schedules, ...newGenerated];
+            } else {
+                window.schedules = newGenerated;
+            }
 
-// --- 2. ฟังก์ชันลบแมทช์รายคู่ ---
-function deleteMatchSchedule(id) {
-    if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบโปรแกรมการแข่งขันนี้?")) {
-        schedules = schedules.filter(s => s.id != id);
-        saveData();       // แก้เป็น saveData()
-        renderSchedules(); // แก้เป็น renderSchedules()
-    }
-}
-
-// --- 3. ฟังก์ชันล้างตารางทั้งหมด ---
-function clearSchedule() {
-    if (confirm("⚠️ คำเตือน: คุณต้องการลบโปรแกรมการแข่งขันทั้งหมดใช่หรือไม่?")) {
-        schedules = [];
-        saveData();       // แก้เป็น saveData()
-        renderSchedules(); // แก้เป็น renderSchedules()
-    }
-}
-
-// --- 4. ฟังก์ชันแก้ไข (เสริม) ---
-function editMatchSchedule(id) {
-    const match = schedules.find(s => s.id == id);
-    if (match) {
-        if (typeof openAddSchedModal === "function") {
-            openAddSchedModal(match);
+            // เรียกใช้ฟังก์ชันที่มีในไฟล์ index(67).html
+            if (typeof saveData === "function") saveData();
+            if (typeof renderSchedules === "function") {
+                renderSchedules();
+            } else if (typeof renderSchedule === "function") {
+                renderSchedule();
+            }
+            
+            alert("จัดตารางแข่งสำเร็จ! ข้อมูลควรจะปรากฏแล้ว");
         }
+    } catch (err) {
+        console.error(err);
+        alert("เกิดข้อผิดพลาด: " + err.message);
     }
 }
         
