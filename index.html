@@ -1324,7 +1324,6 @@ function renderSchedule() {
     const cont = document.getElementById('sched-list');
     if (!cont) return;
 
-    // ดึงค่าการปรับแต่งสี (ป้องกัน Error ด้วยเครื่องหมาย ?)
     const cTextColor = document.getElementById('sc-text-color')?.value || '#ffffff';
     const cPillColor = document.getElementById('sc-pill-color')?.value || '#facc15';
 
@@ -1332,7 +1331,6 @@ function renderSchedule() {
         ? schedules 
         : schedules.filter(s => s.group === currentGroupFilter);
 
-    // จัดกลุ่มตามสัปดาห์
     const grouped = filteredSchedules.reduce((acc, curr) => {
         const key = `Week ${curr.week} (${formatDate(curr.date)})`;
         if (!acc[key]) acc[key] = [];
@@ -1349,35 +1347,39 @@ function renderSchedule() {
                 <div class="relative overflow-hidden glass mb-3 rounded-2xl flex items-center justify-between p-4 border border-white/5 shadow-xl schedule-match-card-new" 
                      onclick="toggleDeleteBtn(${s.id})">
                     
-                    <div class="flex-1 flex items-center justify-start gap-4">
-                        <div class="text-left">
-                            <div class="font-black italic text-lg md:text-xl uppercase tracking-tighter" style="color: ${cTextColor};">
-                                ${tA.name}
-                            </div>
-                            <div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">${s.group ? 'Group ' + s.group : ''}</div>
+                    <div class="flex-1 text-left">
+                        <div class="font-black italic text-lg md:text-xl uppercase tracking-tighter" style="color: ${cTextColor};">
+                            ${tA.name}
                         </div>
-                        <img src="${tA.logo}" class="w-14 h-14 md:w-16 md:h-16 object-contain" alt="Logo">
+                        <div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">${s.group ? 'Group ' + s.group : ''}</div>
                     </div>
 
-                    <div class="flex flex-col items-center justify-center min-w-[100px] px-2 border-x border-white/10">
-                        <div class="text-2xl font-black italic text-yellow-500 leading-none mb-1">VS</div>
-                        <div class="bg-yellow-500 text-black px-3 py-0.5 rounded-full text-sm font-black mb-1">${s.time}</div>
-                        <div class="text-[9px] text-gray-400 font-medium">${formatDate(s.date)}</div>
+                    <div class="flex items-center justify-center gap-3 md:gap-6 min-w-[200px] md:min-w-[250px]">
+                        
+                        <img src="${tA.logo}" class="w-12 h-12 md:w-16 md:h-16 object-cover rounded-full border-2 border-white/10 shadow-lg aspect-square" alt="Logo">
+
+                        <div class="flex flex-col items-center justify-center px-2">
+                            <div class="text-2xl font-black italic text-yellow-500 leading-none">
+                                <span class="inline-block">V</span><span class="inline-block">S</span>
+                            </div>
+                            <div class="bg-yellow-500 text-black px-3 py-0.5 rounded-full text-[12px] font-black mt-1 mb-1 shadow-md">${s.time}</div>
+                            <div class="text-[8px] text-gray-400 font-medium whitespace-nowrap">${formatDate(s.date)}</div>
+                        </div>
+
+                        <img src="${tB.logo}" class="w-12 h-12 md:w-16 md:h-16 object-cover rounded-full border-2 border-white/10 shadow-lg aspect-square" alt="Logo">
+                        
                     </div>
 
-                    <div class="flex-1 flex items-center justify-end gap-4">
-                        <img src="${tB.logo}" class="w-14 h-14 md:w-16 md:h-16 object-contain" alt="Logo">
-                        <div class="text-right">
-                            <div class="font-black italic text-lg md:text-xl uppercase tracking-tighter" style="color: ${cTextColor};">
-                                ${tB.name}
-                            </div>
-                            <div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">${s.group ? 'Group ' + s.group : ''}</div>
+                    <div class="flex-1 text-right">
+                        <div class="font-black italic text-lg md:text-xl uppercase tracking-tighter" style="color: ${cTextColor};">
+                            ${tB.name}
                         </div>
+                        <div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">${s.group ? 'Group ' + s.group : ''}</div>
                     </div>
 
                     <div id="delete-wrapper-${s.id}" class="delete-btn-hidden absolute inset-0 bg-black/90 flex items-center justify-center rounded-2xl transition-all z-20">
-                        <button onclick="event.stopPropagation(); deleteMatchSchedule(${s.id})" class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-red-500">
-                            <i class="fas fa-trash-alt mr-2"></i> ยืนยันลบแมตช์
+                        <button onclick="event.stopPropagation(); deleteMatchSchedule(${s.id})" class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-red-500 shadow-lg">
+                            <i class="fas fa-trash-alt mr-2"></i> ยืนยันลบ
                         </button>
                         <button onclick="event.stopPropagation(); toggleDeleteBtn(${s.id})" class="ml-2 bg-gray-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-gray-500">
                             ยกเลิก
@@ -1388,8 +1390,8 @@ function renderSchedule() {
         }).join('');
 
         return `
-            <div class="p-2 rounded-lg mb-4 font-bold text-center text-black tracking-widest uppercase text-sm" 
-                 style="background-color: ${cPillColor}; shadow: 0 4px 15px rgba(0,0,0,0.3); transform: skewX(-10deg);">
+            <div class="p-2 rounded-lg mb-4 font-bold text-center text-black tracking-widest uppercase text-xs" 
+                 style="background-color: ${cPillColor}; transform: skewX(-10deg); box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
                  ${key}
             </div>
             ${matchesHtml}
