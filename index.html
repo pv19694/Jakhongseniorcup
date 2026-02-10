@@ -2570,26 +2570,37 @@ function refreshAllData(btnElement) {
             }
         }
 
-        // --- 3. ฟังก์ชันจุดระเบิดระบบ (Init) ---
-        // ทำหน้าที่ลำดับการทำงานตอนเปิดโปรแกรมครั้งแรก
+       // --- 3. ฟังก์ชันจุดระเบิดระบบ (Init) ---
         function init() {
             console.log("กำลังเริ่มต้นระบบ...");
-            load();             // ดึงข้อมูลเก่ามา
-            loadDefaultData();  // ถ้าไม่มีข้อมูลเก่าเลย ให้ใช้ค่าเริ่มต้น
             
-            // วาดหน้าจอ
+            // 1. โหลดข้อมูลจาก LocalStorage
+            load();             
+
+            // 2. ถ้าโหลดมาแล้วทีมว่างเปล่า ให้ใช้ค่าเริ่มต้น (ป้องกันหน้าจอขาว)
+            if (!teams || teams.length === 0) {
+                loadDefaultData();
+            }
+            
+            // 3. ปรับแต่งสีธีม
             if (typeof renderTheme === 'function') renderTheme();
-            if (typeof renderAll === 'function') renderAll();
-            else {
-                // ถ้าไม่มี renderAll ให้เรียกทีละส่วน
-                if (typeof renderTeams === 'function') renderTeams();
-                if (typeof renderSchedule === 'function') renderSchedule();
-                if (typeof renderLeaderboard === 'function') renderLeaderboard();
-                if (typeof updateDropdowns === 'function') updateDropdowns();
+
+            // 4. *** แก้ไขจุดนี้: เรียกฟังก์ชันแสดงผลที่มีอยู่จริงในไฟล์ของคุณ ***
+            // ในไฟล์ของคุณใช้ฟังก์ชันเหล่านี้ในการวาดหน้าจอ:
+            if (typeof renderTeams === 'function') renderTeams();
+            if (typeof renderSchedule === 'function') renderSchedule();
+            if (typeof renderLeaderboard === 'function') renderLeaderboard();
+            if (typeof updateDropdowns === 'function') updateDropdowns();
+            
+            // 5. สั่งให้ไปที่หน้าแดชบอร์ดเป็นหน้าแรก
+            // ตรวจสอบว่ามีฟังก์ชัน nav ไหม ถ้ามีให้เรียกเพื่อให้หน้าจอแสดงผล
+            if (typeof nav === 'function') {
+                const homeBtn = document.querySelector('button[onclick*="home"]');
+                nav('home', homeBtn);
             }
         }
 
-        // --- 4. สั่งให้ทำงานทันทีที่โหลดหน้าเว็บเสร็จ ---
+        // สั่งให้ทำงานทันทีที่โหลดหน้าเว็บเสร็จ
         window.onload = init;
 
     </script>
