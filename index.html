@@ -6,6 +6,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -400,15 +401,7 @@
                         JAKHONG SYSTEM
                     </h1>
                 </div>
-               <div class="flex items-center gap-3">
-    <button onclick="refreshAllData(this)" class="text-green-500 hover:text-green-400 transition" title="อัปเดตข้อมูล">
-        <i class="fas fa-sync-alt text-xl"></i>
-    </button>
-    
-    <button onclick="toggleSettings()" class="text-gray-400 hover:text-white transition">
-        <i class="fas fa-cog text-xl"></i>
-    </button>
-</div>
+                <button onclick="toggleSettings()" class="text-gray-400 hover:text-white transition"><i class="fas fa-cog text-xl"></i></button>
             </div>
             <div class="flex overflow-x-auto gap-3 pb-3 no-scrollbar">
                 <button onclick="nav('home', this)" class="nav-btn active px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition"><i class="fas fa-home"></i> แดชบอร์ด</button>
@@ -919,40 +912,46 @@
             { id: 't3', name: 'Titan FC', color: '#66ff66', tel: '083-333-3333', logo: '' },
         ];
         
-       // --- แก้ไขฟังก์ชัน load ---
-const load = () => {
-    try {
-        const t = localStorage.getItem('jl_teams');
-        const p = localStorage.getItem('jl_players');
-        const sch = localStorage.getItem('jl_schedules'); // ใช้ jl_schedules
-        const navTitle = localStorage.getItem('jl_nav_title');
-
-        if (t) teams = JSON.parse(t);
-        if (p) players = JSON.parse(p);
-        if (sch) schedules = JSON.parse(sch); // ให้ค่าเข้า schedules
-        
-        if (navTitle) {
-            const el = document.getElementById('nav-title');
-            if (el) el.innerText = navTitle;
+        function loadDefaultData() {
+            // Check if teams array is empty AND local storage key does not exist (true first load)
+            if (teams.length === 0 && localStorage.getItem('jl_teams') === null) {
+                teams = [...DEFAULT_TEAMS];
+                players = [
+                    // Sample players for default teams
+                    { id: Date.now() + 1, name: 'ยอดกัปตัน', no: '10', teamId: 't1', manager: true, img: '' },
+                    { id: Date.now() + 2, name: 'เสือปืนใหญ่', no: '9', teamId: 't2', manager: true, img: '' },
+                    { id: Date.now() + 3, name: 'กองหลังหิน', no: '5', teamId: 't3', manager: true, img: '' },
+                ];
+                save();
+                alert('เริ่มต้นระบบใหม่! ได้ทำการเพิ่ม 3 ทีมเริ่มต้นให้แล้ว (Phoenix, Dragon, Titan) เพื่อให้ระบบทำงานได้ทันที');
+            }
         }
-        console.log("Load Complete");
-    } catch (e) { console.error(e); }
-}
 
-// --- แก้ไขฟังก์ชัน save ---
-const save = () => {
-    try {
-        localStorage.setItem('jl_teams', JSON.stringify(teams));
-        localStorage.setItem('jl_players', JSON.stringify(players));
-        localStorage.setItem('jl_schedules', JSON.stringify(schedules)); // เซฟ schedules
-        localStorage.setItem('jl_nav_title', document.getElementById('nav-title').innerText);
-        
-        // สั่งวาดหน้าจอใหม่ด้วยฟังก์ชันที่มีจริง
-        renderTeams();
-        renderSchedule();
-        renderLeaderboard();
-    } catch (e) { console.error(e); }
-}
+
+        // *** CRITICAL: Save function with Theme Update ***
+        const save = () => {
+            try {
+                localStorage.setItem('jl_teams', JSON.stringify(teams));
+                localStorage.setItem('jl_players', JSON.stringify(players));
+                localStorage.setItem('jl_matches', JSON.stringify(matches));
+                localStorage.setItem('jl_stats', JSON.stringify(stats));
+                localStorage.setItem('jl_schedules', JSON.stringify(schedules));
+                localStorage.setItem('jl_logo', globalLogo);
+                localStorage.setItem('jl_theme_name', themeName); 
+                localStorage.setItem('jl_theme_color', themeColor); 
+                localStorage.setItem('jl_secondary_color', secondaryColor); 
+
+                renderTheme(); // Update theme immediately
+                renderAll(); // RENDER ALL UI AFTER EVERY SAVE
+            } catch (e) {
+                if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+                    showStorageWarning();
+                    console.error("Local Storage Quota Exceeded. Data not saved.", e);
+                } else {
+                    console.error("Error saving data:", e);
+                }
+            }
+        }
         
         function showStorageWarning() {
             document.getElementById('storage-warning-modal').classList.remove('hidden');
@@ -1444,63 +1443,28 @@ function renderSchedule() {
 function updateAllMatchTimes() {
     const containers = document.querySelectorAll('.week-sortable-container');
     
-    // สร้าง Array ใหม่เพื่อเก็บลำดับที่จัดใหม่ทั้งหมด
-    let newOrderedSchedules = [];
-
     containers.forEach(container => {
         const cards = container.querySelectorAll('.match-card');
-        let startHour = 16; 
+        let startHour = 16; // เริ่มคู่แรก 16:00
 
         cards.forEach((card, index) => {
             const mid = card.getAttribute('data-id');
-            // ค้นหา match จาก schedules เดิม
             const matchObj = schedules.find(s => String(s.id) === String(mid));
             
             if (matchObj) {
-                // 1. คำนวณเวลาใหม่
-                let totalMin = index * 40; 
+                let totalMin = index * 40; // ห่างกันคู่ละ 40 นาที
                 let h = startHour + Math.floor(totalMin / 60);
                 let m = totalMin % 60;
                 let newTime = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
                 
-                // 2. อัปเดตเวลาใน Object
+                // อัปเดตข้อมูลในระบบและเปลี่ยนตัวเลขบนหน้าจอ
                 matchObj.time = newTime;
-                
-                // 3. อัปเดตตัวเลขเวลาบนหน้าจอทันที
-                const timeDisplay = card.querySelector('.match-time-text');
-                if (timeDisplay) timeDisplay.innerText = newTime;
-
-                // 4. เก็บเข้า Array ใหม่ตามลำดับที่ลากจริง
-                newOrderedSchedules.push(matchObj);
+                card.querySelector('.match-time-text').innerText = newTime;
             }
         });
     });
-
-    // 5. สำคัญมาก: แทนที่ schedules เดิมด้วยลำดับที่จัดใหม่
-    // ถ้าคุณมีการกรอง Group อยู่ อาจจะต้องระวังการทับข้อมูลเดิม
-    // แต่สำหรับระบบลีคเดี่ยว ให้ใช้การ map แทนที่ตัวเดิมแบบนี้ครับ:
-    newOrderedSchedules.forEach(newMatch => {
-        const idx = schedules.findIndex(s => s.id === newMatch.id);
-        if (idx !== -1) {
-            schedules.splice(idx, 1); // ลบตัวเก่าออก
-            schedules.push(newMatch); // ใส่ตัวใหม่เข้าไป (แต่ลำดับใน Array จะเปลี่ยน)
-        }
-    });
     
-    // เพื่อความชัวร์ที่สุด ให้เรียง schedules ตามเวลาใหม่หลังจากลากเสร็จ
-    schedules.sort((a, b) => {
-        if (a.date !== b.date) return new Date(a.date) - new Date(b.date);
-        return a.time.localeCompare(b.time);
-    });
-
-    // 6. บันทึกลง LocalStorage ทันที
-    if (typeof saveData === "function") {
-        saveData();
-    } else {
-        localStorage.setItem('jakhong_matches', JSON.stringify(schedules));
-    }
-    
-    console.log("บันทึกลำดับและเวลาใหม่เรียบร้อยแล้ว");
+    if (typeof saveData === "function") saveData();
 }
 
 
@@ -2459,109 +2423,6 @@ function toggleDeleteBtn(id) {
         wrapper.classList.toggle('delete-btn-hidden');
     }
 }
-
-function refreshAllData(btnElement) {
-    // 1. ทำให้ไอคอนหมุน
-    const icon = btnElement.querySelector('i');
-    icon.classList.add('fa-spin');
-
-    // 2. เรียกฟังก์ชันวาดหน้าจอใหม่ (ตามชื่อฟังก์ชันที่คุณมีในไฟล์)
-    if (typeof renderTeams === 'function') renderTeams();
-    if (typeof renderSchedule === 'function') renderSchedule();
-    if (typeof renderLeaderboard === 'function') renderLeaderboard();
-    if (typeof updateDropdowns === 'function') updateDropdowns();
-
-    // 3. หยุดหมุนหลังจาก 0.6 วินาที
-    setTimeout(() => {
-        icon.classList.remove('fa-spin');
-    }, 600);
-}
-
-
-// --- 1. ฟังก์ชันดึงข้อมูลจากเครื่องขึ้นมาใช้ (เพื่อให้ข้อมูลไม่เด้งกลับ) ---
-        const load = () => {
-            try {
-                const t = localStorage.getItem('jl_teams');
-                const p = localStorage.getItem('jl_players');
-                const m = localStorage.getItem('jl_matches');
-                const s = localStorage.getItem('jl_stats');
-                const sch = localStorage.getItem('jl_schedules');
-                const logo = localStorage.getItem('jl_logo');
-                const tName = localStorage.getItem('jl_theme_name');
-                const tColor = localStorage.getItem('jl_theme_color');
-                const sColor = localStorage.getItem('jl_secondary_color');
-                const navTitle = localStorage.getItem('jl_nav_title');
-
-                if (t) teams = JSON.parse(t);
-                if (p) players = JSON.parse(p);
-                if (m) matches = JSON.parse(m);
-                if (s) stats = JSON.parse(s);
-                if (sch) schedules = JSON.parse(sch);
-                if (logo) globalLogo = logo;
-                if (tName) themeName = tName;
-                if (tColor) themeColor = tColor;
-                if (sColor) secondaryColor = sColor;
-                
-                // โหลดชื่อหัวข้อ JAKHONG SYSTEM กลับมา
-                if (navTitle) {
-                    const el = document.getElementById('nav-title');
-                    if (el) el.innerText = navTitle;
-                }
-
-                console.log("ความจำกลับมาแล้ว: โหลดข้อมูลสำเร็จ!");
-            } catch (e) {
-                console.error("โหลดข้อมูลล้มเหลว:", e);
-            }
-        }
-
-        // --- 2. ฟังก์ชันบันทึกข้อมูล (Save) ---
-        const save = () => {
-            try {
-                localStorage.setItem('jl_teams', JSON.stringify(teams));
-                localStorage.setItem('jl_players', JSON.stringify(players));
-                localStorage.setItem('jl_matches', JSON.stringify(matches));
-                localStorage.setItem('jl_stats', JSON.stringify(stats));
-                localStorage.setItem('jl_schedules', JSON.stringify(schedules));
-                localStorage.setItem('jl_logo', globalLogo);
-                localStorage.setItem('jl_theme_name', themeName); 
-                localStorage.setItem('jl_theme_color', themeColor); 
-                localStorage.setItem('jl_secondary_color', secondaryColor);
-                
-                // บันทึกชื่อหัวข้อด้วย
-                const navTitle = document.getElementById('nav-title').innerText;
-                localStorage.setItem('jl_nav_title', navTitle);
-
-                if (typeof renderTheme === 'function') renderTheme(); 
-                if (typeof renderAll === 'function') renderAll(); 
-                console.log("บันทึกข้อมูลลงเครื่องแล้ว");
-            } catch (e) {
-                console.error("Error saving data:", e);
-            }
-        }
-
-       function init() {
-    console.log("System Starting...");
-    load(); // ดึงข้อมูล
-    
-    if (teams.length === 0) {
-        loadDefaultData(); // ถ้าไม่มีข้อมูลเลย ให้ใช้ทีมเริ่มต้น
-    }
-
-    // สั่งวาดหน้าจอทีละส่วน (เพราะไม่มี renderAll)
-    if (typeof renderTeams === 'function') renderTeams();
-    if (typeof renderSchedule === 'function') renderSchedule();
-    if (typeof renderLeaderboard === 'function') renderLeaderboard();
-    if (typeof updateDropdowns === 'function') updateDropdowns();
-    if (typeof renderTheme === 'function') renderTheme();
-
-    // *** หัวใจสำคัญ: สั่งให้เปิดหน้า Dashboard ทันที ***
-    // ค้นหาปุ่มแดชบอร์ดแล้วจำลองการคลิก
-    const dashboardBtn = document.querySelector('button[onclick*="home"]');
-    if (dashboardBtn) {
-        nav('home', dashboardBtn);
-    }
-}
-window.onload = init;
 
     </script>
 </body>
