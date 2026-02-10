@@ -2284,9 +2284,8 @@ function autoGenerateLeague() {
     if (!startDateStr) return;
 
     try {
-        // 1. สุ่มลำดับทีมตั้งต้น
         let tempTeams = [...teams].slice(0, 8);
-        tempTeams.sort(() => Math.random() - 0.5); 
+        tempTeams.sort(() => Math.random() - 0.5); // สุ่มลำดับทีมตั้งต้น
 
         let newGenerated = [];
         let startDate = new Date(startDateStr);
@@ -2312,48 +2311,39 @@ function autoGenerateLeague() {
                 });
             }
 
-            // 2. สุ่มลำดับคู่ในสัปดาห์นั้น (เพื่อให้คละเวลาแข่ง ไม่ให้ทีมเดิมแข่งคู่แรกตลอด)
+            // สุ่มลำดับคู่ในแต่ละวันเพื่อความยุติธรรม
             currentRoundMatches.sort(() => Math.random() - 0.5);
 
+            // --- คำนวณเวลาแข่งใหม่ (คู่ละ 40 นาที) ---
             currentRoundMatches.forEach((match, index) => {
-                match.time = `${17 + index}:00`; 
+                let startHour = 17; // เริ่ม 17:00
+                let totalMinutes = index * 40; // คู่ที่ 0 = 0นาที, คู่ที่ 1 = 40นาที, คู่ที่ 2 = 80นาที...
+                
+                let hour = startHour + Math.floor(totalMinutes / 60);
+                let minute = totalMinutes % 60;
+                
+                // รูปแบบเวลาให้เป็น HH:MM (เช่น 17:40, 18:20)
+                match.time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
                 newGenerated.push(match);
             });
 
             tempTeams.splice(1, 0, tempTeams.pop()); 
         }
 
-        if (confirm(`สุ่มสำเร็จ 28 แมตช์! ต้องการบันทึกหรือไม่?`)) {
-            // อัปเดตข้อมูลเข้าตัวแปรหลัก
-            if (typeof schedules !== 'undefined') {
-                schedules = [...schedules, ...newGenerated];
-            } else {
-                window.schedules = newGenerated;
-            }
+        if (confirm(`สุ่มสำเร็จ 28 แมตช์ (แข่งคู่ละ 40 นาที)! ต้องการบันทึกหรือไม่?`)) {
+            schedules = [...schedules, ...newGenerated];
 
-            // --- แก้ไขจุดที่มีปัญหา: ตรวจสอบฟังก์ชันบันทึก ---
-            if (typeof saveData === "function") {
-                saveData();
-            } else if (typeof save === "function") {
-                save();
-            } else {
-                // ถ้าหาฟังก์ชันบันทึกไม่เจอเลย ให้บันทึกลง localStorage โดยตรง
-                localStorage.setItem('jakhong_schedules', JSON.stringify(schedules));
-                console.log("Saved directly to localStorage because saveData function not found.");
-            }
+            // ตรวจสอบชื่อฟังก์ชันบันทึกที่มีในไฟล์ของคุณ (เพื่อไม่ให้เกิด Error)
+            if (typeof saveData === "function") saveData();
+            else if (typeof save === "function") save();
 
-            // --- ตรวจสอบฟังก์ชันแสดงผลหน้าจอ ---
-            if (typeof renderSchedule === "function") {
-                renderSchedule();
-            } else if (typeof renderSchedules === "function") {
-                renderSchedules();
-            }
+            // แสดงผลบนหน้าจอ
+            if (typeof renderSchedule === "function") renderSchedule();
             
-            alert("จัดตารางแข่งแบบคละเวลาสำเร็จ!");
+            alert("จัดตารางแข่งสำเร็จ! เวลาแข่งจะห่างกันคู่ละ 40 นาทีครับ");
         }
     } catch (err) {
-        console.error(err);
-        alert("เกิดข้อผิดพลาดในการแสดงผล: " + err.message);
+        alert("เกิดข้อผิดพลาด: " + err.message);
     }
 }
         
