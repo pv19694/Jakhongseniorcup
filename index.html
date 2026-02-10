@@ -489,7 +489,7 @@
             <div class="rounded-xl overflow-hidden shadow-2xl">
                 <div id="lb-banner" class="p-6 text-center relative" style="background: linear-gradient(135deg, #1c365b, #0c1626);">
                     <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
-                    <h2 contenteditable="true" id="lb-title" class="relative text-3xl md:text-5xl font-extrabold uppercase italic outline-text tracking-wider z-10 focus:outline-none focus:border-b border-white" style="color: var(--primary-color);">
+                    <h2 contenteditable="true" id="lb-title" onblur="saveTitle()" class="relative text-3xl md:text-5xl font-extrabold uppercase italic outline-text tracking-wider z-10 focus:outline-none focus:border-b border-white" style="color: var(--primary-color);">
                         ตารางคะแนน JAKHONG SENIOR CUP
                     </h2>
                 </div>
@@ -2423,6 +2423,13 @@ function toggleDeleteBtn(id) {
         wrapper.classList.toggle('delete-btn-hidden');
     }
 }
+
+function saveTableTitle() {
+    const title = document.getElementById('lb-title').innerText;
+    localStorage.setItem('jakhong_table_title', title);
+    console.log("บันทึกชื่อตารางแล้ว");
+}
+        
 
     </script>
 </body>
