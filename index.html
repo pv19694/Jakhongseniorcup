@@ -364,7 +364,22 @@
         .all-stats-row:hover {
             background-color: rgba(255, 255, 255, 0.05);
         }
-        
+
+    /* เพิ่มต่อท้ายในส่วน style */
+.delete-btn-hidden {
+    display: none !important;
+}
+
+/* ปรับให้การ์ดดูเหมือนปุ่มที่กดได้ */
+.schedule-match-card-new {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.schedule-match-card-new:hover {
+    transform: translateY(-2px);
+    border-color: rgba(250, 204, 21, 0.4) !important;
+}
+  
     </style>
 </head>
 <body class="flex flex-col">
@@ -1307,34 +1322,17 @@ document.getElementById('lb-thead-row').lastElementChild.children[0].style.backg
 
 function renderSchedule() {
     const cont = document.getElementById('sched-list');
-    if (!cont) return; // ป้องกันถ้าหา Element ไม่เจอ
+    if (!cont) return;
 
-    // --- ส่วนดึงค่าสี (เพิ่ม || เพื่อป้องกัน Error ถ้าหา Element ไม่เจอ) ---
-    const cBgColorOverlay = document.getElementById('sc-bg-color')?.value || '#1c365b';
-    const cBgColorMain = document.getElementById('sc-bg-color-main')?.value || '#0c1626';
+    // ดึงค่าการปรับแต่งสี (ป้องกัน Error ด้วยเครื่องหมาย ?)
     const cTextColor = document.getElementById('sc-text-color')?.value || '#ffffff';
     const cPillColor = document.getElementById('sc-pill-color')?.value || '#facc15';
-    const cHeaderText = document.getElementById('sc-header-text')?.value || 'โปรแกรมการแข่งขัน';
 
-    // Apply Styles
-    const mainContainer = document.getElementById('schedule-main-container');
-    if (mainContainer) mainContainer.style.backgroundColor = cBgColorMain;
-
-    const overlay = document.getElementById('sc-bg-overlay');
-    if (overlay) overlay.style.background = `linear-gradient(to br, ${cBgColorOverlay}, #0c1626)`;
-    
-    const pill = document.getElementById('sc-pill');
-    if (pill) {
-        pill.style.backgroundColor = cPillColor;
-        pill.innerText = cHeaderText;
-    }
-
-    // --- ส่วนกรองข้อมูล ---
     const filteredSchedules = currentGroupFilter === 'All' 
         ? schedules 
         : schedules.filter(s => s.group === currentGroupFilter);
 
-    // Group by Week
+    // จัดกลุ่มตามสัปดาห์
     const grouped = filteredSchedules.reduce((acc, curr) => {
         const key = `Week ${curr.week} (${formatDate(curr.date)})`;
         if (!acc[key]) acc[key] = [];
@@ -1342,63 +1340,63 @@ function renderSchedule() {
         return acc;
     }, {});
 
-    // สร้าง HTML
     let html = Object.keys(grouped).sort().map(key => {
         const matchesHtml = grouped[key].map(s => {
-            const tA = teams.find(t => t.id == s.teamA);
-            const tB = teams.find(t => t.id == s.teamB);
+            const tA = teams.find(t => t.id == s.teamA) || { name: 'รอระบุ', logo: '' };
+            const tB = teams.find(t => t.id == s.teamB) || { name: 'รอระบุ', logo: '' };
             
-            // เช็คว่าแข่งหรือยัง (เทียบกับข้อมูลผลการแข่งขันที่มี)
-            const matchExists = (typeof matches !== 'undefined') && matches.some(m => 
-                (m.teamA == s.teamA && m.teamB == s.teamB && m.date == s.date) || 
-                (m.teamA == s.teamB && m.teamB == s.teamA && m.date == s.date)
-            );
-            
-            const status = matchExists 
-                ? `<span class="text-sm font-bold text-green-400">แข่งแล้ว</span>` 
-                : `<span class="text-sm font-bold text-gray-500">รอแข่ง</span>`; 
-
-            const groupDisplay = s.group ? `กลุ่ม ${s.group}` : ''; 
-
             return `
-                <div class="schedule-match-card bg-black/20 mb-2 p-4 rounded-xl flex items-center justify-between border border-white/5" data-id="${s.id}">
-                    <div class="schedule-team-container flex-1 flex items-center gap-3 justify-end" style="color: ${cTextColor};">
-                        <div class="text-right">
-                            <div class="font-bold uppercase text-sm md:text-base">${tA?.name || 'รอระบุ'}</div>
-                            <div class="text-[10px] text-gray-400">${groupDisplay}</div>
-                        </div>
-                        <img src="${tA?.logo || ''}" class="w-10 h-10 rounded-full border-2" style="border-color: ${cPillColor};">
-                    </div>
-
-                    <div class="schedule-center-info px-4 text-center" style="color: ${cTextColor};">
-                        <div class="font-black italic text-xl">VS</div>
-                        <div class="text-lg font-bold">${s.time}</div>
-                        <div class="text-[10px] text-gray-400">${formatDate(s.date)}</div>
-                        <div class="mt-1">${status}</div>
-                    </div>
-
-                    <div class="schedule-team-container flex-1 flex items-center gap-3 justify-start" style="color: ${cTextColor};">
-                        <img src="${tB?.logo || ''}" class="w-10 h-10 rounded-full border-2" style="border-color: ${cPillColor};">
-                        <div class="text-left">
-                            <div class="font-bold uppercase text-sm md:text-base">${tB?.name || 'รอระบุ'}</div>
-                            <div class="text-[10px] text-gray-400">${groupDisplay}</div>
-                        </div>
-                    </div>
+                <div class="relative overflow-hidden glass mb-3 rounded-2xl flex items-center justify-between p-4 border border-white/5 shadow-xl schedule-match-card-new" 
+                     onclick="toggleDeleteBtn(${s.id})">
                     
-                    <div class="flex flex-col gap-1 ml-2">
-                        <button onclick="deleteMatchSchedule(${s.id})" class="text-red-500 hover:text-red-400 p-1 text-xs"><i class="fas fa-trash"></i></button>
+                    <div class="flex-1 flex items-center justify-start gap-4">
+                        <div class="text-left">
+                            <div class="font-black italic text-lg md:text-xl uppercase tracking-tighter" style="color: ${cTextColor};">
+                                ${tA.name}
+                            </div>
+                            <div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">${s.group ? 'Group ' + s.group : ''}</div>
+                        </div>
+                        <img src="${tA.logo}" class="w-14 h-14 md:w-16 md:h-16 object-contain" alt="Logo">
+                    </div>
+
+                    <div class="flex flex-col items-center justify-center min-w-[100px] px-2 border-x border-white/10">
+                        <div class="text-2xl font-black italic text-yellow-500 leading-none mb-1">VS</div>
+                        <div class="bg-yellow-500 text-black px-3 py-0.5 rounded-full text-sm font-black mb-1">${s.time}</div>
+                        <div class="text-[9px] text-gray-400 font-medium">${formatDate(s.date)}</div>
+                    </div>
+
+                    <div class="flex-1 flex items-center justify-end gap-4">
+                        <img src="${tB.logo}" class="w-14 h-14 md:w-16 md:h-16 object-contain" alt="Logo">
+                        <div class="text-right">
+                            <div class="font-black italic text-lg md:text-xl uppercase tracking-tighter" style="color: ${cTextColor};">
+                                ${tB.name}
+                            </div>
+                            <div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">${s.group ? 'Group ' + s.group : ''}</div>
+                        </div>
+                    </div>
+
+                    <div id="delete-wrapper-${s.id}" class="delete-btn-hidden absolute inset-0 bg-black/90 flex items-center justify-center rounded-2xl transition-all z-20">
+                        <button onclick="event.stopPropagation(); deleteMatchSchedule(${s.id})" class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-red-500">
+                            <i class="fas fa-trash-alt mr-2"></i> ยืนยันลบแมตช์
+                        </button>
+                        <button onclick="event.stopPropagation(); toggleDeleteBtn(${s.id})" class="ml-2 bg-gray-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-gray-500">
+                            ยกเลิก
+                        </button>
                     </div>
                 </div>
             `;
         }).join('');
 
         return `
-            <div class="schedule-group-header p-2 rounded-lg mb-2 font-bold text-center text-black" style="background-color: ${cPillColor};">${key}</div>
+            <div class="p-2 rounded-lg mb-4 font-bold text-center text-black tracking-widest uppercase text-sm" 
+                 style="background-color: ${cPillColor}; shadow: 0 4px 15px rgba(0,0,0,0.3); transform: skewX(-10deg);">
+                 ${key}
+            </div>
             ${matchesHtml}
         `;
     }).join('');
 
-    cont.innerHTML = html || '<p class="text-center text-gray-500 py-10">ไม่มีโปรแกรมการแข่งขันในขณะนี้</p>';
+    cont.innerHTML = html || '<p class="text-center text-gray-500 py-10">ไม่มีโปรแกรมการแข่งขัน</p>';
 }
 
         
@@ -2346,7 +2344,15 @@ function autoGenerateLeague() {
         alert("เกิดข้อผิดพลาด: " + err.message);
     }
 }
-        
+
+        // ฟังก์ชันสำหรับสลับการแสดงผลหน้าต่างลบแมตช์
+function toggleDeleteBtn(id) {
+    const wrapper = document.getElementById(`delete-wrapper-${id}`);
+    if (wrapper) {
+        // ถ้าเปิดอยู่ให้ปิด ถ้าปิดอยู่ให้เปิด
+        wrapper.classList.toggle('delete-btn-hidden');
+    }
+}
 
     </script>
 </body>
