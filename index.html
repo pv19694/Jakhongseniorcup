@@ -1191,54 +1191,44 @@
 
         // --- 1. LEADERBOARD ---
         function calculateLeaderboardData() {
-            const data = teams.map(t => ({
-                id: t.id,
-                name: t.name,
-                color: t.color,
-                p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0
-            }));
+    let data = teams.map(team => {
+        let p = 0, w = 0, d = 0, l = 0, gf = 0, ga = 0, pts = 0;
+        
+        // ตรวจสอบข้อมูลจากทุกแมตช์ที่แข่งจบแล้ว
+        matches.forEach(m => {
+            if (!m.played) return;
+            
+            if (m.teamA == team.id) {
+                p++;
+                gf += parseInt(m.scoreA || 0);
+                ga += parseInt(m.scoreB || 0);
+                if (m.scoreA > m.scoreB) { w++; pts += 3; }
+                else if (m.scoreA == m.scoreB) { d++; pts += 1; }
+                else { l++; }
+            } else if (m.teamB == team.id) {
+                p++;
+                gf += parseInt(m.scoreB || 0);
+                ga += parseInt(m.scoreA || 0);
+                if (m.scoreB > m.scoreA) { w++; pts += 3; }
+                else if (m.scoreB == m.scoreA) { d++; pts += 1; }
+                else { l++; }
+            }
+        });
 
-            matches.forEach(m => {
-                const idxA = data.findIndex(d => d.id == m.teamA);
-                const idxB = data.findIndex(d => d.id == m.teamB);
-                if (idxA === -1 || idxB === -1) return; // Skip if team not found
+        return {
+            id: team.id,
+            name: team.name,
+            logo: team.logo, // *** เพิ่มบรรทัดนี้ เพื่อให้ส่งโลโก้ออกไปด้วย ***
+            p, w, d, l, gf, ga,
+            gd: gf - ga,
+            pts
+        };
+    });
 
-                const scoreA = parseInt(m.scoreA);
-                const scoreB = parseInt(m.scoreB);
-
-                // Update Team A
-                data[idxA].p++;
-                data[idxA].gf += scoreA;
-                data[idxA].ga += scoreB;
-                data[idxA].gd = data[idxA].gf - data[idxA].ga;
-
-                // Update Team B
-                data[idxB].p++;
-                data[idxB].gf += scoreB;
-                data[idxB].ga += scoreA;
-                data[idxB].gd = data[idxB].gf - data[idxB].ga;
-
-                if (scoreA > scoreB) {
-                    data[idxA].w++; data[idxA].pts += 3;
-                    data[idxB].l++;
-                } else if (scoreA < scoreB) {
-                    data[idxB].w++; data[idxB].pts += 3;
-                    data[idxA].l++;
-                } else {
-                    data[idxA].d++; data[idxA].pts += 1;
-                    data[idxB].d++; data[idxB].pts += 1;
-                }
-            });
-
-            // Sort: Points (desc), Goal Difference (desc), Goals For (desc), Name (asc)
-            return data.sort((a, b) => {
-                if (b.pts !== a.pts) return b.pts - a.pts;
-                if (b.gd !== a.gd) return b.gd - a.gd;
-                if (b.gf !== a.gf) return b.gf - a.gf;
-                return a.name.localeCompare(b.name);
-            });
-        }
-
+    // เรียงลำดับตามแต้ม และลูกได้เสีย
+    return data.sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
+}
+        
        function renderLeaderboard() {
     const standings = calculateLeaderboardData();
     const body = document.getElementById('lb-body');
