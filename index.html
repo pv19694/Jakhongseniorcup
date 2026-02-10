@@ -2284,7 +2284,7 @@ function autoGenerateLeague() {
     if (!startDateStr) return;
 
     try {
-        // 1. สุ่มลำดับทีมตั้งต้น (Shuffle Teams) เพื่อไม่ให้ทีม 1 อยู่ที่เดิมทุกครั้ง
+        // 1. สุ่มลำดับทีมตั้งต้น
         let tempTeams = [...teams].slice(0, 8);
         tempTeams.sort(() => Math.random() - 0.5); 
 
@@ -2296,7 +2296,7 @@ function autoGenerateLeague() {
             matchDay.setDate(startDate.getDate() + (round * 7));
             let dateStr = matchDay.toISOString().split('T')[0];
             
-            let currentRoundMatches = []; // พักแมตช์สัปดาห์นี้ไว้สุ่มลำดับ
+            let currentRoundMatches = [];
 
             for (let i = 0; i < 4; i++) {
                 let teamA = tempTeams[i];
@@ -2307,33 +2307,53 @@ function autoGenerateLeague() {
                     week: round + 1,
                     teamA: teamA.id, 
                     teamB: teamB.id,
-                    group: (i < 2) ? 'A' : 'B', // แบ่งกลุ่ม A/B ตามคู่
+                    group: (i < 2) ? 'A' : 'B',
                     scoreA: "", scoreB: "", played: false
                 });
             }
 
-            // 2. สุ่มลำดับคู่ในสัปดาห์นี้ (Shuffle Matches in Week)
-            // ขั้นตอนนี้จะทำให้ทีมไม่แข่งเวลาเดิมซ้ำๆ
+            // 2. สุ่มลำดับคู่ในสัปดาห์นั้น (เพื่อให้คละเวลาแข่ง ไม่ให้ทีมเดิมแข่งคู่แรกตลอด)
             currentRoundMatches.sort(() => Math.random() - 0.5);
 
-            // 3. แจกจ่ายเวลาหลังจากสุ่มลำดับคู่แล้ว
             currentRoundMatches.forEach((match, index) => {
-                match.time = `${17 + index}:00`; // คู่ที่ 1 ได้ 17:00, คู่ที่ 2 ได้ 18:00...
+                match.time = `${17 + index}:00`; 
                 newGenerated.push(match);
             });
 
-            // หมุนทีมรอบวง (Rotate)
             tempTeams.splice(1, 0, tempTeams.pop()); 
         }
 
-        if (confirm(`สุ่มสำเร็จ 28 แมตช์แบบคละเวลา! ต้องการบันทึกหรือไม่?`)) {
-            schedules = [...schedules, ...newGenerated];
-            saveData();       
-            renderSchedule(); 
-            alert("จัดตารางแข่งแบบคละทีมและเวลาสำเร็จ!");
+        if (confirm(`สุ่มสำเร็จ 28 แมตช์! ต้องการบันทึกหรือไม่?`)) {
+            // อัปเดตข้อมูลเข้าตัวแปรหลัก
+            if (typeof schedules !== 'undefined') {
+                schedules = [...schedules, ...newGenerated];
+            } else {
+                window.schedules = newGenerated;
+            }
+
+            // --- แก้ไขจุดที่มีปัญหา: ตรวจสอบฟังก์ชันบันทึก ---
+            if (typeof saveData === "function") {
+                saveData();
+            } else if (typeof save === "function") {
+                save();
+            } else {
+                // ถ้าหาฟังก์ชันบันทึกไม่เจอเลย ให้บันทึกลง localStorage โดยตรง
+                localStorage.setItem('jakhong_schedules', JSON.stringify(schedules));
+                console.log("Saved directly to localStorage because saveData function not found.");
+            }
+
+            // --- ตรวจสอบฟังก์ชันแสดงผลหน้าจอ ---
+            if (typeof renderSchedule === "function") {
+                renderSchedule();
+            } else if (typeof renderSchedules === "function") {
+                renderSchedules();
+            }
+            
+            alert("จัดตารางแข่งแบบคละเวลาสำเร็จ!");
         }
     } catch (err) {
-        alert("เกิดข้อผิดพลาด: " + err.message);
+        console.error(err);
+        alert("เกิดข้อผิดพลาดในการแสดงผล: " + err.message);
     }
 }
         
