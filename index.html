@@ -2308,26 +2308,69 @@ document.getElementById('lb-thead-row').lastElementChild.children[0].style.backg
 // --- ระบบสุ่มโปรแกรมรายสัปดาห์ (New Logic) ---
 let tempMatches = []; 
 
-function renderGenPreview(numWeeks) {
-    const container = document.getElementById('gen-preview-list');
-    const previewWrapper = document.getElementById('gen-preview-container');
+function generateLeagueSchedule() {
+    if (teams.length < 2) return alert("กรุณาเพิ่มทีมในระบบก่อนสุ่ม (อย่างน้อย 2 ทีม)");
     
-    // ถ้าไม่มีข้อมูลแมตช์ ให้ซ่อนกล่องพรีวิวแล้วออกเลย
-    if (!tempMatches || tempMatches.length === 0) {
-        previewWrapper.classList.add('hidden');
-        return;
+    const startDateVal = document.getElementById('gen-start-date').value;
+    const startTime = document.getElementById('gen-start-time').value;
+    const duration = parseInt(document.getElementById('gen-duration').value);
+    const numWeeks = parseInt(document.getElementById('gen-weeks').value);
+
+    if (!startDateVal) return alert("กรุณาระบุวันที่เริ่มแข่งขันสัปดาห์แรก");
+
+    // 1. สร้างคู่แข่งทั้งหมด (Round Robin)
+    let allPairs = [];
+    for (let i = 0; i < teams.length; i++) {
+        for (let j = i + 1; j < teams.length; j++) {
+            allPairs.push([teams[i], teams[j]]);
+        }
     }
 
-    previewWrapper.classList.remove('hidden');
+    // 2. สุ่มลำดับคู่แข่ง (Shuffle)
+    allPairs.sort(() => Math.random() - 0.5);
+
+    // 3. แบ่งคู่แข่งลงสัปดาห์
+    const matchesPerWeek = Math.ceil(allPairs.length / numWeeks);
+    tempMatches = [];
+    let currentBaseDate = new Date(startDateVal);
+
+    for (let w = 0; w < numWeeks; w++) {
+        let weekPairs = allPairs.slice(w * matchesPerWeek, (w + 1) * matchesPerWeek);
+        
+        weekPairs.forEach((pair, index) => {
+            let [h, m] = startTime.split(':').map(Number);
+            let timeObj = new Date();
+            timeObj.setHours(h, m + (index * duration));
+            let matchTimeStr = timeObj.toTimeString().substring(0, 5);
+
+            let matchDate = new Date(currentBaseDate);
+            matchDate.setDate(currentBaseDate.getDate() + (w * 7));
+
+            tempMatches.push({
+                id: Date.now() + Math.random(),
+                date: matchDate.toISOString().split('T')[0],
+                time: matchTimeStr,
+                teamA: pair[0].name,
+                teamB: pair[1].name,
+                group: pair[0].group || "ทั่วไป",
+                week: w + 1 // ระบุสัปดาห์
+            });
+        });
+    }
+    renderGenPreview(numWeeks);
+}
+
+function renderGenPreview(numWeeks) {
+    const container = document.getElementById('gen-preview-list');
+    document.getElementById('gen-preview-container').classList.remove('hidden');
     container.innerHTML = '';
 
     for (let w = 1; w <= numWeeks; w++) {
         let weekMatches = tempMatches.filter(m => m.week === w);
         if (weekMatches.length === 0) continue;
 
-        
         let weekHTML = `
-            <div class="bg-black/40 border border-gray-700 p-4 rounded-xl mb-4">
+            <div class="bg-black/40 border border-gray-700 p-4 rounded-xl">
                 <h5 class="text-yellow-400 font-bold mb-3 border-b border-gray-700 pb-2 flex justify-between">
                     <span>WEEK ${w}</span>
                     <span class="text-xs text-gray-400">${weekMatches[0].date}</span>
@@ -2335,7 +2378,7 @@ function renderGenPreview(numWeeks) {
                 <div class="space-y-2">
                     ${weekMatches.map(m => `
                         <div class="flex items-center justify-between bg-white/5 p-2 rounded text-[11px]">
-                            <span class="text-gray-400 w-12 font-mono">${m.time}</span>
+                            <span class="text-gray-400 w-12">${m.time}</span>
                             <span class="flex-1 text-center font-bold truncate mx-1">${m.teamA} vs ${m.teamB}</span>
                         </div>
                     `).join('')}
@@ -2347,17 +2390,11 @@ function renderGenPreview(numWeeks) {
 }
 
 function saveGeneratedMatches() {
-    if (tempMatches.length === 0) return;
-    
     if (confirm("ยืนยันการเพิ่มแมทช์ที่สุ่มทั้งหมดนี้ลงในระบบ?")) {
         schedules = [...schedules, ...tempMatches];
         save();
-        renderSchedules(); // รีเฟรชตารางหลัก
-        
-        // ล้างค่าและซ่อนกล่องพรีวิวทันที
-        tempMatches = [];
+        renderSchedules(); // รีเฟรชตารางแข่งหลัก
         document.getElementById('gen-preview-container').classList.add('hidden');
-        
         alert("บันทึกโปรแกรมเรียบร้อยแล้ว!");
     }
 }
