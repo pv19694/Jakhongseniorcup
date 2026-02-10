@@ -919,72 +919,41 @@
             { id: 't3', name: 'Titan FC', color: '#66ff66', tel: '083-333-3333', logo: '' },
         ];
         
-       // --- 1. ฟังก์ชันดึงข้อมูลจากเครื่องมาใช้ (เพิ่มเข้าไปใหม่) ---
-        const load = () => {
-            try {
-                const t = localStorage.getItem('jl_teams');
-                const p = localStorage.getItem('jl_players');
-                const m = localStorage.getItem('jl_matches');
-                const s = localStorage.getItem('jl_stats');
-                const sch = localStorage.getItem('jl_schedules');
-                const logo = localStorage.getItem('jl_logo');
-                const tName = localStorage.getItem('jl_theme_name');
-                const tColor = localStorage.getItem('jl_theme_color');
-                const sColor = localStorage.getItem('jl_secondary_color');
-                const navTitle = localStorage.getItem('jl_nav_title');
+       // --- แก้ไขฟังก์ชัน load ---
+const load = () => {
+    try {
+        const t = localStorage.getItem('jl_teams');
+        const p = localStorage.getItem('jl_players');
+        const sch = localStorage.getItem('jl_schedules'); // ใช้ jl_schedules
+        const navTitle = localStorage.getItem('jl_nav_title');
 
-                if (t) teams = JSON.parse(t);
-                if (p) players = JSON.parse(p);
-                if (m) matches = JSON.parse(m);
-                if (s) stats = JSON.parse(s);
-                if (sch) schedules = JSON.parse(sch);
-                if (logo) globalLogo = logo;
-                if (themeName) themeName = tName;
-                if (themeColor) themeColor = tColor;
-                if (secondaryColor) secondaryColor = sColor;
-                if (navTitle) document.getElementById('nav-title').innerText = navTitle;
-
-                console.log("โหลดข้อมูลสำเร็จ!");
-            } catch (e) {
-                console.error("โหลดข้อมูลล้มเหลว:", e);
-            }
+        if (t) teams = JSON.parse(t);
+        if (p) players = JSON.parse(p);
+        if (sch) schedules = JSON.parse(sch); // ให้ค่าเข้า schedules
+        
+        if (navTitle) {
+            const el = document.getElementById('nav-title');
+            if (el) el.innerText = navTitle;
         }
+        console.log("Load Complete");
+    } catch (e) { console.error(e); }
+}
 
-        // --- 2. ฟังก์ชันตรวจสอบค่าเริ่มต้น (มีอยู่แล้วแต่ปรับให้เช็ค jl_teams) ---
-        function loadDefaultData() {
-            if (teams.length === 0 && localStorage.getItem('jl_teams') === null) {
-                teams = [...DEFAULT_TEAMS];
-                players = [
-                    { id: Date.now() + 1, name: 'ยอดกัปตัน', no: '10', teamId: 't1', manager: true, img: '' },
-                    { id: Date.now() + 2, name: 'เสือปืนใหญ่', no: '9', teamId: 't2', manager: true, img: '' },
-                    { id: Date.now() + 3, name: 'กองหลังหิน', no: '5', teamId: 't3', manager: true, img: '' },
-                ];
-                save();
-                alert('เริ่มต้นระบบใหม่! ได้เพิ่ม 3 ทีมเริ่มต้นให้แล้ว');
-            }
-        }
-
-        // --- 3. ฟังก์ชันบันทึกข้อมูล (ปรับปรุงให้บันทึกชื่อหัวข้อด้วย) ---
-        const save = () => {
-            try {
-                localStorage.setItem('jl_teams', JSON.stringify(teams));
-                localStorage.setItem('jl_players', JSON.stringify(players));
-                localStorage.setItem('jl_matches', JSON.stringify(matches));
-                localStorage.setItem('jl_stats', JSON.stringify(stats));
-                localStorage.setItem('jl_schedules', JSON.stringify(schedules));
-                localStorage.setItem('jl_logo', globalLogo);
-                localStorage.setItem('jl_theme_name', themeName); 
-                localStorage.setItem('jl_theme_color', themeColor); 
-                localStorage.setItem('jl_secondary_color', secondaryColor); 
-                localStorage.setItem('jl_nav_title', document.getElementById('nav-title').innerText);
-
-                renderTheme(); 
-                renderAll(); 
-                console.log("บันทึกข้อมูลแล้ว");
-            } catch (e) {
-                console.error("Error saving data:", e);
-            }
-        }
+// --- แก้ไขฟังก์ชัน save ---
+const save = () => {
+    try {
+        localStorage.setItem('jl_teams', JSON.stringify(teams));
+        localStorage.setItem('jl_players', JSON.stringify(players));
+        localStorage.setItem('jl_schedules', JSON.stringify(schedules)); // เซฟ schedules
+        localStorage.setItem('jl_nav_title', document.getElementById('nav-title').innerText);
+        
+        // สั่งวาดหน้าจอใหม่ด้วยฟังก์ชันที่มีจริง
+        renderTeams();
+        renderSchedule();
+        renderLeaderboard();
+    } catch (e) { console.error(e); }
+}
+        
         function showStorageWarning() {
             document.getElementById('storage-warning-modal').classList.remove('hidden');
         }
@@ -2570,38 +2539,29 @@ function refreshAllData(btnElement) {
             }
         }
 
-       // --- 3. ฟังก์ชันจุดระเบิดระบบ (Init) ---
-        function init() {
-            console.log("กำลังเริ่มต้นระบบ...");
-            
-            // 1. โหลดข้อมูลจาก LocalStorage
-            load();             
+       function init() {
+    console.log("System Starting...");
+    load(); // ดึงข้อมูล
+    
+    if (teams.length === 0) {
+        loadDefaultData(); // ถ้าไม่มีข้อมูลเลย ให้ใช้ทีมเริ่มต้น
+    }
 
-            // 2. ถ้าโหลดมาแล้วทีมว่างเปล่า ให้ใช้ค่าเริ่มต้น (ป้องกันหน้าจอขาว)
-            if (!teams || teams.length === 0) {
-                loadDefaultData();
-            }
-            
-            // 3. ปรับแต่งสีธีม
-            if (typeof renderTheme === 'function') renderTheme();
+    // สั่งวาดหน้าจอทีละส่วน (เพราะไม่มี renderAll)
+    if (typeof renderTeams === 'function') renderTeams();
+    if (typeof renderSchedule === 'function') renderSchedule();
+    if (typeof renderLeaderboard === 'function') renderLeaderboard();
+    if (typeof updateDropdowns === 'function') updateDropdowns();
+    if (typeof renderTheme === 'function') renderTheme();
 
-            // 4. *** แก้ไขจุดนี้: เรียกฟังก์ชันแสดงผลที่มีอยู่จริงในไฟล์ของคุณ ***
-            // ในไฟล์ของคุณใช้ฟังก์ชันเหล่านี้ในการวาดหน้าจอ:
-            if (typeof renderTeams === 'function') renderTeams();
-            if (typeof renderSchedule === 'function') renderSchedule();
-            if (typeof renderLeaderboard === 'function') renderLeaderboard();
-            if (typeof updateDropdowns === 'function') updateDropdowns();
-            
-            // 5. สั่งให้ไปที่หน้าแดชบอร์ดเป็นหน้าแรก
-            // ตรวจสอบว่ามีฟังก์ชัน nav ไหม ถ้ามีให้เรียกเพื่อให้หน้าจอแสดงผล
-            if (typeof nav === 'function') {
-                const homeBtn = document.querySelector('button[onclick*="home"]');
-                nav('home', homeBtn);
-            }
-        }
-
-        // สั่งให้ทำงานทันทีที่โหลดหน้าเว็บเสร็จ
-        window.onload = init;
+    // *** หัวใจสำคัญ: สั่งให้เปิดหน้า Dashboard ทันที ***
+    // ค้นหาปุ่มแดชบอร์ดแล้วจำลองการคลิก
+    const dashboardBtn = document.querySelector('button[onclick*="home"]');
+    if (dashboardBtn) {
+        nav('home', dashboardBtn);
+    }
+}
+window.onload = init;
 
     </script>
 </body>
