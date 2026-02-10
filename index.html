@@ -2273,20 +2273,17 @@ function clearSchedule() {
     }
 }
 
-// --- ฟังก์ชันจัดลีกอัตโนมัติ 8 ทีม ---
 function autoGenerateLeague() {
-    // 1. ตรวจสอบว่ามีตัวแปร teams และ schedules หรือไม่
     if (typeof teams === 'undefined' || teams.length < 8) {
-        return alert("กรุณาเพิ่มทีมให้ครบ 8 ทีมก่อน (ปัจจุบันมี " + (typeof teams !== 'undefined' ? teams.length : 0) + " ทีม)");
+        return alert("กรุณาเพิ่มทีมให้ครบ 8 ทีมก่อน");
     }
     
-    // 2. ถามวันที่
     const startDateStr = prompt("ระบุวันที่เริ่มแข่ง (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
     if (!startDateStr) return;
 
     try {
         let tempTeams = [...teams].slice(0, 8);
-        tempTeams.sort(() => Math.random() - 0.5); // Shuffle
+        tempTeams.sort(() => Math.random() - 0.5); 
 
         let newGenerated = [];
         let startDate = new Date(startDateStr);
@@ -2313,30 +2310,24 @@ function autoGenerateLeague() {
                     played: false
                 });
             }
-            tempTeams.splice(1, 0, tempTeams.pop()); // Rotate
+            tempTeams.splice(1, 0, tempTeams.pop()); 
         }
 
-        // 3. บันทึก (ตรวจสอบชื่อฟังก์ชันที่มีในไฟล์ index 67 จริงๆ)
         if (confirm(`สุ่มสำเร็จ 28 แมตช์! ต้องการบันทึกหรือไม่?`)) {
-            // มั่นใจว่า schedules ถูกประกาศไว้แล้ว
-            if (typeof schedules !== 'undefined') {
-                schedules = [...schedules, ...newGenerated];
-            } else {
-                window.schedules = newGenerated;
-            }
+            schedules = [...schedules, ...newGenerated];
 
-            // เรียกใช้ฟังก์ชันที่มีในไฟล์ index(67).html
+            // --- แก้ไขจุดนี้ให้เรียกชื่อฟังก์ชันที่คุณมี ---
             if (typeof saveData === "function") saveData();
-            if (typeof renderSchedules === "function") {
-                renderSchedules();
-            } else if (typeof renderSchedule === "function") {
-                renderSchedule();
-            }
+            else if (typeof save === "function") save();
+
+            // ลองเรียกชื่อที่น่าจะเป็นไปได้ ถ้าอันไหนมีจริงมันจะทำงานอันนั้น
+            if (typeof renderSchedules === "function") renderSchedules();
+            else if (typeof renderSchedule === "function") renderSchedule();
+            else if (typeof initApp === "function") initApp(); // บางไฟล์ใช้ชื่อนี้เริ่มระบบใหม่
             
-            alert("จัดตารางแข่งสำเร็จ! ข้อมูลควรจะปรากฏแล้ว");
+            alert("จัดตารางแข่งสำเร็จ! กรุณารีเฟรชหน้าจอหากข้อมูลไม่ขึ้น");
         }
     } catch (err) {
-        console.error(err);
         alert("เกิดข้อผิดพลาด: " + err.message);
     }
 }
