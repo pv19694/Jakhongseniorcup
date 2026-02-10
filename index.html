@@ -535,27 +535,6 @@
 </div>
 
             
-            <div class="flex flex-col min-h-[500px] rounded-xl overflow-hidden shadow-2xl relative" id="schedule-main-container">
-                <div class="flex-1 p-4 md:p-8 relative z-10 w-full" id="sc-container">
-                    <div class="text-center mb-8">
-                        <span id="sc-pill" class="inline-block px-8 py-2 rounded-full text-xl md:text-2xl font-bold uppercase shadow-lg text-black mb-2 transform skew-x-[-10deg]" style="background-color: var(--primary-color);">
-                            โปรแกรมการแข่งขัน
-                        </span>
-                    </div>
-
-                    <div class="flex gap-3 justify-center mb-6 overflow-x-auto no-scrollbar" id="group-tabs-container">
-                        <button onclick="setGroupFilter('All', this)" class="group-tab active text-black px-4 py-1 rounded-full text-sm font-bold transition hover:bg-yellow-600" style="background-color: var(--primary-color);">ทั้งหมด</button>
-                        <button onclick="setGroupFilter('A', this)" class="group-tab bg-gray-700 text-white px-4 py-1 rounded-full text-sm font-medium transition hover:bg-gray-600">กลุ่ม A</button>
-                        <button onclick="setGroupFilter('B', this)" class="group-tab bg-gray-700 text-white px-4 py-1 rounded-full text-sm font-medium transition hover:bg-gray-600">กลุ่ม B</button>
-                    </div>
-                    
-                    <div id="sched-list" class="space-y-4 max-w-4xl mx-auto">
-                        </div>
-                </div>
-
-                <div id="sc-bg-overlay" class="absolute inset-0 z-0 bg-gradient-to-br from-blue-900 to-black opacity-90"></div>
-            </div>
-        </div>
 
         <div id="page-daily" class="section hidden fade-in">
             <div class="glass p-4 rounded-xl mb-6 flex flex-wrap gap-6 items-end">
