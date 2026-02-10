@@ -2284,8 +2284,8 @@ function autoGenerateLeague() {
     if (!startDateStr) return;
 
     try {
+        // 1. สุ่มลำดับทีมตั้งต้น (Shuffle Teams) เพื่อไม่ให้ทีม 1 อยู่ที่เดิมทุกครั้ง
         let tempTeams = [...teams].slice(0, 8);
-        // สุ่มลำดับทีมตั้งต้นก่อน เพื่อไม่ให้ทีมเดิมอยู่ตำแหน่งเดิมทุกครั้งที่กดสุ่มใหม่
         tempTeams.sort(() => Math.random() - 0.5); 
 
         let newGenerated = [];
@@ -2296,41 +2296,41 @@ function autoGenerateLeague() {
             matchDay.setDate(startDate.getDate() + (round * 7));
             let dateStr = matchDay.toISOString().split('T')[0];
             
-            let roundMatches = []; // เก็บแมตช์ของสัปดาห์นี้ไว้ก่อนเพื่อสุ่มลำดับ
+            let currentRoundMatches = []; // พักแมตช์สัปดาห์นี้ไว้สุ่มลำดับ
 
             for (let i = 0; i < 4; i++) {
                 let teamA = tempTeams[i];
                 let teamB = tempTeams[7 - i];
-                
-                roundMatches.push({
+                currentRoundMatches.push({
                     id: Date.now() + Math.random(),
                     date: dateStr,
                     week: round + 1,
                     teamA: teamA.id, 
                     teamB: teamB.id,
-                    group: 'All', // หรือ (i < 2) ? 'A' : 'B' ตามที่คุณต้องการ
+                    group: (i < 2) ? 'A' : 'B', // แบ่งกลุ่ม A/B ตามคู่
                     scoreA: "", scoreB: "", played: false
                 });
             }
 
-            // --- หัวใจสำคัญ: สุ่มลำดับคู่ในสัปดาห์นี้ (Shuffle matches in round) ---
-            roundMatches.sort(() => Math.random() - 0.5);
+            // 2. สุ่มลำดับคู่ในสัปดาห์นี้ (Shuffle Matches in Week)
+            // ขั้นตอนนี้จะทำให้ทีมไม่แข่งเวลาเดิมซ้ำๆ
+            currentRoundMatches.sort(() => Math.random() - 0.5);
 
-            // หลังจากสุ่มลำดับคู่แล้ว ค่อยกำหนด "เวลาแข่ง" (Time)
-            roundMatches.forEach((match, index) => {
-                match.time = `${17 + index}:00`; // คู่แรก 17:00, คู่สอง 18:00... แบบคละทีมกันแล้ว
+            // 3. แจกจ่ายเวลาหลังจากสุ่มลำดับคู่แล้ว
+            currentRoundMatches.forEach((match, index) => {
+                match.time = `${17 + index}:00`; // คู่ที่ 1 ได้ 17:00, คู่ที่ 2 ได้ 18:00...
                 newGenerated.push(match);
             });
 
-            // หมุนทีมตามสูตร Circle Method
+            // หมุนทีมรอบวง (Rotate)
             tempTeams.splice(1, 0, tempTeams.pop()); 
         }
 
-        if (confirm(`สุ่มสำเร็จ 28 แมตช์! (คละลำดับเวลาให้แล้ว) ต้องการบันทึกหรือไม่?`)) {
+        if (confirm(`สุ่มสำเร็จ 28 แมตช์แบบคละเวลา! ต้องการบันทึกหรือไม่?`)) {
             schedules = [...schedules, ...newGenerated];
             saveData();       
             renderSchedule(); 
-            alert("จัดตารางแข่งสำเร็จ! ทีมจะคละเวลาแข่งกันแล้วครับ");
+            alert("จัดตารางแข่งแบบคละทีมและเวลาสำเร็จ!");
         }
     } catch (err) {
         alert("เกิดข้อผิดพลาด: " + err.message);
