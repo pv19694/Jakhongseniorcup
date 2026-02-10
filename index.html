@@ -1021,24 +1021,88 @@
             return new Date(d).toLocaleDateString('th-TH', {day:'2-digit', month:'2-digit', year:'numeric'});
         }
         
-        // FIX: Ensure onload calls are correct
-        window.onload = () => {
-            const today = new Date().toISOString().split('T')[0];
-            document.querySelectorAll('input[type="date"]').forEach(i => i.value = today);
-            
-            loadDefaultData(); // ** CRITICAL: Load defaults before rendering **
+       // --- 1. วางฟังก์ชัน load ไว้นอก onload (เพื่อให้เป็นระเบียบ) ---
+const load = () => {
+    try {
+        const sTeams = localStorage.getItem('jl_teams');
+        const sPlayers = localStorage.getItem('jl_players');
+        const sMatches = localStorage.getItem('jl_matches');
+        const sStats = localStorage.getItem('jl_stats');
+        const sSchedules = localStorage.getItem('jl_schedules');
+        const sTitle = localStorage.getItem('jl_table_title');
 
-            renderTheme(); 
-            if(globalLogo) document.getElementById('daily-logo-img').src = globalLogo;
-            
-            renderAll();
-            // FIX: Set initial nav state to home
-            const initialButton = document.querySelector('.nav-btn');
-            if (initialButton) {
-                nav('home', initialButton);
-            } else {
-                renderDashboard();
+        if (sTeams) teams = JSON.parse(sTeams);
+        if (sPlayers) players = JSON.parse(sPlayers);
+        if (sMatches) matches = JSON.parse(sMatches);
+        if (sStats) stats = JSON.parse(sStats);
+        if (sSchedules) schedules = JSON.parse(sSchedules);
+        
+        // ดึงชื่อตารางกลับมาแสดง
+        if (sTitle && document.getElementById('lb-title')) {
+            document.getElementById('lb-title').innerText = sTitle;
+        }
+
+        globalLogo = localStorage.getItem('jl_logo') || '';
+        themeName = localStorage.getItem('jl_theme_name') || 'default';
+        themeColor = localStorage.getItem('jl_theme_color') || '#facc15';
+        secondaryColor = localStorage.getItem('jl_secondary_color') || '#1c365b';
+    } catch (e) {
+        console.error("โหลดข้อมูลไม่สำเร็จ:", e);
+    }
+}
+
+// --- 2. ส่วนเริ่มต้นระบบเมื่อโหลดหน้าเว็บ ---
+window.onload = () => {
+    const today = new Date().toISOString().split('T')[0];
+    document.querySelectorAll('input[type="date"]').forEach(i => i.value = today);
+    
+    // *** ลำดับสำคัญมาก ***
+    load();             // 1. โหลดข้อมูลเก่าจากเครื่องก่อน
+    loadDefaultData();  // 2. ถ้าเครื่องว่างเปล่า ค่อยใช้ค่าเริ่มต้น
+    // *******************
+
+    renderTheme(); 
+    if(globalLogo && document.getElementById('daily-logo-img')) {
+        document.getElementById('daily-logo-img').src = globalLogo;
+    }
+
+    renderAll();
+    
+    // ตั้งค่าปุ่มกดเมนู (Nav)
+    const initialButton = document.querySelector('.nav-btn');
+    if (initialButton) {
+        nav('home', initialButton);
+    } else {
+        renderDashboard();
+    }
+    
+    // Event สำหรับ Schedule Card
+    const schedList = document.getElementById('sched-list');
+    if (schedList) {
+        schedList.addEventListener('click', (e) => {
+            const card = e.target.closest('.schedule-match-card');
+            if (card) {
+                document.querySelectorAll('.schedule-match-card').forEach(c => {
+                    if (c !== card) c.classList.remove('show-actions');
+                });
+                card.classList.toggle('show-actions');
             }
+        });
+    }
+
+    // ตั้งค่าหน้า Daily/Stats
+    const viewModeEl = document.getElementById('daily-view-mode');
+    if (viewModeEl) {
+        const viewMode = viewModeEl.value;
+        if (viewMode === 'daily') {
+            document.getElementById('daily-content')?.classList.remove('hidden');
+            renderDaily();
+        } else {
+            document.getElementById('all-stats-content')?.classList.remove('hidden');
+            renderAllStats();
+        }
+    }
+} // <--- ปีกกาปิดของ window.onload ต้องอยู่ตรงนี้!
             
             // NEW: Add event listener for schedule card (simulated)
             document.getElementById('sched-list').addEventListener('click', (e) => {
