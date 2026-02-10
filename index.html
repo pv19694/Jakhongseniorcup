@@ -919,23 +919,52 @@
             { id: 't3', name: 'Titan FC', color: '#66ff66', tel: '083-333-3333', logo: '' },
         ];
         
+       // --- 1. ฟังก์ชันดึงข้อมูลจากเครื่องมาใช้ (เพิ่มเข้าไปใหม่) ---
+        const load = () => {
+            try {
+                const t = localStorage.getItem('jl_teams');
+                const p = localStorage.getItem('jl_players');
+                const m = localStorage.getItem('jl_matches');
+                const s = localStorage.getItem('jl_stats');
+                const sch = localStorage.getItem('jl_schedules');
+                const logo = localStorage.getItem('jl_logo');
+                const tName = localStorage.getItem('jl_theme_name');
+                const tColor = localStorage.getItem('jl_theme_color');
+                const sColor = localStorage.getItem('jl_secondary_color');
+                const navTitle = localStorage.getItem('jl_nav_title');
+
+                if (t) teams = JSON.parse(t);
+                if (p) players = JSON.parse(p);
+                if (m) matches = JSON.parse(m);
+                if (s) stats = JSON.parse(s);
+                if (sch) schedules = JSON.parse(sch);
+                if (logo) globalLogo = logo;
+                if (themeName) themeName = tName;
+                if (themeColor) themeColor = tColor;
+                if (secondaryColor) secondaryColor = sColor;
+                if (navTitle) document.getElementById('nav-title').innerText = navTitle;
+
+                console.log("โหลดข้อมูลสำเร็จ!");
+            } catch (e) {
+                console.error("โหลดข้อมูลล้มเหลว:", e);
+            }
+        }
+
+        // --- 2. ฟังก์ชันตรวจสอบค่าเริ่มต้น (มีอยู่แล้วแต่ปรับให้เช็ค jl_teams) ---
         function loadDefaultData() {
-            // Check if teams array is empty AND local storage key does not exist (true first load)
             if (teams.length === 0 && localStorage.getItem('jl_teams') === null) {
                 teams = [...DEFAULT_TEAMS];
                 players = [
-                    // Sample players for default teams
                     { id: Date.now() + 1, name: 'ยอดกัปตัน', no: '10', teamId: 't1', manager: true, img: '' },
                     { id: Date.now() + 2, name: 'เสือปืนใหญ่', no: '9', teamId: 't2', manager: true, img: '' },
                     { id: Date.now() + 3, name: 'กองหลังหิน', no: '5', teamId: 't3', manager: true, img: '' },
                 ];
                 save();
-                alert('เริ่มต้นระบบใหม่! ได้ทำการเพิ่ม 3 ทีมเริ่มต้นให้แล้ว (Phoenix, Dragon, Titan) เพื่อให้ระบบทำงานได้ทันที');
+                alert('เริ่มต้นระบบใหม่! ได้เพิ่ม 3 ทีมเริ่มต้นให้แล้ว');
             }
         }
 
-
-        // *** CRITICAL: Save function with Theme Update ***
+        // --- 3. ฟังก์ชันบันทึกข้อมูล (ปรับปรุงให้บันทึกชื่อหัวข้อด้วย) ---
         const save = () => {
             try {
                 localStorage.setItem('jl_teams', JSON.stringify(teams));
@@ -947,19 +976,15 @@
                 localStorage.setItem('jl_theme_name', themeName); 
                 localStorage.setItem('jl_theme_color', themeColor); 
                 localStorage.setItem('jl_secondary_color', secondaryColor); 
+                localStorage.setItem('jl_nav_title', document.getElementById('nav-title').innerText);
 
-                renderTheme(); // Update theme immediately
-                renderAll(); // RENDER ALL UI AFTER EVERY SAVE
+                renderTheme(); 
+                renderAll(); 
+                console.log("บันทึกข้อมูลแล้ว");
             } catch (e) {
-                if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
-                    showStorageWarning();
-                    console.error("Local Storage Quota Exceeded. Data not saved.", e);
-                } else {
-                    console.error("Error saving data:", e);
-                }
+                console.error("Error saving data:", e);
             }
         }
-        
         function showStorageWarning() {
             document.getElementById('storage-warning-modal').classList.remove('hidden');
         }
@@ -2483,7 +2508,90 @@ function refreshAllData(btnElement) {
     }, 600);
 }
 
-        
+
+// --- 1. ฟังก์ชันดึงข้อมูลจากเครื่องขึ้นมาใช้ (เพื่อให้ข้อมูลไม่เด้งกลับ) ---
+        const load = () => {
+            try {
+                const t = localStorage.getItem('jl_teams');
+                const p = localStorage.getItem('jl_players');
+                const m = localStorage.getItem('jl_matches');
+                const s = localStorage.getItem('jl_stats');
+                const sch = localStorage.getItem('jl_schedules');
+                const logo = localStorage.getItem('jl_logo');
+                const tName = localStorage.getItem('jl_theme_name');
+                const tColor = localStorage.getItem('jl_theme_color');
+                const sColor = localStorage.getItem('jl_secondary_color');
+                const navTitle = localStorage.getItem('jl_nav_title');
+
+                if (t) teams = JSON.parse(t);
+                if (p) players = JSON.parse(p);
+                if (m) matches = JSON.parse(m);
+                if (s) stats = JSON.parse(s);
+                if (sch) schedules = JSON.parse(sch);
+                if (logo) globalLogo = logo;
+                if (tName) themeName = tName;
+                if (tColor) themeColor = tColor;
+                if (sColor) secondaryColor = sColor;
+                
+                // โหลดชื่อหัวข้อ JAKHONG SYSTEM กลับมา
+                if (navTitle) {
+                    const el = document.getElementById('nav-title');
+                    if (el) el.innerText = navTitle;
+                }
+
+                console.log("ความจำกลับมาแล้ว: โหลดข้อมูลสำเร็จ!");
+            } catch (e) {
+                console.error("โหลดข้อมูลล้มเหลว:", e);
+            }
+        }
+
+        // --- 2. ฟังก์ชันบันทึกข้อมูล (Save) ---
+        const save = () => {
+            try {
+                localStorage.setItem('jl_teams', JSON.stringify(teams));
+                localStorage.setItem('jl_players', JSON.stringify(players));
+                localStorage.setItem('jl_matches', JSON.stringify(matches));
+                localStorage.setItem('jl_stats', JSON.stringify(stats));
+                localStorage.setItem('jl_schedules', JSON.stringify(schedules));
+                localStorage.setItem('jl_logo', globalLogo);
+                localStorage.setItem('jl_theme_name', themeName); 
+                localStorage.setItem('jl_theme_color', themeColor); 
+                localStorage.setItem('jl_secondary_color', secondaryColor);
+                
+                // บันทึกชื่อหัวข้อด้วย
+                const navTitle = document.getElementById('nav-title').innerText;
+                localStorage.setItem('jl_nav_title', navTitle);
+
+                if (typeof renderTheme === 'function') renderTheme(); 
+                if (typeof renderAll === 'function') renderAll(); 
+                console.log("บันทึกข้อมูลลงเครื่องแล้ว");
+            } catch (e) {
+                console.error("Error saving data:", e);
+            }
+        }
+
+        // --- 3. ฟังก์ชันจุดระเบิดระบบ (Init) ---
+        // ทำหน้าที่ลำดับการทำงานตอนเปิดโปรแกรมครั้งแรก
+        function init() {
+            console.log("กำลังเริ่มต้นระบบ...");
+            load();             // ดึงข้อมูลเก่ามา
+            loadDefaultData();  // ถ้าไม่มีข้อมูลเก่าเลย ให้ใช้ค่าเริ่มต้น
+            
+            // วาดหน้าจอ
+            if (typeof renderTheme === 'function') renderTheme();
+            if (typeof renderAll === 'function') renderAll();
+            else {
+                // ถ้าไม่มี renderAll ให้เรียกทีละส่วน
+                if (typeof renderTeams === 'function') renderTeams();
+                if (typeof renderSchedule === 'function') renderSchedule();
+                if (typeof renderLeaderboard === 'function') renderLeaderboard();
+                if (typeof updateDropdowns === 'function') updateDropdowns();
+            }
+        }
+
+        // --- 4. สั่งให้ทำงานทันทีที่โหลดหน้าเว็บเสร็จ ---
+        window.onload = init;
+
     </script>
 </body>
 </html>
