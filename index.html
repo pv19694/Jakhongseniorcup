@@ -12,6 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jakhong League System 4.2 (Modified)</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,600;0,800;1,800&display=swap" rel="stylesheet">
 
@@ -1345,7 +1346,6 @@ function renderSchedule() {
     const cTextColor = document.getElementById('sc-text-color')?.value || '#ffffff';
     const cPillColor = document.getElementById('sc-pill-color')?.value || '#facc15';
 
-    // กรองข้อมูลตามกลุ่ม
     const filteredSchedules = currentGroupFilter === 'All' 
         ? schedules 
         : schedules.filter(s => s.group === currentGroupFilter);
@@ -1360,14 +1360,12 @@ function renderSchedule() {
 
     let html = Object.keys(grouped).sort().map(key => {
         const matchesHtml = grouped[key].map(s => {
-            // --- จุดสำคัญ: ต้องหาทีมด้วย == เพื่อให้รองรับทั้ง string และ number ---
-            // และต้องหาใหม่ทุกครั้งใน loop ของแต่ละแมตช์
-            const tA = teams.find(t => String(t.id) === String(s.teamA)) || { name: 'รอระบุ', logo: 'https://via.placeholder.com/150' };
-            const tB = teams.find(t => String(t.id) === String(s.teamB)) || { name: 'รอระบุ', logo: 'https://via.placeholder.com/150' };
+            const tA = teams.find(t => String(t.id) === String(s.teamA)) || { name: 'รอระบุ', logo: '' };
+            const tB = teams.find(t => String(t.id) === String(s.teamB)) || { name: 'รอระบุ', logo: '' };
             
             return `
-                <div class="relative overflow-hidden glass mb-3 rounded-2xl flex items-center justify-between p-4 border border-white/5 shadow-xl schedule-match-card-new" 
-                     onclick="toggleDeleteBtn(${s.id})">
+                <div class="match-card relative overflow-hidden glass mb-3 rounded-2xl flex items-center justify-between p-4 border border-white/5 shadow-xl cursor-grab active:cursor-grabbing" 
+                     data-id="${s.id}" onclick="toggleDeleteBtn(${s.id})">
                     
                     <div class="flex-1 text-left">
                         <div class="font-black italic text-lg md:text-xl uppercase tracking-tighter" style="color: ${cTextColor};">
@@ -1377,21 +1375,21 @@ function renderSchedule() {
                     </div>
 
                     <div class="flex items-center justify-center gap-3 md:gap-6 min-w-[200px] md:min-w-[250px]">
-                        
                         <div class="w-12 h-12 md:w-16 md:h-16 min-w-[48px] min-h-[48px] overflow-hidden rounded-full border-2 border-white/10 shadow-lg">
-                            <img src="${tA.logo}" class="w-full h-full object-cover aspect-square" style="border-radius: 50% !important;" alt="Logo A">
+                            <img src="${tA.logo}" class="w-full h-full object-cover aspect-square" style="border-radius: 50% !important;">
                         </div>
 
                         <div class="flex flex-col items-center justify-center px-2">
                             <div class="text-2xl font-black italic text-yellow-500 leading-none">VS</div>
-                            <div class="bg-yellow-500 text-black px-3 py-0.5 rounded-full text-[12px] font-black mt-1 mb-1 shadow-md">${s.time}</div>
-                            <div class="text-[8px] text-gray-400 font-medium">${formatDate(s.date)}</div>
+                            <div class="match-time-text bg-yellow-500 text-black px-3 py-0.5 rounded-full text-[12px] font-black mt-1 mb-1 shadow-md">
+                                ${s.time}
+                            </div>
+                            <div class="text-[8px] text-gray-400 font-medium whitespace-nowrap">${formatDate(s.date)}</div>
                         </div>
 
                         <div class="w-12 h-12 md:w-16 md:h-16 min-w-[48px] min-h-[48px] overflow-hidden rounded-full border-2 border-white/10 shadow-lg">
-                            <img src="${tB.logo}" class="w-full h-full object-cover aspect-square" style="border-radius: 50% !important;" alt="Logo B">
+                            <img src="${tB.logo}" class="w-full h-full object-cover aspect-square" style="border-radius: 50% !important;">
                         </div>
-                        
                     </div>
 
                     <div class="flex-1 text-right">
@@ -1402,12 +1400,8 @@ function renderSchedule() {
                     </div>
 
                     <div id="delete-wrapper-${s.id}" class="delete-btn-hidden absolute inset-0 bg-black/90 flex items-center justify-center rounded-2xl z-20">
-                        <button onclick="event.stopPropagation(); deleteMatchSchedule(${s.id})" class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-red-500">
-                            ยืนยันลบ
-                        </button>
-                        <button onclick="event.stopPropagation(); toggleDeleteBtn(${s.id})" class="ml-2 bg-gray-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-gray-500">
-                            ยกเลิก
-                        </button>
+                        <button onclick="event.stopPropagation(); deleteMatchSchedule(${s.id})" class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold">ยืนยันลบ</button>
+                        <button onclick="event.stopPropagation(); toggleDeleteBtn(${s.id})" class="ml-2 bg-gray-600 text-white px-4 py-2 rounded-lg font-bold">ยกเลิก</button>
                     </div>
                 </div>
             `;
@@ -1418,14 +1412,58 @@ function renderSchedule() {
                  style="background-color: ${cPillColor}; transform: skewX(-10deg);">
                  ${key}
             </div>
-            ${matchesHtml}
+            <div class="week-sortable-container">
+                ${matchesHtml}
+            </div>
         `;
     }).join('');
 
     cont.innerHTML = html || '<p class="text-center text-gray-500 py-10">ไม่มีโปรแกรมการแข่งขัน</p>';
+
+    // --- ส่วนสำคัญ: เรียกใช้ SortableJS ทันทีหลังจากสร้าง HTML เสร็จ ---
+    document.querySelectorAll('.week-sortable-container').forEach(el => {
+        Sortable.create(el, {
+            animation: 150,
+            ghostClass: 'bg-yellow-500/20', 
+            onEnd: function() {
+                // เรียกใช้ฟังก์ชันคำนวณเวลาใหม่ (คุณต้องมีฟังก์ชันนี้ตามที่เคยคุยกันด้านบน)
+                updateAllMatchTimes();
+            }
+        });
+    });
+}
+        
+
+function updateAllMatchTimes() {
+    const containers = document.querySelectorAll('.week-sortable-container');
+    
+    containers.forEach(container => {
+        const cards = container.querySelectorAll('.match-card');
+        let startHour = 16; // เริ่มคู่แรก 16:00
+
+        cards.forEach((card, index) => {
+            const mid = card.getAttribute('data-id');
+            const matchObj = schedules.find(s => String(s.id) === String(mid));
+            
+            if (matchObj) {
+                let totalMin = index * 40; // ห่างกันคู่ละ 40 นาที
+                let h = startHour + Math.floor(totalMin / 60);
+                let m = totalMin % 60;
+                let newTime = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+                
+                // อัปเดตข้อมูลในระบบและเปลี่ยนตัวเลขบนหน้าจอ
+                matchObj.time = newTime;
+                card.querySelector('.match-time-text').innerText = newTime;
+            }
+        });
+    });
+    
+    if (typeof saveData === "function") saveData();
 }
 
-        
+
+
+
         
         // ** NEW: Dummy function for editSched to prevent error **
         function editSched(id) {
