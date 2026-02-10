@@ -400,7 +400,15 @@
                         JAKHONG SYSTEM
                     </h1>
                 </div>
-                <button onclick="toggleSettings()" class="text-gray-400 hover:text-white transition"><i class="fas fa-cog text-xl"></i></button>
+               <div class="flex items-center gap-3">
+    <button onclick="refreshAllData(this)" class="text-green-500 hover:text-green-400 transition" title="อัปเดตข้อมูล">
+        <i class="fas fa-sync-alt text-xl"></i>
+    </button>
+    
+    <button onclick="toggleSettings()" class="text-gray-400 hover:text-white transition">
+        <i class="fas fa-cog text-xl"></i>
+    </button>
+</div>
             </div>
             <div class="flex overflow-x-auto gap-3 pb-3 no-scrollbar">
                 <button onclick="nav('home', this)" class="nav-btn active px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition"><i class="fas fa-home"></i> แดชบอร์ด</button>
@@ -2423,6 +2431,24 @@ function toggleDeleteBtn(id) {
     }
 }
 
+function refreshAllData(btnElement) {
+    // 1. ทำให้ไอคอนหมุน
+    const icon = btnElement.querySelector('i');
+    icon.classList.add('fa-spin');
+
+    // 2. เรียกฟังก์ชันวาดหน้าจอใหม่ (ตามชื่อฟังก์ชันที่คุณมีในไฟล์)
+    if (typeof renderTeams === 'function') renderTeams();
+    if (typeof renderSchedule === 'function') renderSchedule();
+    if (typeof renderLeaderboard === 'function') renderLeaderboard();
+    if (typeof updateDropdowns === 'function') updateDropdowns();
+
+    // 3. หยุดหมุนหลังจาก 0.6 วินาที
+    setTimeout(() => {
+        icon.classList.remove('fa-spin');
+    }, 600);
+}
+
+        
     </script>
 </body>
 </html>
