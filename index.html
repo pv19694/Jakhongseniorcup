@@ -1071,6 +1071,39 @@
             }
         }
 
+function saveScheduleOrder() {
+    try {
+        // 1. ดึง Card การแข่งขันทั้งหมดที่เรียงอยู่บนหน้าจอตอนนี้
+        const listItems = document.querySelectorAll('#sched-list .schedule-match-card');
+        const newOrderedSchedules = [];
+
+        listItems.forEach(item => {
+            // ดึง ID จาก Attribute data-id (หรือจาก onclick ถ้าไม่มี data-id)
+            // ในไฟล์ของคุณมักจะอยู่ใน onclick="editSchedule('ID_HERE')"
+            const onclickAttr = item.getAttribute('onclick') || "";
+            const matchId = onclickAttr.match(/'([^']+)'/)?.[1];
+            
+            if (matchId) {
+                const matchData = schedules.find(m => m.id === matchId);
+                if (matchData) {
+                    newOrderedSchedules.push(matchData);
+                }
+            }
+        });
+
+        // 2. ถ้าดึงข้อมูลมาได้ครบ ให้ทับค่าตัวแปร schedules หลัก
+        if (newOrderedSchedules.length > 0) {
+            schedules = newOrderedSchedules;
+            // 3. เรียกฟังก์ชัน save หลักที่คุณมีอยู่แล้วเพื่อลง Storage
+            save(); 
+            console.log("บันทึกลำดับการแข่งใหม่สำเร็จ!");
+        }
+    } catch (e) {
+        console.error("Error saving schedule order:", e);
+    }
+}
+
+
         function nav(id, button) {
             document.querySelectorAll('.section').forEach(el => el.classList.add('hidden'));
             document.getElementById('page-'+id).classList.remove('hidden');
@@ -1426,18 +1459,25 @@ function renderSchedule() {
 
     cont.innerHTML = html || '<p class="text-center text-gray-500 py-10">ไม่มีโปรแกรมการแข่งขัน</p>';
 
-    // --- ส่วนสำคัญ: เรียกใช้ SortableJS ทันทีหลังจากสร้าง HTML เสร็จ ---
+// --- ส่วนสำคัญ: เรียกใช้ SortableJS ทันทีหลังจากสร้าง HTML เสร็จ ---
     document.querySelectorAll('.week-sortable-container').forEach(el => {
         Sortable.create(el, {
             animation: 150,
             ghostClass: 'bg-yellow-500/20', 
             onEnd: function() {
-                // เรียกใช้ฟังก์ชันคำนวณเวลาใหม่ (คุณต้องมีฟังก์ชันนี้ตามที่เคยคุยกันด้านบน)
-                updateAllMatchTimes();
+                // 1. เรียกใช้ฟังก์ชันคำนวณเวลาใหม่ (ถ้ามี)
+                if (typeof updateAllMatchTimes === 'function') {
+                    updateAllMatchTimes();
+                }
+
+                // 2. เรียกใช้ฟังก์ชันบันทึกลำดับ (ที่คุณเพิ่งสร้างไว้ต่อจาก Theme)
+                if (typeof saveScheduleOrder === 'function') {
+                    saveScheduleOrder();
+                }
             }
         });
     });
-}
+} // ปิดฟังก์ชัน renderSchedule
         
 
 function updateAllMatchTimes() {
