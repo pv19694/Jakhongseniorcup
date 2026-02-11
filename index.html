@@ -399,7 +399,7 @@
                     </div>
                     <h1 class="text-xl font-extrabold italic uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-500" 
                         id="nav-title">
-                        JAKHONG SYSTEM
+                        JAKHONG LEAGUE 1/2569
                     </h1>
                 </div>
                 <button onclick="toggleSettings()" class="text-gray-400 hover:text-white transition"><i class="fas fa-cog text-xl"></i></button>
@@ -631,7 +631,7 @@
                     <div class="flex items-center gap-3 z-10">
                         <img id="daily-logo-img" src="" class="w-12 h-12 object-contain drop-shadow-md bg-white rounded-full p-1 border border-yellow-400">
                         <div contenteditable="true" id="daily-title-edit" class="text-xl md:text-3xl font-extrabold uppercase italic leading-none outline-text text-yellow-400" style="text-shadow: 2px 2px 0 #000;">
-                            สรุปผลการแข่งขัน 25/11/2568 JAKHONG LEAGUE 3
+                            สรุปผลการแข่งขัน JAKHONG LEAGUE 1/2569
                         </div>
                     </div>
                 </div>
@@ -906,7 +906,7 @@
         let schedules = JSON.parse(localStorage.getItem('jl_schedules')) || [];
         
         let globalLogo = localStorage.getItem('jl_logo') || ""; 
-        let themeName = localStorage.getItem('jl_theme_name') || 'JAKHONG SYSTEM';
+        let themeName = localStorage.getItem('jl_theme_name') || 'JAKHONG LEAGUE 1/2569';
         let themeColor = localStorage.getItem('jl_theme_color') || '#facc15';
         let secondaryColor = localStorage.getItem('jl_secondary_color') || '#1c365b'; 
 
@@ -970,7 +970,7 @@
             // FIX: Ensure theme variables are updated correctly 
             themeColor = localStorage.getItem('jl_theme_color') || '#facc15';
             secondaryColor = localStorage.getItem('jl_secondary_color') || '#1c365b';
-            themeName = localStorage.getItem('jl_theme_name') || 'JAKHONG SYSTEM';
+            themeName = localStorage.getItem('jl_theme_name') || 'JAKHONG LEAGUE 1/2569';
 
             document.documentElement.style.setProperty('--primary-color', themeColor);
             document.documentElement.style.setProperty('--secondary-color', secondaryColor);
@@ -2380,7 +2380,7 @@ function updateAllMatchTimes() {
                     stats = importedData.stats || [];
                     schedules = importedData.schedules || [];
                     globalLogo = importedData.globalLogo || "";
-                    themeName = importedData.themeName || 'JAKHONG SYSTEM';
+                    themeName = importedData.themeName || 'JAKHONG LEAGUE 1/2569';
                     themeColor = importedData.themeColor || '#facc15';
                     secondaryColor = importedData.secondaryData || '#1c365b';
 
