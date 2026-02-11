@@ -488,23 +488,12 @@
             </div>
 
             <div class="rounded-xl overflow-hidden shadow-2xl">
-    <div id="lb-banner" class="p-6 text-center relative" style="background: linear-gradient(135deg, #1c365b, #0c1626);">
-        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
-        
-        <div class="relative z-10 flex items-center justify-center gap-3 group">
-            <h2 contenteditable="true" id="lb-title" 
-                class="text-3xl md:text-5xl font-extrabold uppercase italic outline-text tracking-wider focus:outline-none focus:ring-1 focus:ring-white/30 px-2 rounded" 
-                style="color: var(--primary-color);">
-                ตารางคะแนน JAKHONG SENIOR CUP
-            </h2>
-            
-            <button onclick="saveManualTitle()" 
-                    class="opacity-0 group-hover:opacity-100 bg-green-600 hover:bg-green-500 text-white text-[10px] px-2 py-1 rounded shadow-lg transition-all no-print"
-                    title="บันทึกชื่อตาราง">
-                <i class="fas fa-save"></i> SAVE
-            </button>
-        </div>
-    </div>
+                <div id="lb-banner" class="p-6 text-center relative" style="background: linear-gradient(135deg, #1c365b, #0c1626);">
+                    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
+                    <h2 contenteditable="true" id="lb-title" class="relative text-3xl md:text-5xl font-extrabold uppercase italic outline-text tracking-wider z-10 focus:outline-none focus:border-b border-white" style="color: var(--primary-color);">
+                        ตารางคะแนน JAKHONG LEAGUE 1/2569
+                    </h2>
+                </div>
                 
                 <div class="overflow-x-auto bg-gray-900">
                     <table class="w-full text-left border-collapse min-w-[700px]" id="lb-table">
@@ -531,18 +520,25 @@
 
      <div id="page-schedule" class="section hidden fade-in">
     <div class="glass p-3 rounded-xl mb-4 flex flex-wrap gap-4 items-center text-xs">
-        <div class="flex gap-2">
-            <button onclick="openAddSchedModal()" class="bg-green-600 text-white px-3 py-1 rounded font-bold hover:bg-green-500 transition">
+        <div class="flex flex-wrap gap-2">
+            <button onclick="openAddSchedModal()" class="bg-green-600 text-white px-3 py-1.5 rounded font-bold hover:bg-green-500 transition flex items-center gap-1">
                 <i class="fas fa-plus"></i> เพิ่มแมทช์
             </button>
-            <button onclick="autoGenerateLeague()" class="bg-blue-600 text-white px-3 py-1 rounded font-bold hover:bg-blue-500 transition">
+
+            <button onclick="autoGenerateLeague()" class="bg-blue-600 text-white px-3 py-1.5 rounded font-bold hover:bg-blue-500 transition flex items-center gap-1">
                 <i class="fas fa-magic"></i> จัดลีกอัตโนมัติ (8 ทีม)
             </button>
-            <button onclick="clearSchedule()" class="bg-red-600 text-white px-3 py-1 rounded font-bold hover:bg-red-500 transition">
+
+            <button onclick="saveScheduleOrder()" class="bg-emerald-700 text-white px-4 py-1.5 rounded font-bold hover:bg-emerald-600 transition flex items-center gap-1 shadow-lg ring-2 ring-white/10">
+                <i class="fas fa-save"></i> บันทึกลำดับการแข่ง
+            </button>
+
+            <button onclick="clearSchedule()" class="bg-red-600 text-white px-3 py-1.5 rounded font-bold hover:bg-red-500 transition flex items-center gap-1">
                 <i class="fas fa-trash-alt"></i> ล้างตาราง
             </button>
         </div>
     </div>
+         
 
     <div class="flex flex-col min-h-[500px] rounded-xl overflow-hidden shadow-2xl relative" id="schedule-main-container">
         <div class="flex-1 p-4 md:p-8 relative z-10 w-full">
@@ -859,7 +855,7 @@
                 <h3 class="font-bold mb-3 text-white">1. ธีมและชื่อลีก</h3>
                 <div class="mb-3">
                     <label class="text-sm text-gray-400 block mb-1">ชื่อลีก (แสดงใน Navbar)</label>
-                    <input type="text" id="theme-name-input" class="w-full bg-gray-700 p-2 rounded text-white" placeholder="เช่น JAKHONG SENIOR CUP">
+                    <input type="text" id="theme-name-input" class="w-full bg-gray-700 p-2 rounded text-white" placeholder="เช่น JAKHONG LEAGUE 1/2569">
                 </div>
                 <div class="flex gap-4">
                     <div>
@@ -1085,61 +1081,51 @@
 
 function saveScheduleOrder() {
     try {
-        // 1. ดึง Card การแข่งขันทั้งหมดที่เรียงอยู่บนหน้าจอตอนนี้
-        const listItems = document.querySelectorAll('#sched-list .schedule-match-card');
+        // 1. ดึง Card ทั้งหมดที่เรียงอยู่บนหน้าจอ (ใช้ Class .match-card ให้ตรงกับ HTML)
+        const listItems = document.querySelectorAll('.match-card');
+        
+        if (listItems.length === 0) {
+            alert("ไม่พบข้อมูลที่จะบันทึก กรุณาลองใหม่อีกครั้ง");
+            return;
+        }
+
         const newOrderedSchedules = [];
 
         listItems.forEach(item => {
-            // ดึง ID จาก Attribute data-id (หรือจาก onclick ถ้าไม่มี data-id)
-            // ในไฟล์ของคุณมักจะอยู่ใน onclick="editSchedule('ID_HERE')"
-            const onclickAttr = item.getAttribute('onclick') || "";
-            const matchId = onclickAttr.match(/'([^']+)'/)?.[1];
+            // 2. ดึง ID จาก data-id ที่เราใส่ไว้ใน HTML (วิธีนี้แม่นยำที่สุด)
+            const mId = item.getAttribute('data-id');
             
-            if (matchId) {
-                const matchData = schedules.find(m => m.id === matchId);
+            if (mId) {
+                // ค้นหาข้อมูลแมตช์จากตัวแปร schedules เดิม (แปลงเป็น String เพื่อความชัวร์ในการเปรียบเทียบ)
+                const matchData = schedules.find(m => String(m.id) === String(mId));
                 if (matchData) {
                     newOrderedSchedules.push(matchData);
                 }
             }
         });
 
-        // 2. ถ้าดึงข้อมูลมาได้ครบ ให้ทับค่าตัวแปร schedules หลัก
+        // 3. ตรวจสอบว่าดึงข้อมูลมาได้ครบไหมก่อนจะทับค่าเดิม
         if (newOrderedSchedules.length > 0) {
+            // อัปเดตตัวแปรหลัก
             schedules = newOrderedSchedules;
-            // 3. เรียกฟังก์ชัน save หลักที่คุณมีอยู่แล้วเพื่อลง Storage
+            
+            // 4. บันทึกลง LocalStorage (ใช้ฟังก์ชัน save() ตัวหลักของคุณ)
             save(); 
-            console.log("บันทึกลำดับการแข่งใหม่สำเร็จ!");
+            
+            // แสดงแจ้งเตือนให้ผู้ใช้ทราบ
+            alert("✅ บันทึกลำดับการแข่งขันเรียบร้อยแล้ว!");
+            console.log("บันทึกลำดับการแข่งใหม่สำเร็จ!", schedules);
+            
+            // 5. วาดหน้าจอใหม่เพื่อให้ลำดับในระบบกับหน้าจอตรงกันเป๊ะๆ
+            renderSchedule();
+        } else {
+            alert("เกิดข้อผิดพลาด: ไม่สามารถดึงข้อมูลลำดับใหม่ได้");
         }
     } catch (e) {
         console.error("Error saving schedule order:", e);
+        alert("เกิดข้อผิดพลาดในการบันทึก: " + e.message);
     }
 }
-
-
-function saveManualTitle() {
-    const titleElement = document.getElementById('lb-title');
-    if (titleElement) {
-        const newTitle = titleElement.innerText.trim();
-        
-        // 1. บันทึกลง LocalStorage
-        localStorage.setItem('jl_table_title', newTitle);
-        
-        // 2. แสดงสถานะว่าเซฟแล้วที่ตัวปุ่ม
-        const btn = event.currentTarget;
-        const originalHTML = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-check"></i> SAVED';
-        btn.classList.replace('bg-green-600', 'bg-blue-600');
-        
-        console.log("บันทึกชื่อตารางสำเร็จ:", newTitle);
-
-        // 3. หลังจาก 2 วินาทีให้ปุ่มกลับเป็นสีเดิม
-        setTimeout(() => {
-            btn.innerHTML = originalHTML;
-            btn.classList.replace('bg-blue-600', 'bg-green-600');
-        }, 2000);
-    }
-}
-
 
         function nav(id, button) {
             document.querySelectorAll('.section').forEach(el => el.classList.add('hidden'));
