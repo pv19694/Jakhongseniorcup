@@ -847,27 +847,40 @@
         </div>
     </div>
 
-    <div id="settings-modal" class="fixed inset-0 bg-black/90 hidden z-[60] flex items-center justify-center">
-        <div class="glass p-6 rounded-xl w-full max-w-sm text-center">
-            <h2 class="text-xl font-bold mb-4" style="color: var(--primary-color);">ตั้งค่าระบบลีก</h2>
+<div id="settings-modal" class="fixed inset-0 bg-black/90 hidden z-[60] flex items-center justify-center">
+    <div class="glass p-6 rounded-xl w-full max-w-sm text-center">
+        <h2 class="text-xl font-bold mb-4" style="color: var(--primary-color);">ตั้งค่าระบบลีก</h2>
+        
+        <div class="p-4 rounded-lg mb-4 text-left border border-gray-700 bg-gray-800">
+            <h3 class="font-bold mb-3 text-white">1. ธีมและชื่อลีก</h3>
             
-            <div class="p-4 rounded-lg mb-4 text-left border border-gray-700 bg-gray-800">
-                <h3 class="font-bold mb-3 text-white">1. ธีมและชื่อลีก</h3>
-                <div class="mb-3">
-                    <label class="text-sm text-gray-400 block mb-1">ชื่อลีก (แสดงใน Navbar)</label>
-                    <input type="text" id="theme-name-input" class="w-full bg-gray-700 p-2 rounded text-white" placeholder="JAKHONG LEAGUE 1/2569">
+            <div class="mb-3">
+                <label class="text-sm text-gray-400 block mb-1">ชื่อลีก (แสดงใน Navbar)</label>
+                <input type="text" id="theme-name-input" 
+                       class="w-full bg-gray-700 p-2 rounded text-white border border-transparent focus:border-yellow-500 outline-none" 
+                       placeholder="JAKHONG LEAGUE 1/2569">
+            </div>
+
+            <div class="flex gap-4">
+                <div class="flex-1">
+                    <label class="text-sm text-gray-400 block mb-1">สีหลัก (Accent)</label>
+                    <input type="color" id="theme-color-input" class="w-full h-10 rounded cursor-pointer" onchange="updateThemeAndSave()">
                 </div>
-                <div class="flex gap-4">
-                    <div>
-                        <label class="text-sm text-gray-400 block mb-1">สีหลัก (Accent)</label>
-                        <input type="color" id="theme-color-input" class="w-full h-10 rounded cursor-pointer" onchange="updateThemeAndSave()">
-                    </div>
-                    <div>
-                        <label class="text-sm text-gray-400 block mb-1">สีรอง (Header/Banner)</label>
-                        <input type="color" id="secondary-color-input" class="w-full h-10 rounded cursor-pointer" onchange="updateThemeAndSave()">
-                    </div>
+                <div class="flex-1">
+                    <label class="text-sm text-gray-400 block mb-1">สีรอง (Header)</label>
+                    <input type="color" id="secondary-color-input" class="w-full h-10 rounded cursor-pointer" onchange="updateThemeAndSave()">
                 </div>
             </div>
+        </div> <div class="flex gap-2">
+            <button onclick="saveLeagueSettings()" class="flex-1 bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-500 transition">
+                <i class="fas fa-save mr-1"></i> บันทึกการตั้งค่า
+            </button>
+            <button onclick="document.getElementById('settings-modal').classList.add('hidden')" class="flex-1 bg-gray-600 text-white py-2 rounded-lg font-bold hover:bg-gray-500 transition">
+                ยกเลิก
+            </button>
+        </div>
+    </div> </div> ```
+
 
             <div class="p-4 rounded-lg mb-4 text-left border border-gray-700 bg-gray-800">
                 <h3 class="font-bold mb-3 text-white">2. โลโก้ลีก</h3>
@@ -2487,6 +2500,52 @@ function toggleDeleteBtn(id) {
     }
 }
 
+
+// ฟังก์ชันบันทึกการตั้งค่าจากหน้าต่าง Settings
+function saveLeagueSettings() {
+    const newName = document.getElementById('theme-name-input').value.trim();
+    const newPrimary = document.getElementById('theme-color-input').value;
+    const newSecondary = document.getElementById('secondary-color-input').value;
+
+    if (newName !== "") {
+        // 1. อัปเดตตัวแปรในระบบ
+        themeName = newName;
+        themeColor = newPrimary;
+        secondaryColor = newSecondary;
+
+        // 2. อัปเดตสีหน้าเว็บทันที (CSS Variables)
+        document.documentElement.style.setProperty('--primary-color', themeColor);
+        document.documentElement.style.setProperty('--secondary-color', secondaryColor);
+
+        // 3. อัปเดตชื่อใน Navbar (ถ้ามี)
+        const navBrand = document.querySelector('.nav-brand') || document.querySelector('nav h1');
+        if (navBrand) navBrand.innerText = themeName;
+
+        // 4. บันทึกลงความจำเครื่อง (LocalStorage)
+        save(); 
+
+        // 5. ปิดหน้าต่างและอัปเดตหน้า Dashboard
+        document.getElementById('settings-modal').classList.add('hidden');
+        
+        // เรียกฟังก์ชันวาดหน้าจอใหม่ (ถ้าชื่อฟังก์ชันในไฟล์คุณเป็นชื่ออื่นให้เปลี่ยนตามครับ)
+        if (typeof renderDashboard === "function") renderDashboard();
+        if (typeof renderSchedule === "function") renderSchedule();
+        
+        alert("บันทึกการตั้งค่า '"+ themeName +"' เรียบร้อยแล้ว!");
+    } else {
+        alert("กรุณากรอกชื่อลีกด้วยครับ");
+    }
+}
+
+// ฟังก์ชันสำหรับเปิดหน้าต่างตั้งค่า (เพื่อให้ดึงค่าปัจจุบันมาโชว์ในช่องกรอก)
+function openSettingsModal() {
+    document.getElementById('theme-name-input').value = themeName;
+    document.getElementById('theme-color-input').value = themeColor || '#facc15';
+    document.getElementById('secondary-color-input').value = secondaryColor || '#1c365b';
+    document.getElementById('settings-modal').classList.remove('hidden');
+}
+        
+        
     </script>
 </body>
 </html>
