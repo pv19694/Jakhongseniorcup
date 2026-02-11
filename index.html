@@ -7,6 +7,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -519,25 +520,18 @@
 
      <div id="page-schedule" class="section hidden fade-in">
     <div class="glass p-3 rounded-xl mb-4 flex flex-wrap gap-4 items-center text-xs">
-        <div class="flex flex-wrap gap-2">
-            <button onclick="openAddSchedModal()" class="bg-green-600 text-white px-3 py-1.5 rounded font-bold hover:bg-green-500 transition flex items-center gap-1">
+        <div class="flex gap-2">
+            <button onclick="openAddSchedModal()" class="bg-green-600 text-white px-3 py-1 rounded font-bold hover:bg-green-500 transition">
                 <i class="fas fa-plus"></i> เพิ่มแมทช์
             </button>
-
-            <button onclick="autoGenerateLeague()" class="bg-blue-600 text-white px-3 py-1.5 rounded font-bold hover:bg-blue-500 transition flex items-center gap-1">
+            <button onclick="autoGenerateLeague()" class="bg-blue-600 text-white px-3 py-1 rounded font-bold hover:bg-blue-500 transition">
                 <i class="fas fa-magic"></i> จัดลีกอัตโนมัติ (8 ทีม)
             </button>
-
-            <button onclick="saveScheduleOrder()" class="bg-emerald-700 text-white px-4 py-1.5 rounded font-bold hover:bg-emerald-600 transition flex items-center gap-1 shadow-lg ring-2 ring-white/10">
-                <i class="fas fa-save"></i> บันทึกลำดับการแข่ง
-            </button>
-
-            <button onclick="clearSchedule()" class="bg-red-600 text-white px-3 py-1.5 rounded font-bold hover:bg-red-500 transition flex items-center gap-1">
+            <button onclick="clearSchedule()" class="bg-red-600 text-white px-3 py-1 rounded font-bold hover:bg-red-500 transition">
                 <i class="fas fa-trash-alt"></i> ล้างตาราง
             </button>
         </div>
     </div>
-         
 
     <div class="flex flex-col min-h-[500px] rounded-xl overflow-hidden shadow-2xl relative" id="schedule-main-container">
         <div class="flex-1 p-4 md:p-8 relative z-10 w-full">
@@ -1080,51 +1074,36 @@
 
 function saveScheduleOrder() {
     try {
-        // 1. ดึง Card ทั้งหมดที่เรียงอยู่บนหน้าจอ (ใช้ Class .match-card ให้ตรงกับ HTML)
-        const listItems = document.querySelectorAll('.match-card');
-        
-        if (listItems.length === 0) {
-            alert("ไม่พบข้อมูลที่จะบันทึก กรุณาลองใหม่อีกครั้ง");
-            return;
-        }
-
+        // 1. ดึง Card การแข่งขันทั้งหมดที่เรียงอยู่บนหน้าจอตอนนี้
+        const listItems = document.querySelectorAll('#sched-list .schedule-match-card');
         const newOrderedSchedules = [];
 
         listItems.forEach(item => {
-            // 2. ดึง ID จาก data-id ที่เราใส่ไว้ใน HTML (วิธีนี้แม่นยำที่สุด)
-            const mId = item.getAttribute('data-id');
+            // ดึง ID จาก Attribute data-id (หรือจาก onclick ถ้าไม่มี data-id)
+            // ในไฟล์ของคุณมักจะอยู่ใน onclick="editSchedule('ID_HERE')"
+            const onclickAttr = item.getAttribute('onclick') || "";
+            const matchId = onclickAttr.match(/'([^']+)'/)?.[1];
             
-            if (mId) {
-                // ค้นหาข้อมูลแมตช์จากตัวแปร schedules เดิม (แปลงเป็น String เพื่อความชัวร์ในการเปรียบเทียบ)
-                const matchData = schedules.find(m => String(m.id) === String(mId));
+            if (matchId) {
+                const matchData = schedules.find(m => m.id === matchId);
                 if (matchData) {
                     newOrderedSchedules.push(matchData);
                 }
             }
         });
 
-        // 3. ตรวจสอบว่าดึงข้อมูลมาได้ครบไหมก่อนจะทับค่าเดิม
+        // 2. ถ้าดึงข้อมูลมาได้ครบ ให้ทับค่าตัวแปร schedules หลัก
         if (newOrderedSchedules.length > 0) {
-            // อัปเดตตัวแปรหลัก
             schedules = newOrderedSchedules;
-            
-            // 4. บันทึกลง LocalStorage (ใช้ฟังก์ชัน save() ตัวหลักของคุณ)
+            // 3. เรียกฟังก์ชัน save หลักที่คุณมีอยู่แล้วเพื่อลง Storage
             save(); 
-            
-            // แสดงแจ้งเตือนให้ผู้ใช้ทราบ
-            alert("✅ บันทึกลำดับการแข่งขันเรียบร้อยแล้ว!");
-            console.log("บันทึกลำดับการแข่งใหม่สำเร็จ!", schedules);
-            
-            // 5. วาดหน้าจอใหม่เพื่อให้ลำดับในระบบกับหน้าจอตรงกันเป๊ะๆ
-            renderSchedule();
-        } else {
-            alert("เกิดข้อผิดพลาด: ไม่สามารถดึงข้อมูลลำดับใหม่ได้");
+            console.log("บันทึกลำดับการแข่งใหม่สำเร็จ!");
         }
     } catch (e) {
         console.error("Error saving schedule order:", e);
-        alert("เกิดข้อผิดพลาดในการบันทึก: " + e.message);
     }
 }
+
 
         function nav(id, button) {
             document.querySelectorAll('.section').forEach(el => el.classList.add('hidden'));
@@ -1469,25 +1448,14 @@ function renderSchedule() {
     `;
 }).join('');
         return `
-            // --- ส่วนเดิม ---
-// return `
-//    <div class="p-2 rounded-lg mb-4 font-bold text-center text-black tracking-widest uppercase text-xs" 
-//         style="background-color: ${cPillColor}; transform: skewX(-10deg);">
-//         ${key}
-//    </div>
-
-// --- แก้เป็นแบบนี้ ---
-return `
-    <div class="p-2 rounded-lg mb-4 font-bold text-center text-black tracking-widest uppercase text-xs outline-none focus:ring-2 focus:ring-white/50" 
-         contenteditable="true"
-         onblur="saveWeekTitle('${key}', this.innerText)"
-         style="background-color: ${cPillColor}; transform: skewX(-10deg);">
-         ${localStorage.getItem('week_title_' + key) || key}
-    </div>
-    <div class="week-sortable-container">
-        ${matchesHtml}
-    </div>
-`;
+            <div class="p-2 rounded-lg mb-4 font-bold text-center text-black tracking-widest uppercase text-xs" 
+                 style="background-color: ${cPillColor}; transform: skewX(-10deg);">
+                 ${key}
+            </div>
+            <div class="week-sortable-container">
+                ${matchesHtml}
+            </div>
+        `;
     }).join('');
 
     cont.innerHTML = html || '<p class="text-center text-gray-500 py-10">ไม่มีโปรแกรมการแข่งขัน</p>';
@@ -1513,16 +1481,6 @@ return `
 } // ปิดฟังก์ชัน renderSchedule
         
 
-function saveWeekTitle(originalKey, newText) {
-    // บันทึกชื่อใหม่ลงเครื่องโดยอ้างอิงจากคีย์เดิมของมัน
-    localStorage.setItem('week_title_' + originalKey, newText.trim());
-    console.log(`บันทึกชื่อใหม่ของ ${originalKey} เป็น: ${newText}`);
-    
-    // ไม่ต้องสั่ง save() ของระบบหลักก็ได้เพราะเราเก็บแยก แต่ถ้าอยากให้ชัวร์สั่งไว้ได้ครับ
-    if (typeof save === 'function') save();
-}
-
-  
 function updateAllMatchTimes() {
     const containers = document.querySelectorAll('.week-sortable-container');
     
@@ -2418,19 +2376,13 @@ function updateAllMatchTimes() {
             reader.readAsText(file);
         }
 
+// ฟังก์ชันล้างตาราง
 function clearSchedule() {
-    if (!confirm("คุณแน่ใจหรือไม่ที่จะล้างตารางแข่งทั้งหมด?")) return;
-    
-    // เพิ่มการล้างชื่อหัวข้อที่เคยเซฟไว้
-    Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('week_title_')) {
-            localStorage.removeItem(key);
-        }
-    });
-
-    schedules = [];
-    save();
-    renderSchedule();
+    if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบโปรแกรมการแข่งขันทั้งหมด?")) {
+        schedules = [];
+        save();
+        renderSchedule();
+    }
 }
 
 function autoGenerateLeague() {
