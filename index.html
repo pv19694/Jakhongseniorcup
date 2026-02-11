@@ -488,12 +488,23 @@
             </div>
 
             <div class="rounded-xl overflow-hidden shadow-2xl">
-                <div id="lb-banner" class="p-6 text-center relative" style="background: linear-gradient(135deg, #1c365b, #0c1626);">
-                    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
-                    <h2 contenteditable="true" id="lb-title" class="relative text-3xl md:text-5xl font-extrabold uppercase italic outline-text tracking-wider z-10 focus:outline-none focus:border-b border-white" style="color: var(--primary-color);">
-                        ตารางคะแนน JAKHONG SENIOR CUP
-                    </h2>
-                </div>
+    <div id="lb-banner" class="p-6 text-center relative" style="background: linear-gradient(135deg, #1c365b, #0c1626);">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
+        
+        <div class="relative z-10 flex items-center justify-center gap-3 group">
+            <h2 contenteditable="true" id="lb-title" 
+                class="text-3xl md:text-5xl font-extrabold uppercase italic outline-text tracking-wider focus:outline-none focus:ring-1 focus:ring-white/30 px-2 rounded" 
+                style="color: var(--primary-color);">
+                ตารางคะแนน JAKHONG SENIOR CUP
+            </h2>
+            
+            <button onclick="saveManualTitle()" 
+                    class="opacity-0 group-hover:opacity-100 bg-green-600 hover:bg-green-500 text-white text-[10px] px-2 py-1 rounded shadow-lg transition-all no-print"
+                    title="บันทึกชื่อตาราง">
+                <i class="fas fa-save"></i> SAVE
+            </button>
+        </div>
+    </div>
                 
                 <div class="overflow-x-auto bg-gray-900">
                     <table class="w-full text-left border-collapse min-w-[700px]" id="lb-table">
@@ -1101,6 +1112,31 @@ function saveScheduleOrder() {
         }
     } catch (e) {
         console.error("Error saving schedule order:", e);
+    }
+}
+
+
+function saveManualTitle() {
+    const titleElement = document.getElementById('lb-title');
+    if (titleElement) {
+        const newTitle = titleElement.innerText.trim();
+        
+        // 1. บันทึกลง LocalStorage
+        localStorage.setItem('jl_table_title', newTitle);
+        
+        // 2. แสดงสถานะว่าเซฟแล้วที่ตัวปุ่ม
+        const btn = event.currentTarget;
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> SAVED';
+        btn.classList.replace('bg-green-600', 'bg-blue-600');
+        
+        console.log("บันทึกชื่อตารางสำเร็จ:", newTitle);
+
+        // 3. หลังจาก 2 วินาทีให้ปุ่มกลับเป็นสีเดิม
+        setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            btn.classList.replace('bg-blue-600', 'bg-green-600');
+        }, 2000);
     }
 }
 
