@@ -1469,14 +1469,25 @@ function renderSchedule() {
     `;
 }).join('');
         return `
-            <div class="p-2 rounded-lg mb-4 font-bold text-center text-black tracking-widest uppercase text-xs" 
-                 style="background-color: ${cPillColor}; transform: skewX(-10deg);">
-                 ${key}
-            </div>
-            <div class="week-sortable-container">
-                ${matchesHtml}
-            </div>
-        `;
+            // --- ส่วนเดิม ---
+// return `
+//    <div class="p-2 rounded-lg mb-4 font-bold text-center text-black tracking-widest uppercase text-xs" 
+//         style="background-color: ${cPillColor}; transform: skewX(-10deg);">
+//         ${key}
+//    </div>
+
+// --- แก้เป็นแบบนี้ ---
+return `
+    <div class="p-2 rounded-lg mb-4 font-bold text-center text-black tracking-widest uppercase text-xs outline-none focus:ring-2 focus:ring-white/50" 
+         contenteditable="true"
+         onblur="saveWeekTitle('${key}', this.innerText)"
+         style="background-color: ${cPillColor}; transform: skewX(-10deg);">
+         ${localStorage.getItem('week_title_' + key) || key}
+    </div>
+    <div class="week-sortable-container">
+        ${matchesHtml}
+    </div>
+`;
     }).join('');
 
     cont.innerHTML = html || '<p class="text-center text-gray-500 py-10">ไม่มีโปรแกรมการแข่งขัน</p>';
@@ -1502,6 +1513,16 @@ function renderSchedule() {
 } // ปิดฟังก์ชัน renderSchedule
         
 
+function saveWeekTitle(originalKey, newText) {
+    // บันทึกชื่อใหม่ลงเครื่องโดยอ้างอิงจากคีย์เดิมของมัน
+    localStorage.setItem('week_title_' + originalKey, newText.trim());
+    console.log(`บันทึกชื่อใหม่ของ ${originalKey} เป็น: ${newText}`);
+    
+    // ไม่ต้องสั่ง save() ของระบบหลักก็ได้เพราะเราเก็บแยก แต่ถ้าอยากให้ชัวร์สั่งไว้ได้ครับ
+    if (typeof save === 'function') save();
+}
+
+  
 function updateAllMatchTimes() {
     const containers = document.querySelectorAll('.week-sortable-container');
     
@@ -2397,13 +2418,19 @@ function updateAllMatchTimes() {
             reader.readAsText(file);
         }
 
-// ฟังก์ชันล้างตาราง
 function clearSchedule() {
-    if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบโปรแกรมการแข่งขันทั้งหมด?")) {
-        schedules = [];
-        save();
-        renderSchedule();
-    }
+    if (!confirm("คุณแน่ใจหรือไม่ที่จะล้างตารางแข่งทั้งหมด?")) return;
+    
+    // เพิ่มการล้างชื่อหัวข้อที่เคยเซฟไว้
+    Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('week_title_')) {
+            localStorage.removeItem(key);
+        }
+    });
+
+    schedules = [];
+    save();
+    renderSchedule();
 }
 
 function autoGenerateLeague() {
