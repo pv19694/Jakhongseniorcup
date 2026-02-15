@@ -1250,46 +1250,41 @@ function saveScheduleOrder() {
             calculateDashboardStats();
         }
 
-    // --- 1. LEADERBOARD (เวอร์ชันแก้ไขสมบูรณ์) ---
+   // --- 1. LEADERBOARD (ฉบับแก้ไขสมบูรณ์) ---
 function calculateLeaderboardData() {
-    // 1. สร้างโครงสร้างข้อมูลตั้งต้นจากรายการทีมปัจจุบัน
+    // สร้างข้อมูลทีมเริ่มต้น
     const data = teams.map(t => ({
         id: t.id,
         name: t.name,
-        logo: t.logo || '', 
+        logo: t.logo || '',
         color: t.color || '#facc15',
         p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0
     }));
 
-    // 2. ตรวจสอบว่ามีแมตช์ที่แข่งจบแล้วหรือไม่
     matches.forEach(m => {
-        // ตรวจสอบสถานะ played ให้รองรับทั้ง Boolean และ String
+        // ตรวจสอบว่าแมตช์แข่งจบหรือยัง (รองรับทั้ง boolean และ string)
         const isPlayed = m.played === true || m.played === "true";
         if (!isPlayed || !m.teamA || !m.teamB) return;
 
-        // ค้นหาตำแหน่งทีมในอาเรย์ data โดยใช้ == (ยืดหยุ่นเรื่องประเภทข้อมูล)
+        // ใช้ == เพื่อแก้ปัญหา String ID vs Number ID
         const idxA = data.findIndex(d => d.id == m.teamA);
         const idxB = data.findIndex(d => d.id == m.teamB);
 
-        // ถ้าหาทีมไม่เจอ (เช่น ทีมถูกลบ) ให้ข้ามแมตช์นี้ไป
         if (idxA === -1 || idxB === -1) return;
 
         const scoreA = parseInt(m.scoreA) || 0;
         const scoreB = parseInt(m.scoreB) || 0;
 
-        // อัปเดตสถิติทีม A
         data[idxA].p++;
         data[idxA].gf += scoreA;
         data[idxA].ga += scoreB;
         data[idxA].gd = data[idxA].gf - data[idxA].ga;
 
-        // อัปเดตสถิติทีม B
         data[idxB].p++;
         data[idxB].gf += scoreB;
         data[idxB].ga += scoreA;
         data[idxB].gd = data[idxB].gf - data[idxB].ga;
 
-        // คำนวณแต้ม ชนะ-เสมอ-แพ้
         if (scoreA > scoreB) {
             data[idxA].w++; data[idxA].pts += 3;
             data[idxB].l++;
@@ -1302,13 +1297,48 @@ function calculateLeaderboardData() {
         }
     });
 
-    // 3. เรียงลำดับ (เหมือนเดิม)
     return data.sort((a, b) => {
         if (b.pts !== a.pts) return b.pts - a.pts;
         if (b.gd !== a.gd) return b.gd - a.gd;
         if (b.gf !== a.gf) return b.gf - a.gf;
         return a.name.localeCompare(b.name);
     });
+}
+
+// --- ส่วนที่ทำให้ตารางยอมแสดงผล (Fix Render) ---
+function renderLeaderboard() {
+    const data = calculateLeaderboardData();
+    const tbody = document.getElementById('lb-body');
+    if (!tbody) return;
+
+    // แก้ไข: เพิ่มค่าสีเริ่มต้น ป้องกันโค้ดค้างถ้าหา Element ไม่เจอ
+    const bgColor = document.getElementById('lb-bg-body')?.value || '#1e293b';
+    const textColor = document.getElementById('lb-body-text-color')?.value || '#ffffff';
+    const rankColor = document.getElementById('lb-rank-color')?.value || '#facc15';
+
+    tbody.innerHTML = data.map((t, i) => `
+        <tr class="border-b border-white/5 transition hover:bg-white/5" style="background-color: ${bgColor}; color: ${textColor};">
+            <td class="p-4 font-black text-2xl italic" style="color: ${rankColor};">${i + 1}</td>
+            <td class="p-4">
+                <div class="flex items-center gap-3">
+                    ${t.logo ? `<img src="${t.logo}" class="w-10 h-10 logo-circle border-2 border-white/20">` : 
+                               `<div class="w-10 h-10 logo-circle bg-gray-700 flex items-center justify-center border-2 border-white/20"><i class="fas fa-shield-alt text-xs"></i></div>`}
+                    <span class="uppercase font-bold tracking-wide">${t.name}</span>
+                </div>
+            </td>
+            <td class="p-4 text-center font-bold">${t.p}</td>
+            <td class="p-4 text-center text-green-400">${t.w}</td>
+            <td class="p-4 text-center text-gray-400">${t.d}</td>
+            <td class="p-4 text-center text-red-400">${t.l}</td>
+            <td class="p-4 text-center text-xs opacity-70">${t.gf}/${t.ga}</td>
+            <td class="p-4 text-center font-bold ${t.gd >= 0 ? 'text-blue-400' : 'text-orange-400'}">${t.gd > 0 ? '+' + t.gd : t.gd}</td>
+            <td class="p-0">
+                <div class="h-full py-4 text-center text-2xl font-black bg-gradient-to-b from-yellow-400 to-yellow-600 text-black shadow-inner">
+                    ${t.pts}
+                </div>
+            </td>
+        </tr>
+    `).join('');
 }
 
 // --- จุดสำคัญ: ฟังก์ชันช่วยอัปเดตหน้าจอทันที ---
