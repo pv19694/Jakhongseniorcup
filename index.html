@@ -1250,81 +1250,76 @@ function saveScheduleOrder() {
             calculateDashboardStats();
         }
 
-      // --- 1. LEADERBOARD ---
+    // --- 1. LEADERBOARD (เวอร์ชันแก้ไขสมบูรณ์) ---
 function calculateLeaderboardData() {
-    // ตรวจสอบว่ามีข้อมูลทีมและแมตช์หรือไม่ ถ้าไม่มีให้คืนค่าอาเรย์ว่าง
-    if (!teams || teams.length === 0) return [];
-
+    // 1. สร้างโครงสร้างข้อมูลตั้งต้นจากรายการทีมปัจจุบัน
     const data = teams.map(t => ({
         id: t.id,
         name: t.name,
-        logo: t.logo || '', // ป้องกันกรณีไม่มีโลโก้
-        color: t.color || '#cccccc',
+        logo: t.logo || '', 
+        color: t.color || '#facc15',
         p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0
     }));
 
-    // ตรวจสอบว่ามีแมตช์หรือไม่
-    if (matches && matches.length > 0) {
-        matches.forEach(m => {
-            // จุดสำคัญ: ตรวจสอบสถานะ played ให้ยืดหยุ่นขึ้น (รองรับทั้ง true และ "true")
-            const isPlayed = m.played === true || m.played === "true";
-            
-            if (!isPlayed || !m.teamA || !m.teamB) return;
+    // 2. ตรวจสอบว่ามีแมตช์ที่แข่งจบแล้วหรือไม่
+    matches.forEach(m => {
+        // ตรวจสอบสถานะ played ให้รองรับทั้ง Boolean และ String
+        const isPlayed = m.played === true || m.played === "true";
+        if (!isPlayed || !m.teamA || !m.teamB) return;
 
-            // ใช้ == เพื่อรองรับทั้ง ID ที่เป็น String และ Number
-            const idxA = data.findIndex(d => d.id == m.teamA);
-            const idxB = data.findIndex(d => d.id == m.teamB);
+        // ค้นหาตำแหน่งทีมในอาเรย์ data โดยใช้ == (ยืดหยุ่นเรื่องประเภทข้อมูล)
+        const idxA = data.findIndex(d => d.id == m.teamA);
+        const idxB = data.findIndex(d => d.id == m.teamB);
 
-            if (idxA === -1 || idxB === -1) return;
+        // ถ้าหาทีมไม่เจอ (เช่น ทีมถูกลบ) ให้ข้ามแมตช์นี้ไป
+        if (idxA === -1 || idxB === -1) return;
 
-            const scoreA = parseInt(m.scoreA) || 0;
-            const scoreB = parseInt(m.scoreB) || 0;
+        const scoreA = parseInt(m.scoreA) || 0;
+        const scoreB = parseInt(m.scoreB) || 0;
 
-            // อัปเดตสถิติทีม A
-            data[idxA].p++;
-            data[idxA].gf += scoreA;
-            data[idxA].ga += scoreB;
-            data[idxA].gd = data[idxA].gf - data[idxA].ga;
+        // อัปเดตสถิติทีม A
+        data[idxA].p++;
+        data[idxA].gf += scoreA;
+        data[idxA].ga += scoreB;
+        data[idxA].gd = data[idxA].gf - data[idxA].ga;
 
-            // อัปเดตสถิติทีม B
-            data[idxB].p++;
-            data[idxB].gf += scoreB;
-            data[idxB].ga += scoreA;
-            data[idxB].gd = data[idxB].gf - data[idxB].ga;
+        // อัปเดตสถิติทีม B
+        data[idxB].p++;
+        data[idxB].gf += scoreB;
+        data[idxB].ga += scoreA;
+        data[idxB].gd = data[idxB].gf - data[idxB].ga;
 
-            // คำนวณแต้ม ชนะ-เสมอ-แพ้
-            if (scoreA > scoreB) {
-                data[idxA].w++; data[idxA].pts += 3;
-                data[idxB].l++;
-            } else if (scoreA < scoreB) {
-                data[idxB].w++; data[idxB].pts += 3;
-                data[idxA].l++;
-            } else {
-                data[idxA].d++; data[idxA].pts += 1;
-                data[idxB].d++; data[idxB].pts += 1;
-            }
-        });
-    }
+        // คำนวณแต้ม ชนะ-เสมอ-แพ้
+        if (scoreA > scoreB) {
+            data[idxA].w++; data[idxA].pts += 3;
+            data[idxB].l++;
+        } else if (scoreA < scoreB) {
+            data[idxB].w++; data[idxB].pts += 3;
+            data[idxA].l++;
+        } else {
+            data[idxA].d++; data[idxA].pts += 1;
+            data[idxB].d++; data[idxB].pts += 1;
+        }
+    });
 
-    // เรียงลำดับ: แต้ม > ลูกได้เสีย > ประตูได้ > ชื่อทีม
-    const sortedData = data.sort((a, b) => {
+    // 3. เรียงลำดับ (เหมือนเดิม)
+    return data.sort((a, b) => {
         if (b.pts !== a.pts) return b.pts - a.pts;
         if (b.gd !== a.gd) return b.gd - a.gd;
         if (b.gf !== a.gf) return b.gf - a.gf;
         return a.name.localeCompare(b.name);
     });
-
-    return sortedData;
 }
 
-// ฟังก์ชันสำหรับสั่งให้อัปเดตตารางคะแนนบนหน้าจอ (เรียกใช้หลังจากบันทึกสถิติ)
-function updateLeaderboardUI() {
-    const leaderboardData = calculateLeaderboardData();
-    // สมมติว่าฟังก์ชันวาดตารางของคุณชื่อ renderLeaderboard
+// --- จุดสำคัญ: ฟังก์ชันช่วยอัปเดตหน้าจอทันที ---
+function forceUpdateAll() {
+    // 1. คำนวณใหม่
+    const newData = calculateLeaderboardData();
+    // 2. สั่งวาดตารางคะแนนใหม่ (ตรวจสอบชื่อฟังก์ชัน render ของคุณด้วยนะครับ)
     if (typeof renderLeaderboard === "function") {
-        renderLeaderboard(leaderboardData);
+        renderLeaderboard(newData); 
     }
-    // ถ้าหน้า Dashboard มีตารางคะแนนย่อ ให้เรียกวาดใหม่ด้วย
+    // 3. สั่งวาดหน้า Dashboard ใหม่
     if (typeof renderDashboard === "function") {
         renderDashboard();
     }
