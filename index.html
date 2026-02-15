@@ -1250,59 +1250,84 @@ function saveScheduleOrder() {
             calculateDashboardStats();
         }
 
-        // --- 1. LEADERBOARD ---
-        function calculateLeaderboardData() {
+      // --- 1. LEADERBOARD ---
+function calculateLeaderboardData() {
+    // ตรวจสอบว่ามีข้อมูลทีมและแมตช์หรือไม่ ถ้าไม่มีให้คืนค่าอาเรย์ว่าง
+    if (!teams || teams.length === 0) return [];
+
     const data = teams.map(t => ({
         id: t.id,
         name: t.name,
-        logo: t.logo,   // *** จุดสำคัญ: เพิ่มบรรท + ดึงโลโก้มาเก็บไว้ตรงนี้ ***
-        color: t.color,
+        logo: t.logo || '', // ป้องกันกรณีไม่มีโลโก้
+        color: t.color || '#cccccc',
         p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0
     }));
 
-    matches.forEach(m => {
-        // คำนวณเฉพาะแมตช์ที่แข่งจบแล้ว (played: true) และไม่ใช่แมตช์ว่าง
-        if (!m.played || !m.teamA || !m.teamB) return;
+    // ตรวจสอบว่ามีแมตช์หรือไม่
+    if (matches && matches.length > 0) {
+        matches.forEach(m => {
+            // จุดสำคัญ: ตรวจสอบสถานะ played ให้ยืดหยุ่นขึ้น (รองรับทั้ง true และ "true")
+            const isPlayed = m.played === true || m.played === "true";
+            
+            if (!isPlayed || !m.teamA || !m.teamB) return;
 
-        const idxA = data.findIndex(d => d.id == m.teamA);
-        const idxB = data.findIndex(d => d.id == m.teamB);
-        if (idxA === -1 || idxB === -1) return;
+            // ใช้ == เพื่อรองรับทั้ง ID ที่เป็น String และ Number
+            const idxA = data.findIndex(d => d.id == m.teamA);
+            const idxB = data.findIndex(d => d.id == m.teamB);
 
-        const scoreA = parseInt(m.scoreA) || 0;
-        const scoreB = parseInt(m.scoreB) || 0;
+            if (idxA === -1 || idxB === -1) return;
 
-        // อัปเดตสถิติทีม A
-        data[idxA].p++;
-        data[idxA].gf += scoreA;
-        data[idxA].ga += scoreB;
-        data[idxA].gd = data[idxA].gf - data[idxA].ga;
+            const scoreA = parseInt(m.scoreA) || 0;
+            const scoreB = parseInt(m.scoreB) || 0;
 
-        // อัปเดตสถิติทีม B
-        data[idxB].p++;
-        data[idxB].gf += scoreB;
-        data[idxB].ga += scoreA;
-        data[idxB].gd = data[idxB].gf - data[idxB].ga;
+            // อัปเดตสถิติทีม A
+            data[idxA].p++;
+            data[idxA].gf += scoreA;
+            data[idxA].ga += scoreB;
+            data[idxA].gd = data[idxA].gf - data[idxA].ga;
 
-        // คำนวณแต้ม ชนะ-เสมอ-แพ้
-        if (scoreA > scoreB) {
-            data[idxA].w++; data[idxA].pts += 3;
-            data[idxB].l++;
-        } else if (scoreA < scoreB) {
-            data[idxB].w++; data[idxB].pts += 3;
-            data[idxA].l++;
-        } else {
-            data[idxA].d++; data[idxA].pts += 1;
-            data[idxB].d++; data[idxB].pts += 1;
-        }
-    });
+            // อัปเดตสถิติทีม B
+            data[idxB].p++;
+            data[idxB].gf += scoreB;
+            data[idxB].ga += scoreA;
+            data[idxB].gd = data[idxB].gf - data[idxB].ga;
+
+            // คำนวณแต้ม ชนะ-เสมอ-แพ้
+            if (scoreA > scoreB) {
+                data[idxA].w++; data[idxA].pts += 3;
+                data[idxB].l++;
+            } else if (scoreA < scoreB) {
+                data[idxB].w++; data[idxB].pts += 3;
+                data[idxA].l++;
+            } else {
+                data[idxA].d++; data[idxA].pts += 1;
+                data[idxB].d++; data[idxB].pts += 1;
+            }
+        });
+    }
 
     // เรียงลำดับ: แต้ม > ลูกได้เสีย > ประตูได้ > ชื่อทีม
-    return data.sort((a, b) => {
+    const sortedData = data.sort((a, b) => {
         if (b.pts !== a.pts) return b.pts - a.pts;
         if (b.gd !== a.gd) return b.gd - a.gd;
         if (b.gf !== a.gf) return b.gf - a.gf;
         return a.name.localeCompare(b.name);
     });
+
+    return sortedData;
+}
+
+// ฟังก์ชันสำหรับสั่งให้อัปเดตตารางคะแนนบนหน้าจอ (เรียกใช้หลังจากบันทึกสถิติ)
+function updateLeaderboardUI() {
+    const leaderboardData = calculateLeaderboardData();
+    // สมมติว่าฟังก์ชันวาดตารางของคุณชื่อ renderLeaderboard
+    if (typeof renderLeaderboard === "function") {
+        renderLeaderboard(leaderboardData);
+    }
+    // ถ้าหน้า Dashboard มีตารางคะแนนย่อ ให้เรียกวาดใหม่ด้วย
+    if (typeof renderDashboard === "function") {
+        renderDashboard();
+    }
 }
 
        function renderLeaderboard() {
