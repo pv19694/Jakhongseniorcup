@@ -2162,42 +2162,49 @@ function updateAllMatchTimes() {
             document.getElementById('player-modal').classList.add('hidden');
         }
 
-        function handleMatchSubmit(e) {
-            e.preventDefault();
-            const id = document.getElementById('match-edit-id').value;
-            const scheduleId = document.getElementById('match-edit-id').dataset.scheduleId;
-            const obj = {
-                id: id || Date.now(),
-                date: document.getElementById('match-date').value,
-                teamA: document.getElementById('m-team-a').value,
-                teamB: document.getElementById('m-team-b').value,
-                scoreA: document.getElementById('m-score-a').value,
-                scoreB: document.getElementById('m-score-b').value,
-                scheduleId: scheduleId || null
-            };
-            if(id) {
-                const idx = matches.findIndex(m => m.id == id);
-                matches[idx] = obj;
-                resetMatchForm();
-            } else {
-                matches.push(obj);
-            }
-            save(); 
-            document.getElementById('m-schedule-id').value = ""; 
-        }
+       function handleMatchSubmit(e) {
+    e.preventDefault();
+    const id = document.getElementById('match-edit-id').value;
+    const scheduleId = document.getElementById('match-edit-id').dataset.scheduleId;
 
-        function editPlayer(id) {
-            const p = players.find(x => x.id == id);
-            if (p) {
-                openPlayerModal(p.id);
-                document.getElementById('p-id').value = p.id;
-                document.getElementById('p-name').value = p.name;
-                document.getElementById('p-no').value = p.no;
-                document.getElementById('p-team').value = p.teamId;
-                document.getElementById('p-manager').checked = p.manager;
-                document.getElementById('btn-player-save').innerText = 'อัปเดต';
-            }
+    // --- จุดที่แก้ไข: เพิ่ม played: true เข้าไปในตัวแปร obj ---
+    const obj = {
+        id: id || Date.now(),
+        date: document.getElementById('match-date').value,
+        teamA: document.getElementById('m-team-a').value,
+        teamB: document.getElementById('m-team-b').value,
+        scoreA: document.getElementById('m-score-a').value,
+        scoreB: document.getElementById('m-score-b').value,
+        scheduleId: scheduleId || null,
+        played: true // <--- สำคัญมาก! ต้องมีตัวนี้ ตารางคะแนนถึงจะคำนวณ
+    };
+
+    if (id) {
+        const idx = matches.findIndex(m => m.id == id);
+        if (idx !== -1) {
+            matches[idx] = obj;
         }
+        resetMatchForm();
+    } else {
+        matches.push(obj);
+        resetMatchForm(); // ล้างฟอร์มหลังเพิ่มใหม่ด้วย
+    }
+
+    // --- ส่วนที่ทำให้ข้อมูลอัปเดตหน้าจอทันที ---
+    save(); // บันทึกลง LocalStorage
+    
+    // สั่งให้วาดหน้าจอใหม่ทันทีโดยไม่ต้อง Refresh
+    if (typeof renderAll === "function") {
+        renderAll(); 
+    } else {
+        // ถ้าไม่มี renderAll ให้เรียกแยกทีละหน้า
+        if (typeof renderLeaderboard === "function") renderLeaderboard();
+        if (typeof renderDashboard === "function") renderDashboard();
+    }
+
+    document.getElementById('m-schedule-id').value = ""; 
+    alert("บันทึกผลการแข่งขันเรียบร้อยแล้ว!");
+}
         
         function updateScheduleMatchDropdown() {
             const dropdown = document.getElementById('m-schedule-id');
