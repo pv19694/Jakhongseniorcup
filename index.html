@@ -1865,15 +1865,24 @@ function updateAllMatchTimes() {
                 note: document.getElementById('s-note').value
             };
 
-            if(id) {
-                const idx = stats.findIndex(s => s.id == id);
-                stats[idx] = obj;
-                resetStatForm();
-            } else {
-                stats.push(obj);
-            }
-            save(); 
-        }
+           if(id) {
+        // กรณีแก้ไขข้อมูลเดิม
+        const idx = stats.findIndex(s => s.id == id);
+        stats[idx] = obj;
+        resetStatForm();
+    } else {
+        // กรณีเพิ่มข้อมูลใหม่
+        stats.push(obj);
+    }
+    
+    // บันทึกลง LocalStorage ทันทีไม่ว่าจะเพิ่มหรือแก้ไข
+    localStorage.setItem('jl_stats', JSON.stringify(stats));
+    
+    // เรียกฟังก์ชันเซฟหลักและอัปเดตหน้าจอ
+    save(); 
+    if (typeof updateWeeklyScorerText === "function") {
+        updateWeeklyScorerText();
+    }
         
         // 1. UPDATED: updateStatPlayers - Removed call to toggleAssistDropdown
         function updateStatPlayers() {
