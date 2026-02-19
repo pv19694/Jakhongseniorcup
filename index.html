@@ -2553,30 +2553,38 @@ function openSettingsModal() {
 }
 
 
-// ฟังก์ชันสรุปรายชื่อคนทำประตูแบบข้อความ
 function updateWeeklyScorerText() {
     const listContainer = document.getElementById('weekly-scorer-text-list');
     if (!listContainer) return;
 
-    // 1. กรองเอาเฉพาะข้อมูลที่เป็นการทำประตู (goal)
-    const goalStats = stats.filter(s => s.type === 'goal');
-    
-    if (goalStats.length === 0) {
-        listContainer.innerHTML = '<p class="italic text-gray-500 text-center py-2">ยังไม่มีข้อมูลการทำประตูในสัปดาห์นี้</p>';
+    // 1. กรองเฉพาะ Goal และเช็คว่า stats มีข้อมูลไหม
+    if (!window.stats || stats.length === 0) {
+        listContainer.innerHTML = '<p class="italic text-gray-500 text-center py-2">ยังไม่มีข้อมูลการบันทึกสถิติ</p>';
         return;
     }
 
-    // 2. จัดกลุ่มข้อมูลตามชื่อนักเตะและชื่อทีม
+    const goalStats = stats.filter(s => s.type === 'goal' || s.type === 'Goal');
+    
+    if (goalStats.length === 0) {
+        listContainer.innerHTML = '<p class="italic text-gray-500 text-center py-2">ยังไม่มีข้อมูลการทำประตู (Goal) ในสัปดาห์นี้</p>';
+        return;
+    }
+
+    // 2. จัดกลุ่มข้อมูล
     const summary = {};
     goalStats.forEach(s => {
-        const key = `${s.playerName} (${s.teamName})`;
-        summary[key] = (summary[key] || 0) + (parseInt(s.count) || 0);
+        const name = s.playerName || 'ไม่ระบุชื่อ';
+        const team = s.teamName || '';
+        const key = `${name} (${team})`;
+        // เช็คว่ามี s.count ไหม ถ้าไม่มีให้ถือว่าเป็น 1 ลูกต่อ 1 รายการบันทึก
+        const goalCount = parseInt(s.count) || 1; 
+        summary[key] = (summary[key] || 0) + goalCount;
     });
 
-    // 3. เรียงลำดับจากคนทำประตูมากที่สุดไปน้อยที่สุด
+    // 3. เรียงลำดับ
     const sortedScorers = Object.entries(summary).sort((a, b) => b[1] - a[1]);
 
-    // 4. สร้าง HTML เพื่อแสดงผล (แบ่งเป็น 2 คอลัมน์บนจอใหญ่)
+    // 4. แสดงผล
     let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1">';
     sortedScorers.forEach(([playerInfo, count]) => {
         html += `
