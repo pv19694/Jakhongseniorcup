@@ -515,29 +515,39 @@
                         <tbody id="lb-body" class="text-base font-medium"></tbody>
                     </table>
                 </div>
+            </div> <div id="scorer-summary-box" class="mt-4 glass p-5 rounded-xl border-t-2" style="border-color: var(--primary-color);">
+                <h3 class="text-lg font-bold mb-3 flex items-center gap-2" style="color: var(--primary-color);">
+                    <i class="fas fa-futbol"></i> รายละเอียดคนทำประตูในสัปดาห์นี้
+                </h3>
+                <div id="weekly-scorer-text-list" class="text-sm space-y-2 text-gray-200">
+                    <p class="italic text-gray-500">กำลังประมวลผลข้อมูล...</p>
+                </div>
             </div>
-        </div>
+        </div> <div id="page-schedule" class="section hidden fade-in">
+            <div class="glass p-3 rounded-xl mb-4 flex flex-wrap gap-4 items-center text-xs">
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="openAddSchedModal()" class="bg-green-600 text-white px-3 py-1.5 rounded font-bold hover:bg-green-500 transition flex items-center gap-1">
+                        <i class="fas fa-plus"></i> เพิ่มแมทช์
+                    </button>
+                    <button onclick="autoGenerateLeague()" class="bg-blue-600 text-white px-3 py-1.5 rounded font-bold hover:bg-blue-500 transition flex items-center gap-1">
+                        <i class="fas fa-magic"></i> จัดลีกอัตโนมัติ (8 ทีม)
+                    </button>
+                    <button onclick="saveScheduleOrder()" class="bg-emerald-700 text-white px-4 py-1.5 rounded font-bold hover:bg-emerald-600 transition flex items-center gap-1 shadow-lg ring-2 ring-white/10">
+                        <i class="fas fa-save"></i> บันทึกลำดับการแข่ง
+                    </button>
+                    <button onclick="clearSchedule()" class="bg-red-600 text-white px-3 py-1.5 rounded font-bold hover:bg-red-500 transition flex items-center gap-1">
+                        <i class="fas fa-trash-alt"></i> ล้างตาราง
+                    </button>
+                </div>
+            </div>
+            ```
 
-     <div id="page-schedule" class="section hidden fade-in">
-    <div class="glass p-3 rounded-xl mb-4 flex flex-wrap gap-4 items-center text-xs">
-        <div class="flex flex-wrap gap-2">
-            <button onclick="openAddSchedModal()" class="bg-green-600 text-white px-3 py-1.5 rounded font-bold hover:bg-green-500 transition flex items-center gap-1">
-                <i class="fas fa-plus"></i> เพิ่มแมทช์
-            </button>
+### การแก้ไขสำคัญที่เกิดขึ้น:
+1.  **Tag Hierarchy**: ตรวจสอบว่า `scorer-summary-box` ถูกวางไว้นอกกล่องตาราง แต่ยังอยู่ภายใต้ `page-leaderboard` เพื่อให้ข้อมูลทั้งสองส่วนแสดงผลและหายไปพร้อมกันเวลาคุณกดปุ่มเมนู
+2.  **Cleaner Logic**: ลบ `</div>` ส่วนเกินที่อาจทำให้โครงสร้าง HTML พัง และจัดระเบียบให้แต่ละหน้า (`page-leaderboard`, `page-schedule`) แยกกันชัดเจน
+3.  **Consistency**: ตรวจสอบการใช้ CSS variables เช่น `--primary-color` เพื่อให้กล่องสรุปคนทำประตูใช้ธีมสีเดียวกับที่คุณตั้งค่าไว้ในหน้าเว็บ
 
-            <button onclick="autoGenerateLeague()" class="bg-blue-600 text-white px-3 py-1.5 rounded font-bold hover:bg-blue-500 transition flex items-center gap-1">
-                <i class="fas fa-magic"></i> จัดลีกอัตโนมัติ (8 ทีม)
-            </button>
-
-            <button onclick="saveScheduleOrder()" class="bg-emerald-700 text-white px-4 py-1.5 rounded font-bold hover:bg-emerald-600 transition flex items-center gap-1 shadow-lg ring-2 ring-white/10">
-                <i class="fas fa-save"></i> บันทึกลำดับการแข่ง
-            </button>
-
-            <button onclick="clearSchedule()" class="bg-red-600 text-white px-3 py-1.5 rounded font-bold hover:bg-red-500 transition flex items-center gap-1">
-                <i class="fas fa-trash-alt"></i> ล้างตาราง
-            </button>
-        </div>
-    </div>
+**หมายเหตุ:** คุณต้องนำฟังก์ชัน JavaScript `updateWeeklyScorerText()` ที่ผมเขียนให้ก่อนหน้านี้ ไปใส่ไว้ในส่วน `<script>` ของไฟล์ และเรียกใช้ภายในฟังก์ชัน `renderLeaderboard()` ด้วย เพื่อให้รายชื่อนักเตะแสดงผลจริงครับ
          
 
     <div class="flex flex-col min-h-[500px] rounded-xl overflow-hidden shadow-2xl relative" id="schedule-main-container">
@@ -1414,6 +1424,8 @@ function forceUpdateAll() {
         </td>
     </tr>
     `).join('');
+    // วางบรรทัดนี้ไว้ตรงนี้ (ก่อนปิดฟังก์ชัน)
+    updateWeeklyScorerText();
 } // <--- ปิดฟังก์ชัน renderLeaderboard ให้เรียบร้อย
 
 // ฟังก์ชันอื่นๆ ต่อไป...
@@ -2589,7 +2601,45 @@ function openSettingsModal() {
     document.getElementById('secondary-color-input').value = secondaryColor || '#1c365b';
     document.getElementById('settings-modal').classList.remove('hidden');
 }
-        
+
+// ฟังก์ชันสำหรับดึงข้อมูลคนทำประตูมาแสดงใต้ตารางคะแนน
+function updateWeeklyScorerText() {
+    const listContainer = document.getElementById('weekly-scorer-text-list');
+    if (!listContainer) return;
+
+    // กรองเอาเฉพาะสถิติที่เป็นการทำประตู (goal)
+    const goalStats = stats.filter(s => s.type === 'goal');
+    
+    if (goalStats.length === 0) {
+        listContainer.innerHTML = '<p class="italic text-gray-500 text-center py-2">ยังไม่มีข้อมูลการทำประตูในสัปดาห์นี้</p>';
+        return;
+    }
+
+    // รวมกลุ่มข้อมูลตามชื่อนักเตะและทีม
+    const summary = {};
+    goalStats.forEach(s => {
+        const key = `${s.playerName} (${s.teamName})`;
+        summary[key] = (summary[key] || 0) + (parseInt(s.count) || 0);
+    });
+
+    // เรียงลำดับคนทำเยอะสุดขึ้นก่อน
+    const sortedScorers = Object.entries(summary).sort((a, b) => b[1] - a[1]);
+
+    // สร้าง HTML แสดงผล
+    let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">';
+    sortedScorers.forEach(([playerInfo, count]) => {
+        html += `
+            <div class="flex justify-between items-center border-b border-white/5 py-1">
+                <span><i class="far fa-user text-xs mr-2 opacity-50"></i>${playerInfo}</span>
+                <span class="font-bold" style="color: var(--primary-color);">${count} ประตู</span>
+            </div>`;
+    });
+    html += '</div>';
+
+    listContainer.innerHTML = html;
+}
+
+    
         
     </script>
 </body>
