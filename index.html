@@ -473,8 +473,7 @@
             </div>
         </div>
 
-<div id="page-leaderboard" class="section hidden fade-in">
-            
+        <div id="page-leaderboard" class="section hidden fade-in">
             <div class="glass p-3 rounded-xl mb-4 flex flex-wrap gap-4 items-center text-xs">
                 <strong class="text-yellow-400">ปรับแต่งตาราง:</strong>
                 <div><label>สีพื้นตาราง</label><input type="color" id="lb-bg-body" value="#1e293b" class="w-5 h-5 rounded align-middle ml-1 cursor-pointer" oninput="renderLeaderboard()"></div>
@@ -517,16 +516,10 @@
                         <tbody id="lb-body" class="text-base font-medium"></tbody>
                     </table>
                 </div>
-            </div> <div id="scorer-summary-box" class="mt-4 glass p-5 rounded-xl border-t-2" style="border-color: var(--primary-color);">
-                <h3 class="text-lg font-bold mb-3 flex items-center gap-2" style="color: var(--primary-color);">
-                    <i class="fas fa-futbol"></i> รายละเอียดคนทำประตูในสัปดาห์นี้
-                </h3>
-                <div id="weekly-scorer-text-list" class="text-sm space-y-2 text-gray-200">
-                    <p class="italic text-gray-500 text-center py-2">กำลังประมวลผลข้อมูล...</p>
-                </div>
             </div>
+        </div>
 
-        </div> <div id="page-schedule" class="section hidden fade-in">
+     <div id="page-schedule" class="section hidden fade-in">
     <div class="glass p-3 rounded-xl mb-4 flex flex-wrap gap-4 items-center text-xs">
         <div class="flex flex-wrap gap-2">
             <button onclick="openAddSchedModal()" class="bg-green-600 text-white px-3 py-1.5 rounded font-bold hover:bg-green-500 transition flex items-center gap-1">
@@ -1313,6 +1306,55 @@ function calculateLeaderboardData() {
     });
 }
 
+// --- ส่วนที่ทำให้ตารางยอมแสดงผล (Fix Render) ---
+function renderLeaderboard() {
+    const data = calculateLeaderboardData();
+    const tbody = document.getElementById('lb-body');
+    if (!tbody) return;
+
+    // แก้ไข: เพิ่มค่าสีเริ่มต้น ป้องกันโค้ดค้างถ้าหา Element ไม่เจอ
+    const bgColor = document.getElementById('lb-bg-body')?.value || '#1e293b';
+    const textColor = document.getElementById('lb-body-text-color')?.value || '#ffffff';
+    const rankColor = document.getElementById('lb-rank-color')?.value || '#facc15';
+
+    tbody.innerHTML = data.map((t, i) => `
+        <tr class="border-b border-white/5 transition hover:bg-white/5" style="background-color: ${bgColor}; color: ${textColor};">
+            <td class="p-4 font-black text-2xl italic" style="color: ${rankColor};">${i + 1}</td>
+            <td class="p-4">
+                <div class="flex items-center gap-3">
+                    ${t.logo ? `<img src="${t.logo}" class="w-10 h-10 logo-circle border-2 border-white/20">` : 
+                               `<div class="w-10 h-10 logo-circle bg-gray-700 flex items-center justify-center border-2 border-white/20"><i class="fas fa-shield-alt text-xs"></i></div>`}
+                    <span class="uppercase font-bold tracking-wide">${t.name}</span>
+                </div>
+            </td>
+            <td class="p-4 text-center font-bold">${t.p}</td>
+            <td class="p-4 text-center text-green-400">${t.w}</td>
+            <td class="p-4 text-center text-gray-400">${t.d}</td>
+            <td class="p-4 text-center text-red-400">${t.l}</td>
+            <td class="p-4 text-center text-xs opacity-70">${t.gf}/${t.ga}</td>
+            <td class="p-4 text-center font-bold ${t.gd >= 0 ? 'text-blue-400' : 'text-orange-400'}">${t.gd > 0 ? '+' + t.gd : t.gd}</td>
+            <td class="p-0">
+                <div class="h-full py-4 text-center text-2xl font-black bg-gradient-to-b from-yellow-400 to-yellow-600 text-black shadow-inner">
+                    ${t.pts}
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// --- จุดสำคัญ: ฟังก์ชันช่วยอัปเดตหน้าจอทันที ---
+function forceUpdateAll() {
+    // 1. คำนวณใหม่
+    const newData = calculateLeaderboardData();
+    // 2. สั่งวาดตารางคะแนนใหม่ (ตรวจสอบชื่อฟังก์ชัน render ของคุณด้วยนะครับ)
+    if (typeof renderLeaderboard === "function") {
+        renderLeaderboard(newData); 
+    }
+    // 3. สั่งวาดหน้า Dashboard ใหม่
+    if (typeof renderDashboard === "function") {
+        renderDashboard();
+    }
+}
 
        function renderLeaderboard() {
     const standings = calculateLeaderboardData();
@@ -1373,12 +1415,9 @@ function calculateLeaderboardData() {
         </td>
     </tr>
     `).join('');
-// --- แทรกตรงนี้ครับ (ก่อนปีกกาปิดอันสุดท้าย) ---
-    if (typeof updateWeeklyScorerText === "function") {
-        updateWeeklyScorerText();
-    }
-}
- 
+} // <--- ปิดฟังก์ชัน renderLeaderboard ให้เรียบร้อย
+
+// ฟังก์ชันอื่นๆ ต่อไป...
 function openAddSchedModal() {
     updateDropdowns(); 
     document.getElementById('sched-modal').classList.remove('hidden');
@@ -1865,24 +1904,15 @@ function updateAllMatchTimes() {
                 note: document.getElementById('s-note').value
             };
 
-           if(id) {
-        // กรณีแก้ไขข้อมูลเดิม
-        const idx = stats.findIndex(s => s.id == id);
-        stats[idx] = obj;
-        resetStatForm();
-    } else {
-        // กรณีเพิ่มข้อมูลใหม่
-        stats.push(obj);
-    }
-    
-    // บันทึกลง LocalStorage ทันทีไม่ว่าจะเพิ่มหรือแก้ไข
-    localStorage.setItem('jl_stats', JSON.stringify(stats));
-    
-    // เรียกฟังก์ชันเซฟหลักและอัปเดตหน้าจอ
-    save(); 
-    if (typeof updateWeeklyScorerText === "function") {
-        updateWeeklyScorerText();
-    }
+            if(id) {
+                const idx = stats.findIndex(s => s.id == id);
+                stats[idx] = obj;
+                resetStatForm();
+            } else {
+                stats.push(obj);
+            }
+            save(); 
+        }
         
         // 1. UPDATED: updateStatPlayers - Removed call to toggleAssistDropdown
         function updateStatPlayers() {
@@ -2559,52 +2589,6 @@ function openSettingsModal() {
     document.getElementById('theme-color-input').value = themeColor || '#facc15';
     document.getElementById('secondary-color-input').value = secondaryColor || '#1c365b';
     document.getElementById('settings-modal').classList.remove('hidden');
-}
-
-
-function updateWeeklyScorerText() {
-    const listContainer = document.getElementById('weekly-scorer-text-list');
-    if (!listContainer) return;
-
-    // 1. กรองเฉพาะ Goal และเช็คว่า stats มีข้อมูลไหม
-    if (!window.stats || stats.length === 0) {
-        listContainer.innerHTML = '<p class="italic text-gray-500 text-center py-2">ยังไม่มีข้อมูลการบันทึกสถิติ</p>';
-        return;
-    }
-
-    const goalStats = stats.filter(s => s.type === 'goal' || s.type === 'Goal');
-    
-    if (goalStats.length === 0) {
-        listContainer.innerHTML = '<p class="italic text-gray-500 text-center py-2">ยังไม่มีข้อมูลการทำประตู (Goal) ในสัปดาห์นี้</p>';
-        return;
-    }
-
-    // 2. จัดกลุ่มข้อมูล
-    const summary = {};
-    goalStats.forEach(s => {
-        const name = s.playerName || 'ไม่ระบุชื่อ';
-        const team = s.teamName || '';
-        const key = `${name} (${team})`;
-        // เช็คว่ามี s.count ไหม ถ้าไม่มีให้ถือว่าเป็น 1 ลูกต่อ 1 รายการบันทึก
-        const goalCount = parseInt(s.count) || 1; 
-        summary[key] = (summary[key] || 0) + goalCount;
-    });
-
-    // 3. เรียงลำดับ
-    const sortedScorers = Object.entries(summary).sort((a, b) => b[1] - a[1]);
-
-    // 4. แสดงผล
-    let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1">';
-    sortedScorers.forEach(([playerInfo, count]) => {
-        html += `
-            <div class="flex justify-between items-center border-b border-white/5 py-1.5 hover:bg-white/5 px-2 rounded transition">
-                <span class="truncate italic"><i class="far fa-user text-xs mr-2 opacity-50"></i>${playerInfo}</span>
-                <span class="font-bold shrink-0" style="color: var(--primary-color);">${count} ประตู</span>
-            </div>`;
-    });
-    html += '</div>';
-
-    listContainer.innerHTML = html;
 }
         
         
