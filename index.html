@@ -515,10 +515,15 @@
                         </thead>
                         <tbody id="lb-body" class="text-base font-medium"></tbody>
                     </table>
-                </div>
-            </div>
+                <div id="lb-today-scorers-container" class="mt-6 p-4 glass rounded-xl border-t-4" style="border-color: var(--primary-color);">
+    <h3 class="text-xl font-bold mb-4 flex items-center gap-2" style="color: var(--primary-color);">
+        <i class="fas fa-futbol"></i> ผู้ที่ทำประตูวันนี้
+    </h3>
+    <div id="lb-today-scorers-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         </div>
-
+</div>
+                    
+                
      <div id="page-schedule" class="section hidden fade-in">
     <div class="glass p-3 rounded-xl mb-4 flex flex-wrap gap-4 items-center text-xs">
         <div class="flex flex-wrap gap-2">
@@ -1415,6 +1420,7 @@ function forceUpdateAll() {
         </td>
     </tr>
     `).join('');
+  renderTodayScorersOnLeaderboard();
 } // <--- ปิดฟังก์ชัน renderLeaderboard ให้เรียบร้อย
 
 // ฟังก์ชันอื่นๆ ต่อไป...
@@ -2590,7 +2596,58 @@ function openSettingsModal() {
     document.getElementById('secondary-color-input').value = secondaryColor || '#1c365b';
     document.getElementById('settings-modal').classList.remove('hidden');
 }
-        
+
+
+  function renderTodayScorersOnLeaderboard() {
+    const listContainer = document.getElementById('lb-today-scorers-list');
+    if (!listContainer) return;
+
+    // 1. ดึงวันที่ปัจจุบัน (รูปแบบ YYYY-MM-DD ให้ตรงกับในระบบ stats)
+    const today = new Date().toISOString().split('T')[0];
+    
+    // 2. กรองข้อมูลเฉพาะที่เป็น 'goal' และเป็นของ 'วันนี้'
+    // (หมายเหตุ: ตัวแปร stats คือตัวแปรหลักในไฟล์ของคุณที่เก็บประวัติการยิงประตู)
+    const todayGoals = stats.filter(s => s.date === today && s.type === 'goal');
+
+    // 3. รวมจำนวนประตูแยกตามรายชื่อนักเตะ (กรณีคนเดียวทำหลายประตู)
+    const summary = {};
+    todayGoals.forEach(s => {
+        if (!summary[s.playerId]) {
+            summary[s.playerId] = { 
+                name: s.playerName, 
+                team: s.teamName, 
+                count: 0 
+            };
+        }
+        summary[s.playerId].count += parseInt(s.count || 1);
+    });
+
+    // 4. เรียงลำดับคนทำประตูมากที่สุดขึ้นก่อน
+    const sortedScorers = Object.values(summary).sort((a, b) => b.count - a.count);
+
+    // 5. สร้าง HTML เพื่อแสดงผล (เน้นข้อความ ไม่เอารูปภาพ)
+    let html = '';
+    if (sortedScorers.length === 0) {
+        html = '<div class="col-span-full text-gray-400 text-center py-4">วันนี้ยังไม่มีการทำประตู</div>';
+    } else {
+        sortedScorers.forEach(player => {
+            html += `
+                <div class="bg-black/20 p-3 rounded-lg border border-white/10 flex justify-between items-center">
+                    <div class="flex flex-col">
+                        <span class="font-bold text-white text-lg">${player.name}</span>
+                        <span class="text-xs opacity-70" style="color: var(--primary-color);">${player.team}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl font-black" style="color: var(--primary-color);">${player.count}</span>
+                        <span class="text-xs text-gray-400">ประตู</span>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    listContainer.innerHTML = html;
+}      
         
     </script>
 </body>
