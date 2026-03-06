@@ -1461,23 +1461,20 @@ function renderSchedule() {
     const cTextColor = document.getElementById('sc-text-color')?.value || '#ffffff';
     const cPillColor = document.getElementById('sc-pill-color')?.value || '#facc15';
 
-    // กรองกลุ่ม (Group Filter)
     const filteredSchedules = currentGroupFilter === 'All' 
         ? schedules 
         : schedules.filter(s => s.group === currentGroupFilter);
 
-    // จัดกลุ่มแมทช์การแข่งขันตามสัปดาห์ (Week)
     const grouped = filteredSchedules.reduce((acc, curr) => {
-        const key = curr.week; // ใช้เลข Week เป็น Key หลัก
+        const key = curr.week; 
         if (!acc[key]) acc[key] = [];
         acc[key].push(curr);
         return acc;
     }, {});
 
-    // สร้าง HTML โดยเรียงตามสัปดาห์
     let html = Object.keys(grouped).sort((a, b) => a - b).map(weekNum => {
         const weekMatches = grouped[weekNum];
-        const weekDate = weekMatches[0].date; // ดึงวันที่ของคู่แรกในสัปดาห์นั้นมาโชว์
+        const weekDate = weekMatches[0].date; 
 
         const matchesHtml = weekMatches.map(s => {
             const tA = teams.find(t => String(t.id) === String(s.teamA)) || { name: 'รอระบุ', logo: '' };
@@ -1527,22 +1524,32 @@ function renderSchedule() {
             `;
         }).join('');
 
-        // คืนค่า Banner ที่มีปุ่มแก้ไขวันที่
+        // --- ดีไซน์แบนเนอร์ใหม่ที่เน้นวันที่ตัวใหญ่ ---
         return `
-            <div class="flex flex-wrap items-center justify-between p-3 rounded-lg mb-4 font-bold text-black tracking-widest uppercase text-lg gap-3 shadow-md" 
+            <div class="relative overflow-hidden p-4 rounded-xl mb-4 shadow-xl flex items-center justify-between border-b-4 border-black/20" 
                  style="background-color: ${cPillColor}; transform: skewX(-10deg);">
                 
-                <div class="flex items-center gap-2 px-2" style="transform: skewX(10deg);">
-                    <i class="fas fa-calendar-day"></i>
-                    WEEK ${weekNum}
+                <div class="flex items-center gap-4 text-black" style="transform: skewX(10deg);">
+                    <div class="flex flex-col leading-none">
+                        <span class="text-[10px] font-black opacity-50 uppercase tracking-tighter">Matchday</span>
+                        <span class="text-2xl font-black italic uppercase">WEEK ${weekNum}</span>
+                    </div>
+                    
+                    <div class="h-8 w-[2px] bg-black/20"></div>
+
+                    <div class="relative flex flex-col leading-none group cursor-pointer">
+                        <span class="text-[10px] font-black opacity-50 uppercase tracking-tighter">Date</span>
+                        <span class="text-2xl font-black italic">${formatDate(weekDate)}</span>
+                        
+                        <input type="date" 
+                               value="${weekDate}" 
+                               onchange="updateWeekDateByInput(${weekNum}, this.value)"
+                               class="absolute inset-0 opacity-0 cursor-pointer">
+                    </div>
                 </div>
 
-                <div class="flex items-center gap-2 bg-black/10 px-3 py-1 rounded border border-black/10" style="transform: skewX(10deg);">
-                    <span class="text-[9px] font-black opacity-50">แก้ไขวันที่:</span>
-                    <input type="date" 
-                           value="${weekDate}" 
-                           onchange="updateWeekDateByInput(${weekNum}, this.value)"
-                           class="bg-transparent border-none text-xs font-bold focus:outline-none cursor-pointer">
+                <div class="opacity-20" style="transform: skewX(10deg);">
+                    <i class="fas fa-calendar-alt text-3xl text-black"></i>
                 </div>
             </div>
             <div class="week-sortable-container">
@@ -1553,7 +1560,6 @@ function renderSchedule() {
 
     cont.innerHTML = html || '<p class="text-center text-gray-500 py-10">ไม่มีโปรแกรมการแข่งขัน</p>';
 
-    // เรียกใช้ SortableJS สำหรับลากวาง
     document.querySelectorAll('.week-sortable-container').forEach(el => {
         Sortable.create(el, {
             animation: 150,
