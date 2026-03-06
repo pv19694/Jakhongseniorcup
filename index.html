@@ -2466,76 +2466,81 @@ function clearSchedule() {
     }
 }
 
-function autoGenerateLeague() {
-    if (typeof teams === 'undefined' || teams.length < 8) {
-        return alert("กรุณาเพิ่มทีมให้ครบ 8 ทีมก่อน");
+function generateSchedule() {
+    // ดึงค่าวันที่เริ่มต้นจาก Input (สมมติว่าเป็นวันที่ของ Week 1)
+    let startDateStr = document.getElementById('start-date').value;
+    if (!startDateStr) {
+        alert("กรุณาเลือกวันที่เริ่มต้น (Week 1)");
+        return;
     }
-    const startDateStr = prompt("ระบุวันที่เริ่มแข่ง (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
-    if (!startDateStr) return;
 
-    try {
-        let tempTeams = [...teams].slice(0, 8);
-        tempTeams.sort(() => Math.random() - 0.5); // สุ่มลำดับทีมตั้งต้น
+    let tempTeams = [...teams];
+    if (tempTeams.length < 8) {
+        alert("กรุณาเพิ่มทีมให้ครบ 8 ทีมก่อนสร้างโปรแกรม");
+        return;
+    }
 
-        let newGenerated = [];
-        let startDate = new Date(startDateStr);
+    // Shuffle ทีมเพื่อความสุ่มในการจัดตาราง
+    tempTeams.sort(() => Math.random() - 0.5);
 
-        for (let round = 0; round < 7; round++) {
-            let matchDay = new Date(startDate);
+    let newMatches = [];
+    let startDate = new Date(startDateStr);
+
+    // วนลูปสร้างการแข่งขัน 7 สัปดาห์ (Round Robin 7 Rounds)
+    for (let round = 0; round < 7; round++) {
+        let matchDay = new Date(startDate);
+        
+        // --- ส่วนแก้ไขเงื่อนไขวันที่ตามที่คุณต้องการ ---
+        if (round < 2) { 
+            // WEEK 1 (round 0) และ WEEK 2 (round 1) 
+            // ให้คำนวณจากวันที่เริ่มต้นที่เลือกมา บวกไปสัปดาห์ละ 7 วัน
             matchDay.setDate(startDate.getDate() + (round * 7));
-            let dateStr = matchDay.toISOString().split('T')[0];
+        } else {
+            // ตั้งแต่ WEEK 3 (round 2) เป็นต้นไป 
+            // บังคับให้เริ่มนับใหม่จากวันที่ 8 มีนาคม 2026 (พ.ศ. 2569)
+            let week3Date = new Date('2026-03-08'); 
+            matchDay.setDate(week3Date.getDate() + ((round - 2) * 7));
+        }
+        // ---------------------------------------
+
+        let dateStr = matchDay.toISOString().split('T')[0];
+        let currentRoundMatches = [];
+
+        // จัดคู่แข่งขัน (Circle Method แบบประยุกต์สำหรับ 8 ทีม)
+        for (let i = 0; i < 4; i++) {
+            let teamA = tempTeams[i];
+            let teamB = tempTeams[7 - i];
             
-            let currentRoundMatches = [];
-
-            for (let i = 0; i < 4; i++) {
-                let teamA = tempTeams[i];
-                let teamB = tempTeams[7 - i];
-                currentRoundMatches.push({
-                    id: Date.now() + Math.random(),
-                    date: dateStr,
-                    week: round + 1,
-                    teamA: teamA.id, 
-                    teamB: teamB.id,
-                    group: (i < 2) ? 'A' : 'B',
-                    scoreA: "", scoreB: "", played: false
-                });
-            }
-
-            // สุ่มลำดับคู่ในแต่ละวันเพื่อความยุติธรรม
-            currentRoundMatches.sort(() => Math.random() - 0.5);
-
-            // --- คำนวณเวลาแข่งใหม่ (คู่ละ 40 นาที) ---
-            currentRoundMatches.forEach((match, index) => {
-                let startHour = 16; // เริ่ม 16:00
-                let totalMinutes = index * 40; // คู่ที่ 0 = 0นาที, คู่ที่ 1 = 40นาที, คู่ที่ 2 = 80นาที...
-                
-                let hour = startHour + Math.floor(totalMinutes / 60);
-                let minute = totalMinutes % 60;
-                
-                // รูปแบบเวลาให้เป็น HH:MM (เช่น 17:40, 18:20)
-                match.time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-                newGenerated.push(match);
+            currentRoundMatches.push({
+                id: Date.now() + Math.random(),
+                date: dateStr,
+                week: round + 1,
+                teamA: teamA.id, 
+                teamB: teamB.id,
+                group: (i < 2) ? 'A' : 'B', // แบ่งกลุ่ม A/B ตามคู่
+                scoreA: "", 
+                scoreB: "", 
+                played: false
             });
-
-            tempTeams.splice(1, 0, tempTeams.pop()); 
         }
 
-        if (confirm(`สุ่มสำเร็จ 28 แมตช์ (แข่งคู่ละ 40 นาที)! ต้องการบันทึกหรือไม่?`)) {
-            schedules = [...schedules, ...newGenerated];
+        newMatches.push(...currentRoundMatches);
 
-            // ตรวจสอบชื่อฟังก์ชันบันทึกที่มีในไฟล์ของคุณ (เพื่อไม่ให้เกิด Error)
-            if (typeof saveData === "function") saveData();
-            else if (typeof save === "function") save();
-
-            // แสดงผลบนหน้าจอ
-            if (typeof renderSchedule === "function") renderSchedule();
-            
-            alert("จัดตารางแข่งสำเร็จ! เวลาแข่งจะห่างกันคู่ละ 40 นาทีครับ");
-        }
-    } catch (err) {
-        alert("เกิดข้อผิดพลาด: " + err.message);
+        // หมุนทีม (ยกเว้นทีมแรกที่ตำแหน่ง [0]) เพื่อจัดรอบถัดไป
+        tempTeams.splice(1, 0, tempTeams.pop());
     }
+
+    // บันทึกข้อมูลลงในตัวแปรหลักและ LocalStorage
+    matches = newMatches;
+    save(); 
+    
+    // อัปเดตการแสดงผลบนหน้าจอ
+    if (typeof renderSchedule === "function") renderSchedule();
+    if (typeof renderDashboard === "function") renderDashboard();
+    
+    alert("สร้างโปรแกรมการแข่งขันใหม่เรียบร้อยแล้ว! (WEEK 3 เริ่มวันที่ 08/03/69)");
 }
+
 
         // ฟังก์ชันสำหรับสลับการแสดงผลหน้าต่างลบแมตช์
 function toggleDeleteBtn(id) {
