@@ -1461,70 +1461,89 @@ function renderSchedule() {
     const cTextColor = document.getElementById('sc-text-color')?.value || '#ffffff';
     const cPillColor = document.getElementById('sc-pill-color')?.value || '#facc15';
 
+    // กรองกลุ่ม (Group Filter)
     const filteredSchedules = currentGroupFilter === 'All' 
         ? schedules 
         : schedules.filter(s => s.group === currentGroupFilter);
 
-    // จัดกลุ่มตามสัปดาห์
+    // จัดกลุ่มแมทช์การแข่งขันตามสัปดาห์ (Week)
     const grouped = filteredSchedules.reduce((acc, curr) => {
-        const key = `Week ${curr.week} (${formatDate(curr.date)})`;
+        const key = curr.week; // ใช้เลข Week เป็น Key หลัก
         if (!acc[key]) acc[key] = [];
         acc[key].push(curr);
         return acc;
     }, {});
 
-    let html = Object.keys(grouped).sort().map(key => {
-        const matchesHtml = grouped[key].map(s => {
-    const tA = teams.find(t => String(t.id) === String(s.teamA)) || { name: 'รอระบุ', logo: '' };
-    const tB = teams.find(t => String(t.id) === String(s.teamB)) || { name: 'รอระบุ', logo: '' };
-    
-    return `
-        <div class="match-card relative overflow-hidden glass mb-3 rounded-2xl flex items-center justify-between p-4 border border-white/5 shadow-xl cursor-grab active:cursor-grabbing" 
-             data-id="${s.id}" onclick="toggleDeleteBtn(${s.id})">
+    // สร้าง HTML โดยเรียงตามสัปดาห์
+    let html = Object.keys(grouped).sort((a, b) => a - b).map(weekNum => {
+        const weekMatches = grouped[weekNum];
+        const weekDate = weekMatches[0].date; // ดึงวันที่ของคู่แรกในสัปดาห์นั้นมาโชว์
+
+        const matchesHtml = weekMatches.map(s => {
+            const tA = teams.find(t => String(t.id) === String(s.teamA)) || { name: 'รอระบุ', logo: '' };
+            const tB = teams.find(t => String(t.id) === String(s.teamB)) || { name: 'รอระบุ', logo: '' };
             
-            <div class="flex-1 flex items-center justify-end gap-3 text-right">
-                <div class="flex flex-col">
-                    <div class="font-black italic text-base md:text-xl uppercase tracking-tighter leading-tight" style="color: ${cTextColor};">
-                        ${tA.name}
+            return `
+                <div class="match-card relative overflow-hidden glass mb-3 rounded-2xl flex items-center justify-between p-4 border border-white/5 shadow-xl cursor-grab active:cursor-grabbing" 
+                     data-id="${s.id}" onclick="toggleDeleteBtn(${s.id})">
+                    
+                    <div class="flex-1 flex items-center justify-end gap-3 text-right">
+                        <div class="flex flex-col">
+                            <div class="font-black italic text-base md:text-xl uppercase tracking-tighter leading-tight" style="color: ${cTextColor};">
+                                ${tA.name}
+                            </div>
+                            <div class="text-[8px] text-gray-500 font-bold uppercase tracking-widest">${s.group ? 'Group ' + s.group : ''}</div>
+                        </div>
+                        <div class="w-12 h-12 md:w-16 md:h-16 min-w-[48px] min-h-[48px] overflow-hidden rounded-full border-2 border-white/10 shadow-lg bg-black/20">
+                            <img src="${tA.logo}" class="w-full h-full object-cover aspect-square" style="border-radius: 50% !important;">
+                        </div>
                     </div>
-                    <div class="text-[8px] text-gray-500 font-bold uppercase tracking-widest">${s.group ? 'Group ' + s.group : ''}</div>
-                </div>
-                <div class="w-12 h-12 md:w-16 md:h-16 min-w-[48px] min-h-[48px] overflow-hidden rounded-full border-2 border-white/10 shadow-lg bg-black/20">
-                    <img src="${tA.logo}" class="w-full h-full object-cover aspect-square" style="border-radius: 50% !important;">
-                </div>
-            </div>
 
-            <div class="flex flex-col items-center justify-center px-4 min-w-[90px]">
-                <div class="text-xl font-black italic text-yellow-500 leading-none">VS</div>
-                <div class="match-time-text bg-yellow-500 text-black px-3 py-0.5 rounded-full text-[11px] font-black mt-1 mb-1 shadow-md">
-                    ${s.time}
-                </div>
-                <div class="text-[8px] text-gray-400 font-medium whitespace-nowrap">${formatDate(s.date)}</div>
-            </div>
-
-            <div class="flex-1 flex items-center justify-start gap-3 text-left">
-                <div class="w-12 h-12 md:w-16 md:h-16 min-w-[48px] min-h-[48px] overflow-hidden rounded-full border-2 border-white/10 shadow-lg bg-black/20">
-                    <img src="${tB.logo}" class="w-full h-full object-cover aspect-square" style="border-radius: 50% !important;">
-                </div>
-                <div class="flex flex-col">
-                    <div class="font-black italic text-base md:text-xl uppercase tracking-tighter leading-tight" style="color: ${cTextColor};">
-                        ${tB.name}
+                    <div class="flex flex-col items-center justify-center px-4 min-w-[90px]">
+                        <div class="text-xl font-black italic text-yellow-500 leading-none">VS</div>
+                        <div class="match-time-text bg-yellow-500 text-black px-3 py-0.5 rounded-full text-[11px] font-black mt-1 mb-1 shadow-md">
+                            ${s.time}
+                        </div>
+                        <div class="text-[8px] text-gray-400 font-medium whitespace-nowrap">${formatDate(s.date)}</div>
                     </div>
-                    <div class="text-[8px] text-gray-500 font-bold uppercase tracking-widest">${s.group ? 'Group ' + s.group : ''}</div>
-                </div>
-            </div>
 
-            <div id="delete-wrapper-${s.id}" class="delete-btn-hidden absolute inset-0 bg-black/90 flex items-center justify-center rounded-2xl z-20">
-                <button onclick="event.stopPropagation(); deleteMatchSchedule(${s.id})" class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold">ยืนยันลบ</button>
-                <button onclick="event.stopPropagation(); toggleDeleteBtn(${s.id})" class="ml-2 bg-gray-600 text-white px-4 py-2 rounded-lg font-bold">ยกเลิก</button>
-            </div>
-        </div>
-    `;
-}).join('');
+                    <div class="flex-1 flex items-center justify-start gap-3 text-left">
+                        <div class="w-12 h-12 md:w-16 md:h-16 min-w-[48px] min-h-[48px] overflow-hidden rounded-full border-2 border-white/10 shadow-lg bg-black/20">
+                            <img src="${tB.logo}" class="w-full h-full object-cover aspect-square" style="border-radius: 50% !important;">
+                        </div>
+                        <div class="flex flex-col">
+                            <div class="font-black italic text-base md:text-xl uppercase tracking-tighter leading-tight" style="color: ${cTextColor};">
+                                ${tB.name}
+                            </div>
+                            <div class="text-[8px] text-gray-500 font-bold uppercase tracking-widest">${s.group ? 'Group ' + s.group : ''}</div>
+                        </div>
+                    </div>
+
+                    <div id="delete-wrapper-${s.id}" class="delete-btn-hidden absolute inset-0 bg-black/90 flex items-center justify-center rounded-2xl z-20">
+                        <button onclick="event.stopPropagation(); deleteMatchSchedule(${s.id})" class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold">ยืนยันลบ</button>
+                        <button onclick="event.stopPropagation(); toggleDeleteBtn(${s.id})" class="ml-2 bg-gray-600 text-white px-4 py-2 rounded-lg font-bold">ยกเลิก</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // คืนค่า Banner ที่มีปุ่มแก้ไขวันที่
         return `
-            <div class="p-2 rounded-lg mb-4 font-bold text-center text-black tracking-widest uppercase text-lg" 
+            <div class="flex flex-wrap items-center justify-between p-3 rounded-lg mb-4 font-bold text-black tracking-widest uppercase text-lg gap-3 shadow-md" 
                  style="background-color: ${cPillColor}; transform: skewX(-10deg);">
-                 ${key}
+                
+                <div class="flex items-center gap-2 px-2" style="transform: skewX(10deg);">
+                    <i class="fas fa-calendar-day"></i>
+                    WEEK ${weekNum}
+                </div>
+
+                <div class="flex items-center gap-2 bg-black/10 px-3 py-1 rounded border border-black/10" style="transform: skewX(10deg);">
+                    <span class="text-[9px] font-black opacity-50">แก้ไขวันที่:</span>
+                    <input type="date" 
+                           value="${weekDate}" 
+                           onchange="updateWeekDateByInput(${weekNum}, this.value)"
+                           class="bg-transparent border-none text-xs font-bold focus:outline-none cursor-pointer">
+                </div>
             </div>
             <div class="week-sortable-container">
                 ${matchesHtml}
@@ -1534,25 +1553,18 @@ function renderSchedule() {
 
     cont.innerHTML = html || '<p class="text-center text-gray-500 py-10">ไม่มีโปรแกรมการแข่งขัน</p>';
 
-// --- ส่วนสำคัญ: เรียกใช้ SortableJS ทันทีหลังจากสร้าง HTML เสร็จ ---
+    // เรียกใช้ SortableJS สำหรับลากวาง
     document.querySelectorAll('.week-sortable-container').forEach(el => {
         Sortable.create(el, {
             animation: 150,
             ghostClass: 'bg-yellow-500/20', 
             onEnd: function() {
-                // 1. เรียกใช้ฟังก์ชันคำนวณเวลาใหม่ (ถ้ามี)
-                if (typeof updateAllMatchTimes === 'function') {
-                    updateAllMatchTimes();
-                }
-
-                // 2. เรียกใช้ฟังก์ชันบันทึกลำดับ (ที่คุณเพิ่งสร้างไว้ต่อจาก Theme)
-                if (typeof saveScheduleOrder === 'function') {
-                    saveScheduleOrder();
-                }
+                if (typeof updateAllMatchTimes === 'function') updateAllMatchTimes();
+                if (typeof saveScheduleOrder === 'function') saveScheduleOrder();
             }
         });
     });
-} // ปิดฟังก์ชัน renderSchedule
+}
         
 
 function updateAllMatchTimes() {
@@ -2595,8 +2607,29 @@ function openSettingsModal() {
     document.getElementById('secondary-color-input').value = secondaryColor || '#1c365b';
     document.getElementById('settings-modal').classList.remove('hidden');
 }
-        
-        
+
+// ฟังก์ชันสำหรับเปลี่ยนวันที่ทั้งสัปดาห์เมื่อมีการแก้จากหน้าเว็บ
+function updateWeekDateByInput(weekNum, newDate) {
+    if (!newDate) return;
+
+    // แก้ไขวันที่ในตัวแปร schedules ทุกคู่ที่เลข Week ตรงกัน
+    schedules = schedules.map(s => {
+        if (parseInt(s.week) === parseInt(weekNum)) {
+            return { ...s, date: newDate };
+        }
+        return s;
+    });
+
+    save(); // บันทึกลง LocalStorage (ฟังก์ชันเดิมในไฟล์คุณ)
+    renderSchedule(); // วาดหน้าจอใหม่ทันที
+    
+    // อัปเดตหน้า Dashboard ถ้ามีฟังก์ชันนี้
+    if (typeof renderDashboard === "function") renderDashboard();
+    
+    console.log("Updated Week " + weekNum + " to " + newDate);
+}
+
+
     </script>
 </body>
 </html>
