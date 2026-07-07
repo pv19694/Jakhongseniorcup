@@ -2484,50 +2484,76 @@ function clearSchedule() {
     }
 }
 
+
 function generateSchedule() {
-    // ดึงค่าวันที่เริ่มต้นจาก Input (สมมติว่าเป็นวันที่ของ Week 1)
+    // 1. ดึงค่าวันที่เริ่มต้นจาก Input
     let startDateStr = document.getElementById('start-date').value;
     if (!startDateStr) {
         alert("กรุณาเลือกวันที่เริ่มต้น (Week 1)");
         return;
     }
 
+    // ตรวจสอบขั้นต่ำในการจัดลีก
     let tempTeams = [...teams];
-    if (tempTeams.length < 8) {
-        alert("กรุณาเพิ่มทีมให้ครบ 8 ทีมก่อนสร้างโปรแกรม");
+    if (tempTeams.length < 2) {
+        alert("กรุณาเพิ่มทีมอย่างน้อย 2 ทีมก่อนสร้างโปรแกรม");
         return;
     }
 
-    // Shuffle ทีมเพื่อความสุ่มในการจัดตาราง
-    tempTeams.sort(() => Math.random() - 0.5);
+    // หากจำนวนทีมเป็นเลขคี่ จะแถมทีม BYE เพื่อให้จับคู่ได้ลงล็อก
+    if (tempTeams.length % 2 !== 0) {
+        tempTeams.push({ id: "BYE", name: "BYE (ไม่มีการแข่ง)" });
+    }
+
+    // ==========================================
+    // ✨ ส่วนแก้ไขที่ 1: ระบบสุ่มคละทีมที่แท้จริง (Fisher-Yates Shuffle)
+    // ==========================================
+    for (let i = tempTeams.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [tempTeams[i], tempTeams[j]] = [tempTeams[j], tempTeams[i]];
+    }
+    // ==========================================
+
+    let numTeams = tempTeams.length;
+    let totalRounds = numTeams - 1; // จำนวนสัปดาห์ทั้งหมดที่จะต้องแข่ง (เช่น 8 ทีม แข่ง 7 สัปดาห์)
+    let matchesPerRound = numTeams / 2;
 
     let newMatches = [];
     let startDate = new Date(startDateStr);
 
-    // วนลูปสร้างการแข่งขัน 7 สัปดาห์ (Round Robin 7 Rounds)
-    for (let round = 0; round < 7; round++) {
+    // 2. วนลูปสร้างการแข่งขันตามจำนวนสัปดาห์จริง (Dynamic Rounds)
+    for (let round = 0; round < totalRounds; round++) {
         let matchDay = new Date(startDate);
         
-        // --- ส่วนแก้ไขเงื่อนไขวันที่ตามที่คุณต้องการ ---
+        // จัดการเงื่อนไขวันที่ล็อกตามที่คุณเคยตั้งค่าไว้
         if (round < 2) { 
-            // WEEK 1 (round 0) และ WEEK 2 (round 1) 
-            // ให้คำนวณจากวันที่เริ่มต้นที่เลือกมา บวกไปสัปดาห์ละ 7 วัน
+            // WEEK 1 และ WEEK 2 บวกไปสัปดาห์ละ 7 วันจากวันที่เลือก
             matchDay.setDate(startDate.getDate() + (round * 7));
         } else {
-            // ตั้งแต่ WEEK 3 (round 2) เป็นต้นไป 
-            // บังคับให้เริ่มนับใหม่จากวันที่ 8 มีนาคม 2026 (พ.ศ. 2569)
+            // ตั้งแต่ WEEK 3 เป็นต้นไป บังคับให้เริ่มนับใหม่จากวันที่ 8 มีนาคม 2026
             let week3Date = new Date('2026-03-08'); 
             matchDay.setDate(week3Date.getDate() + ((round - 2) * 7));
         }
-        // ---------------------------------------
 
         let dateStr = matchDay.toISOString().split('T')[0];
         let currentRoundMatches = [];
 
-        // จัดคู่แข่งขัน (Circle Method แบบประยุกต์สำหรับ 8 ทีม)
-        for (let i = 0; i < 4; i++) {
-            let teamA = tempTeams[i];
-            let teamB = tempTeams[7 - i];
+        // 3. จัดคู่แข่งขันแบบพบกันหมด (Round Robin Algorithm แบบยืดหยุ่นรองรับ N ทีม)
+        for (let i = 0; i < matchesPerRound; i++) {
+            let homeIdx = (round + i) % (numTeams - 1);
+            let awayIdx = (numTeams - 1 - i + round) % (numTeams - 1);
+
+            if (i === 0) {
+                awayIdx = numTeams - 1;
+            }
+
+            let teamA = tempTeams[homeIdx];
+            let teamB = tempTeams[awayIdx];
+
+            // ข้ามแมทช์ที่ต้องแข่งกับทีม BYE (ไม่ต้องโชว์ในตาราง)
+            if (teamA.id === "BYE" || teamB.id === "BYE") {
+                continue;
+            }
             
             currentRoundMatches.push({
                 id: Date.now() + Math.random(),
@@ -2535,7 +2561,7 @@ function generateSchedule() {
                 week: round + 1,
                 teamA: teamA.id, 
                 teamB: teamB.id,
-                group: (i < 2) ? 'A' : 'B', // แบ่งกลุ่ม A/B ตามคู่
+                group: (i < matchesPerRound / 2) ? 'A' : 'B', // แบ่งกลุ่มครึ่งๆ ตามคู่แข่งขันจริง
                 scoreA: "", 
                 scoreB: "", 
                 played: false
@@ -2544,11 +2570,11 @@ function generateSchedule() {
 
         newMatches.push(...currentRoundMatches);
 
-        // หมุนทีม (ยกเว้นทีมแรกที่ตำแหน่ง [0]) เพื่อจัดรอบถัดไป
+        // หมุนทีมเพื่อจัดตารางในรอบถัดไป
         tempTeams.splice(1, 0, tempTeams.pop());
     }
 
-    // บันทึกข้อมูลลงในตัวแปรหลักและ LocalStorage
+    // 4. บันทึกข้อมูลลงในตัวแปรหลักและ LocalStorage
     matches = newMatches;
     save(); 
     
@@ -2556,8 +2582,9 @@ function generateSchedule() {
     if (typeof renderSchedule === "function") renderSchedule();
     if (typeof renderDashboard === "function") renderDashboard();
     
-    alert("สร้างโปรแกรมการแข่งขันใหม่เรียบร้อยแล้ว! (WEEK 3 เริ่มวันที่ 08/03/69)");
+    alert(`สร้างโปรแกรมการแข่งขันสำเร็จ! รองรับทีมทั้งหมดในระบบเรียบร้อย (รวมแข่งทั้งหมด ${totalRounds} สัปดาห์)`);
 }
+
 
 
         // ฟังก์ชันสำหรับสลับการแสดงผลหน้าต่างลบแมตช์
