@@ -2485,7 +2485,8 @@ function clearSchedule() {
 }
 
 
-function generateSchedule() {
+// เปลี่ยนชื่อเป็น autoGenerateLeague ให้ตรงกับที่ปุ่มเรียกใช้งาน
+function autoGenerateLeague() {
     // 1. ดึงค่าวันที่เริ่มต้นจาก Input
     let startDateStr = document.getElementById('start-date').value;
     if (!startDateStr) {
@@ -2493,7 +2494,7 @@ function generateSchedule() {
         return;
     }
 
-    // ตรวจสอบขั้นต่ำในการจัดลีก
+    // ตรวจสอบขั้นต่ำในการจัดลีก (ดึงจากตัวแปร teams ในระบบของคุณ)
     let tempTeams = [...teams];
     if (tempTeams.length < 2) {
         alert("กรุณาเพิ่มทีมอย่างน้อย 2 ทีมก่อนสร้างโปรแกรม");
@@ -2506,7 +2507,7 @@ function generateSchedule() {
     }
 
     // ==========================================
-    // ✨ ส่วนแก้ไขที่ 1: ระบบสุ่มคละทีมที่แท้จริง (Fisher-Yates Shuffle)
+    // ✨ ระบบสุ่มคละทีมที่แท้จริง (Fisher-Yates Shuffle)
     // ==========================================
     for (let i = tempTeams.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -2515,13 +2516,13 @@ function generateSchedule() {
     // ==========================================
 
     let numTeams = tempTeams.length;
-    let totalRounds = numTeams - 1; // จำนวนสัปดาห์ทั้งหมดที่จะต้องแข่ง (เช่น 8 ทีม แข่ง 7 สัปดาห์)
+    let totalRounds = numTeams - 1; // จำนวนสัปดาห์ทั้งหมดที่จะต้องแข่ง
     let matchesPerRound = numTeams / 2;
 
     let newMatches = [];
     let startDate = new Date(startDateStr);
 
-    // 2. วนลูปสร้างการแข่งขันตามจำนวนสัปดาห์จริง (Dynamic Rounds)
+    // 2. วนลูปสร้างการแข่งขันตามจำนวนสัปดาห์จริง
     for (let round = 0; round < totalRounds; round++) {
         let matchDay = new Date(startDate);
         
@@ -2538,7 +2539,7 @@ function generateSchedule() {
         let dateStr = matchDay.toISOString().split('T')[0];
         let currentRoundMatches = [];
 
-        // 3. จัดคู่แข่งขันแบบพบกันหมด (Round Robin Algorithm แบบยืดหยุ่นรองรับ N ทีม)
+        // 3. จัดคู่แข่งขันแบบพบกันหมด (Round Robin) รองรับทุกจำนวนทีม
         for (let i = 0; i < matchesPerRound; i++) {
             let homeIdx = (round + i) % (numTeams - 1);
             let awayIdx = (numTeams - 1 - i + round) % (numTeams - 1);
@@ -2550,7 +2551,7 @@ function generateSchedule() {
             let teamA = tempTeams[homeIdx];
             let teamB = tempTeams[awayIdx];
 
-            // ข้ามแมทช์ที่ต้องแข่งกับทีม BYE (ไม่ต้องโชว์ในตาราง)
+            // ข้ามแมทช์ที่ต้องแข่งกับทีม BYE
             if (teamA.id === "BYE" || teamB.id === "BYE") {
                 continue;
             }
@@ -2561,7 +2562,7 @@ function generateSchedule() {
                 week: round + 1,
                 teamA: teamA.id, 
                 teamB: teamB.id,
-                group: (i < matchesPerRound / 2) ? 'A' : 'B', // แบ่งกลุ่มครึ่งๆ ตามคู่แข่งขันจริง
+                group: (i < matchesPerRound / 2) ? 'A' : 'B', // แบ่งกลุ่มครึ่งๆ ตามคู่แข่งขัน
                 scoreA: "", 
                 scoreB: "", 
                 played: false
@@ -2574,17 +2575,16 @@ function generateSchedule() {
         tempTeams.splice(1, 0, tempTeams.pop());
     }
 
-    // 4. บันทึกข้อมูลลงในตัวแปรหลักและ LocalStorage
+    // 4. บันทึกข้อมูลลงในตัวแปรหลักของโปรแกรมและ LocalStorage
     matches = newMatches;
     save(); 
     
-    // อัปเดตการแสดงผลบนหน้าจอ
+    // อัปเดตการแสดงผลบนหน้าจอตามฟังก์ชันเดิมของคุณ
     if (typeof renderSchedule === "function") renderSchedule();
     if (typeof renderDashboard === "function") renderDashboard();
     
-    alert(`สร้างโปรแกรมการแข่งขันสำเร็จ! รองรับทีมทั้งหมดในระบบเรียบร้อย (รวมแข่งทั้งหมด ${totalRounds} สัปดาห์)`);
+    alert(`จัดลีกอัตโนมัติสำเร็จ! คละตารางแข่งให้ใหม่เรียบร้อย (รวมแข่งทั้งหมด ${totalRounds} สัปดาห์)`);
 }
-
 
 
         // ฟังก์ชันสำหรับสลับการแสดงผลหน้าต่างลบแมตช์
