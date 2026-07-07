@@ -2485,7 +2485,7 @@ function clearSchedule() {
 }
 
 
-// เปลี่ยนชื่อเป็น autoGenerateLeague ให้ตรงกับที่ปุ่มเรียกใช้งาน
+// ฟังก์ชันจัดลีกอัตโนมัติ สุ่มคละทีม รองรับทุกจำนวนทีม
 function autoGenerateLeague() {
     // 1. ดึงค่าวันที่เริ่มต้นจาก Input
     let startDateStr = document.getElementById('start-date').value;
@@ -2494,12 +2494,13 @@ function autoGenerateLeague() {
         return;
     }
 
-    // ตรวจสอบขั้นต่ำในการจัดลีก (ดึงจากตัวแปร teams ในระบบของคุณ)
-    let tempTeams = [...teams];
-    if (tempTeams.length < 2) {
+    // ตรวจสอบขั้นต่ำในการจัดลีก (ใช้ตัวแปร teams จากระบบของคุณ)
+    if (!teams || teams.length < 2) {
         alert("กรุณาเพิ่มทีมอย่างน้อย 2 ทีมก่อนสร้างโปรแกรม");
         return;
     }
+
+    let tempTeams = [...teams];
 
     // หากจำนวนทีมเป็นเลขคี่ จะแถมทีม BYE เพื่อให้จับคู่ได้ลงล็อก
     if (tempTeams.length % 2 !== 0) {
@@ -2537,7 +2538,6 @@ function autoGenerateLeague() {
         }
 
         let dateStr = matchDay.toISOString().split('T')[0];
-        let currentRoundMatches = [];
 
         // 3. จัดคู่แข่งขันแบบพบกันหมด (Round Robin) รองรับทุกจำนวนทีม
         for (let i = 0; i < matchesPerRound; i++) {
@@ -2556,7 +2556,7 @@ function autoGenerateLeague() {
                 continue;
             }
             
-            currentRoundMatches.push({
+            newMatches.push({
                 id: Date.now() + Math.random(),
                 date: dateStr,
                 week: round + 1,
@@ -2569,14 +2569,12 @@ function autoGenerateLeague() {
             });
         }
 
-        newMatches.push(...currentRoundMatches);
-
         // หมุนทีมเพื่อจัดตารางในรอบถัดไป
         tempTeams.splice(1, 0, tempTeams.pop());
     }
 
-    // 4. บันทึกข้อมูลลงในตัวแปรหลักของโปรแกรมและ LocalStorage
-    matches = newMatches;
+    // 4. ✨ แก้ไขจุดสำคัญ: เปลี่ยนจาก matches เป็น schedules เพื่อให้ตรงระบบเดิมของคุณ
+    schedules = newMatches;
     save(); 
     
     // อัปเดตการแสดงผลบนหน้าจอตามฟังก์ชันเดิมของคุณ
