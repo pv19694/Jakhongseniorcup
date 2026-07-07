@@ -2485,69 +2485,60 @@ function clearSchedule() {
 }
 
 
-// ฟังก์ชันจัดลีกอัตโนมัติ สุ่มคละทีม รองรับทุกจำนวนทีม (เวอร์ชันแก้ไขบั๊กวันที่)
+// ฟังก์ชันจัดลีกอัตโนมัติ พบกันหมดแบบไม่ซ้ำคู่ (Round-Robin Tournament)
 function autoGenerateLeague() {
-    // ตรวจสอบขั้นต่ำในการจัดลีก (ใช้ตัวแปร teams จากระบบของคุณ)
-    if (!teams || teams.length < 2) {
+    let tempTeams = [...teams];
+    
+    // 1. ตรวจสอบขั้นต่ำในการจัดลีก
+    if (tempTeams.length < 2) {
         alert("กรุณาเพิ่มทีมอย่างน้อย 2 ทีมก่อนสร้างโปรแกรม");
         return;
     }
 
-    let tempTeams = [...teams];
-
-    // หากจำนวนทีมเป็นเลขคี่ จะแถมทีม BYE เพื่อให้จับคู่ได้ลงล็อก
+    // 2. หากจำนวนทีมเป็นเลขคี่ จะเติมทีม BYE เพื่อจับคู่ให้ลงล็อก
     if (tempTeams.length % 2 !== 0) {
         tempTeams.push({ id: "BYE", name: "BYE (ไม่มีการแข่ง)" });
     }
 
-    // ==========================================
-    // ✨ ระบบสุ่มคละทีมที่แท้จริง (Fisher-Yates Shuffle)
-    // ==========================================
+    // 3. ✨ ระบบสุ่มคละลำดับทีมเริ่มต้น (เพื่อให้การจัดโปรแกรมแต่ละครั้งไม่ซ้ำแบบเดิม)
     for (let i = tempTeams.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [tempTeams[i], tempTeams[j]] = [tempTeams[j], tempTeams[i]];
     }
-    // ==========================================
 
     let numTeams = tempTeams.length;
-    let totalRounds = numTeams - 1; // จำนวนสัปดาห์ทั้งหมดที่จะต้องแข่ง
+    let totalRounds = numTeams - 1; // 8 ทีม จะได้ทั้งหมด 7 สัปดาห์พอดี
     let matchesPerRound = numTeams / 2;
-
     let newMatches = [];
     
-    // ✨ แก้ไขจุดบั๊กหลัก: ตรวจสอบช่องกรอกวันที่ ถ้าไม่มีบนหน้าจอให้ใช้วันที่ปัจจุบันแทนอัติโนมัติ โดนโค้ดจะไม่ค้าง
+    // ตั้งค่าวันที่เริ่มต้น หากไม่มี input วันที่บนจอให้ใช้วันที่ปัจจุบัน
     let startDateInput = document.getElementById('start-date');
     let startDate = (startDateInput && startDateInput.value) ? new Date(startDateInput.value) : new Date();
 
-    // 2. วนลูปสร้างการแข่งขันตามจำนวนสัปดาห์จริง
+    // 4. ✨ ลอจิกแบบพบกันหมดมาตรฐานสากล (Circle Method / Round-Robin)
+    // ลอจิกนี้จะการันตี 100% ว่าแต่ละทีมจะเจอกันคนละ 1 ครั้งจนครบกำหนด โดยไม่มีคู่ซ้ำซ้อน
     for (let round = 0; round < totalRounds; round++) {
         let matchDay = new Date(startDate);
         
-        // จัดการเงื่อนไขวันที่ล็อกตามที่คุณเคยตั้งค่าไว้
+        // จัดการเงื่อนไขวันล็อกตามโครงสร้างเดิมของคุณ
         if (round < 2) { 
-            // WEEK 1 และ WEEK 2 บวกไปสัปดาห์ละ 7 วันจากวันที่เลือก
             matchDay.setDate(startDate.getDate() + (round * 7));
         } else {
-            // ตั้งแต่ WEEK 3 เป็นต้นไป บังคับให้เริ่มนับใหม่จากวันที่ 8 มีนาคม 2026
             let week3Date = new Date('2026-03-08'); 
             matchDay.setDate(week3Date.getDate() + ((round - 2) * 7));
         }
 
         let dateStr = matchDay.toISOString().split('T')[0];
 
-        // 3. จัดคู่แข่งขันแบบพบกันหมด (Round Robin) รองรับทุกจำนวนทีม
         for (let i = 0; i < matchesPerRound; i++) {
-            let homeIdx = (round + i) % (numTeams - 1);
-            let awayIdx = (numTeams - 1 - i + round) % (numTeams - 1);
-
-            if (i === 0) {
-                awayIdx = numTeams - 1;
-            }
+            // คำนวณแบบสลับฝั่งซ้ายและขวาของตารางวงกลม
+            let homeIdx = i;
+            let awayIdx = numTeams - 1 - i;
 
             let teamA = tempTeams[homeIdx];
             let teamB = tempTeams[awayIdx];
 
-            // ข้ามแมทช์ที่ต้องแข่งกับทีม BYE
+            // ข้ามแมทช์ที่ต้องเจอกับทีม BYE (ทีมที่ได้บายสัปดาห์นั้นจะไม่มีประวัติแมทช์ขึ้น)
             if (teamA.id === "BYE" || teamB.id === "BYE") {
                 continue;
             }
@@ -2558,26 +2549,31 @@ function autoGenerateLeague() {
                 week: round + 1,
                 teamA: teamA.id, 
                 teamB: teamB.id,
-                group: (i < matchesPerRound / 2) ? 'A' : 'B', // แบ่งกลุ่มครึ่งๆ ตามคู่แข่งขัน
+                group: (i < matchesPerRound / 2) ? 'A' : 'B', // แบ่งกลุ่มตามโครงสร้างเดิม
                 scoreA: "", 
-                scoreB: "", 
+                scoreB: "",
                 played: false
             });
         }
 
-        // หมุนทีมเพื่อจัดตารางในรอบถัดไป
-        tempTeams.splice(1, 0, tempTeams.pop());
+        // ✨ หัวใจสำคัญ: ทำการหมุนทีม (Rotate) โดยล็อกทีมแรก (index 0) ไว้กับที่ 
+        // แล้วเลื่อนทีมอื่นเวียนไปตามเข็มนาฬิกาเพื่อเปลี่ยนคู่ในสัปดาห์ถัดไป
+        let rotatedTeams = [tempTeams[0]]; // ล็อกทีมแรกไว้
+        rotatedTeams.push(tempTeams[numTeams - 1]); // เอาทีมท้ายสุดมาใส่ช่องที่สอง
+        for (let k = 1; k < numTeams - 1; k++) {
+            rotatedTeams.push(tempTeams[k]); // ขยับทีมอื่น ๆ ถอยไปคนละช่อง
+        }
+        tempTeams = rotatedTeams; // อัปเดตตารางทีมเพื่อใช้จับคู่ในสัปดาห์ถัดไป
     }
 
-    // 4. บันทึกข้อมูลลงในตัวแปรหลักของโปรแกรมและ LocalStorage
+    // 5. บันทึกข้อมูลลงในระบบ และอัปเดตหน้าจอ
     schedules = newMatches;
-    save(); 
+    save();
     
-    // อัปเดตการแสดงผลบนหน้าจอตามฟังก์ชันเดิมของคุณ
     if (typeof renderSchedule === "function") renderSchedule();
     if (typeof renderDashboard === "function") renderDashboard();
     
-    alert(`จัดลีกอัตโนมัติสำเร็จ! คละตารางแข่งให้ใหม่เรียบร้อย (รวมแข่งทั้งหมด ${totalRounds} สัปดาห์)`);
+    alert(`จัดลีกอัตโนมัติสำเร็จ! คละตารางแข่งแบบพบกันหมดไม่ซ้ำคู่เรียบร้อย (รวมแข่งทั้งหมด ${totalRounds} สัปดาห์)`);
 }
 
 
