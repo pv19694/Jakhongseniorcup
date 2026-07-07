@@ -2485,15 +2485,8 @@ function clearSchedule() {
 }
 
 
-// ฟังก์ชันจัดลีกอัตโนมัติ สุ่มคละทีม รองรับทุกจำนวนทีม
+// ฟังก์ชันจัดลีกอัตโนมัติ สุ่มคละทีม รองรับทุกจำนวนทีม (เวอร์ชันแก้ไขบั๊กวันที่)
 function autoGenerateLeague() {
-    // 1. ดึงค่าวันที่เริ่มต้นจาก Input
-    let startDateStr = document.getElementById('start-date').value;
-    if (!startDateStr) {
-        alert("กรุณาเลือกวันที่เริ่มต้น (Week 1)");
-        return;
-    }
-
     // ตรวจสอบขั้นต่ำในการจัดลีก (ใช้ตัวแปร teams จากระบบของคุณ)
     if (!teams || teams.length < 2) {
         alert("กรุณาเพิ่มทีมอย่างน้อย 2 ทีมก่อนสร้างโปรแกรม");
@@ -2521,7 +2514,10 @@ function autoGenerateLeague() {
     let matchesPerRound = numTeams / 2;
 
     let newMatches = [];
-    let startDate = new Date(startDateStr);
+    
+    // ✨ แก้ไขจุดบั๊กหลัก: ตรวจสอบช่องกรอกวันที่ ถ้าไม่มีบนหน้าจอให้ใช้วันที่ปัจจุบันแทนอัติโนมัติ โดนโค้ดจะไม่ค้าง
+    let startDateInput = document.getElementById('start-date');
+    let startDate = (startDateInput && startDateInput.value) ? new Date(startDateInput.value) : new Date();
 
     // 2. วนลูปสร้างการแข่งขันตามจำนวนสัปดาห์จริง
     for (let round = 0; round < totalRounds; round++) {
@@ -2573,7 +2569,7 @@ function autoGenerateLeague() {
         tempTeams.splice(1, 0, tempTeams.pop());
     }
 
-    // 4. ✨ แก้ไขจุดสำคัญ: เปลี่ยนจาก matches เป็น schedules เพื่อให้ตรงระบบเดิมของคุณ
+    // 4. บันทึกข้อมูลลงในตัวแปรหลักของโปรแกรมและ LocalStorage
     schedules = newMatches;
     save(); 
     
